@@ -1,0 +1,2348 @@
+<Shapes xmlns="http://www.evolus.vn/Namespace/Pencil"
+        xmlns:p="http://www.evolus.vn/Namespace/Pencil"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        id="Evolus.UI.StencilBuilder"
+        displayName="Stencil Builder"
+        description="Meta shapes to build stencils"
+        version="1.0"
+        author="Duong Thanh An">
+    <Script comments="">
+        <![CDATA[
+            collection.generateContribution = function (targetElementNameSuffix, contribution, propName, displayName, type, behaviorNames, expressionConverter, meta) {
+                var mode = this.getProperty(propName + "Mode").value;
+                var currentValue = this.getProperty(propName);
+
+                var targetElementName = contribution.targetElementName + targetElementNameSuffix;
+
+                var info = {};
+
+                if (mode == "primary") {
+                    info.prop = {
+                        name: propName,
+                        displayName: displayName,
+                        type: type,
+                        value: currentValue.toString(),
+                        meta: meta || {}
+                    };
+                    contribution.properties.push(info.prop);
+
+                    info.valueLiteral = "$" + propName;
+                    info.realValueLiteral = info.valueLiteral;
+
+                    if (behaviorNames) for (var behaviorName of behaviorNames.split(",")) contribution.addBehavior(targetElementName, behaviorName, [expressionConverter ? expressionConverter(info.valueLiteral) : info.valueLiteral]);
+                    return info;
+                } else if (mode == "secondary") {
+                    info.prop = {
+                        name: propName + "2",
+                        displayName: "Other " + displayName,
+                        type: type,
+                        value: currentValue.toString(),
+                        meta: meta || {}
+                    };
+                    contribution.properties.push(info.prop);
+
+                    info.valueLiteral = "$" + propName + "2";
+                    info.realValueLiteral = info.valueLiteral;
+
+                    if (behaviorNames) for (var behaviorName of behaviorNames.split(",")) contribution.addBehavior(targetElementName, behaviorName, [expressionConverter ? expressionConverter(info.valueLiteral) : info.valueLiteral]);
+                    return info;
+                } else if (mode == "expression") {
+                    info.valueLiteral = this.getProperty(propName + "Expression").value;
+                    info.realValueLiteral = info.valueLiteral;
+
+                    if (behaviorNames) for (var behaviorName of behaviorNames.split(",")) contribution.addBehavior(targetElementName, behaviorName, [expressionConverter ? expressionConverter(info.valueLiteral) : info.valueLiteral]);
+                    return info;
+                } else if (mode.startsWith("#")) {
+                    info.prop = {
+                        name: mode.substring(1),
+                        displayName: mode.substring(1),
+                        type: type,
+                        value: currentValue.toString(),
+                        meta: meta || {}
+                    };
+                    contribution.properties.push(info.prop);
+
+                    info.valueLiteral = "$" + info.prop.name;
+                    info.realValueLiteral = info.valueLiteral;
+
+                    if (behaviorNames) for (var behaviorName of behaviorNames.split(",")) contribution.addBehavior(targetElementName, behaviorName, [expressionConverter ? expressionConverter(info.valueLiteral) : info.valueLiteral]);
+                    return info;
+                } else {
+                    info.valueLiteral = type.name + ".fromString(\"" + this.getProperty(propName).toString() + "\")";
+                    info.realValueLiteral = info.valueLiteral;
+                    info._fixed = true;
+
+                    if (behaviorNames) for (var behaviorName of behaviorNames.split(",")) contribution.addBehavior(targetElementName, behaviorName, [expressionConverter ? expressionConverter(info.valueLiteral) : info.valueLiteral]);
+                    return info;
+                }
+
+                try {
+                    info.realValueLiteral = type.name + ".fromString(\"" + this.getProperty(propName).toString() + "\")";
+                } catch (e) {};
+
+                return info;
+            };
+            collection.generateElementName = function (shapeNode) {
+                var shapeDefId = shapeNode.getAttributeNS(PencilNamespaces.p, "def");
+                var id = shapeNode.getAttribute("id");
+
+                var svg = Dom.findUpward(shapeNode, function (node) {
+                        return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                    });
+
+                var count = 0;
+                var found = false;
+                Dom.workOn(".//svg:g[@p:type='Shape'][@p:def='" + shapeDefId + "']", svg, function (shapeNode) {
+                    if (shapeNode.getAttribute("id") == id) {
+                        found = true;
+                    } else if (!found) count ++;
+                });
+
+                var simpleName = shapeDefId.substring(shapeDefId.indexOf(":") + 1);
+                return simpleName + count;
+            };
+            collection.contributeContentDomNode = function (target, contentDomNodeName, contribution, suffix, options) {
+                if (contribution._contributedDomNode[contentDomNodeName]) return;
+                contribution._contributedDomNode[contentDomNodeName] = true;
+
+                var targetElementName = contribution.targetElementName;
+
+                if (contentDomNodeName) {
+                    var node = Dom.getSingle(".//*[@p:name='" + contentDomNodeName + "']", target.svg);
+                    if (node) {
+                        var parentNode = node.parentNode;
+
+                        node = node.cloneNode(true);
+                        node.setAttribute("id", targetElementName + (suffix || ""));
+                        node.removeAttributeNS(PencilNamespaces.p, "name");
+
+                        if (options) {
+                            if (options.empty) Dom.empty(node);
+                            if (options.noStyle) node.removeAttribute("style");
+                        }
+
+                        if (!options || !options.keepFilter) {
+                            node.removeAttribute("filter");
+                        }
+
+                        if (target.getProperty("boundMode") == "fixed") {
+                            var svg = Dom.findUpward(target.svg, function (node) {
+                                    return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                                });
+
+                            var ctm = parentNode.getTransformToElement(svg);
+                            if (ctm) {
+                                var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+                                ctm.e -= pageMargin;
+                                ctm.f -= pageMargin;
+
+                                var g = node.ownerDocument.createElementNS(PencilNamespaces.svg, "g");
+                                g.setAttribute("transform", Svg.toTransformText(ctm));
+                                g.appendChild(node);
+                                node = g;
+                            }
+                        } else {
+                            node.removeAttribute("transform");
+                        }
+
+                        contribution.contentFragment.appendChild(node);
+                    }
+                }
+            };
+            collection.performPostProcessing = function (contribution) {
+                var shadowModeProp = this.getProperty("shadowStyleMode");
+                if (!shadowModeProp) {
+                    return;
+                }
+                var shadowMode = shadowModeProp.value;
+                if (shadowMode == "none") return;
+
+                if (!contribution.contentFragment) return;
+
+                var shadowStyleInfo = this.def.collection.generateContribution.call(this, "", contribution, "shadowStyle", "Shadow Style", ShadowStyle);
+                var globalGroupNode = Dom.newDOMElement({
+                    _name: "g",
+                    _uri: PencilNamespaces.svg,
+                    id: contribution.targetElementName + "_globalGroup",
+                    "p:filter": "url(#" + contribution.targetElementName + "_shadowFilter" + ")"});
+
+                while (contribution.contentFragment.firstChild) {
+                    globalGroupNode.appendChild(contribution.contentFragment.removeChild(contribution.contentFragment.firstChild));
+                }
+
+                contribution.contentFragment.appendChild(Dom.newDOMElement({
+                    _name: "defs", _uri: PencilNamespaces.svg,
+                    _children: [
+                        { _name: "filter", _uri: PencilNamespaces.svg, id: contribution.targetElementName + "_shadowFilter", x: "-50%", width: "200%", y: "-50%", height: "200%" }
+                    ]
+                }));
+                contribution.contentFragment.appendChild(globalGroupNode);
+
+                contribution.addBehavior(contribution.targetElementName + "_shadowFilter", "DomContent",
+                    [`(function () {
+                        var shadowStyle = ${shadowStyleInfo.valueLiteral};
+                        return Dom.newDOMFragment(
+                        [
+                            { _name: "feGaussianBlur", _uri: PencilNamespaces.svg, in: "SourceAlpha", stdDeviation: shadowStyle.size },
+                            { _name: "feOffset", _uri: PencilNamespaces.svg, dx: shadowStyle.dx, dy: shadowStyle.dy },
+                            { _name: "feComponentTransfer", _uri: PencilNamespaces.svg, _children: [
+                                { _name: "feFuncA", _uri: PencilNamespaces.svg, type: "linear", slope: shadowStyle.opacity }
+                            ]},
+                            { _name: "feMerge", _uri: PencilNamespaces.svg, _children: [
+                                { _name: "feMergeNode", _uri: PencilNamespaces.svg },
+                                { _name: "feMergeNode", _uri: PencilNamespaces.svg, in: "SourceGraphic" }
+                            ]}
+                        ]);
+                    }())`]);
+                contribution.addBehavior(contribution.targetElementName + "_globalGroup", "ApplyFilter",
+                    [`(${shadowStyleInfo.valueLiteral}.opacity) ? true : false`]);
+            };
+            collection.copyClipboardImage = function (target, imageDataPropName, boxPropName) {
+                try {
+                    var image = clipboard.readImage();
+                    if (image) {
+                        var id = Pencil.controller.nativeImageToRefSync(image);
+
+                        var size = image.getSize();
+                        var newImageData = new ImageData(size.width, size.height, ImageData.idToRefString(id));
+                        target.setProperty(imageDataPropName, newImageData);
+                        if (boxPropName) target.setProperty(boxPropName, new Dimension(size.width, size.height));
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+
+            collection.copyClipboardSVGImage = function (target, imageDataPropName, boxPropName, dontParsePathData) {
+                var thiz = target;
+
+                var text = clipboard.readText();
+
+                var dom = Canvas.domParser.parseFromString(text, "text/xml");
+
+                if (!dom || dom.documentElement.namespaceURI != PencilNamespaces.svg) {
+                    return;
+                }
+
+                var width = Svg.getWidth(dom);
+                var height = Svg.getHeight(dom);
+
+                //parse the provided svg viewBox
+                if (dom.documentElement.viewBox) {
+                    var viewBox = dom.documentElement.viewBox.baseVal;
+                    if (viewBox.width > 0 && viewBox.height > 0) {
+                        width = viewBox.width;
+                        height = viewBox.height;
+                    }
+                }
+
+                width = Math.round(width);
+                height = Math.round(height);
+
+                var data = "";
+
+                if (!dontParsePathData) {
+                    var parsedData = [];
+                    Dom.workOn("//svg:path[@d]", dom.documentElement, function (pathNode) {
+                        var d = pathNode.getAttribute("d");
+                        var parsed = thiz.def.collection.parsePathData(d);
+                        var pathInfo = {
+                            commands: parsed,
+                            style: pathNode.getAttribute("style")
+                        };
+                        parsedData.push(pathInfo);
+                    });
+
+                    var dim = new Dimension(width, height);
+                    if (boxPropName) target.setProperty(boxPropName, dim);
+
+                    data = "json:" + JSON.stringify(parsedData);
+                } else {
+                    data = ImageData.SVG_IMAGE_DATA_PREFIX + "," + text;
+                }
+
+                var imageData = new ImageData(width, height, data);
+                target.setProperty(imageDataPropName, imageData);
+            };
+
+            collection.buildNPatchModel = function (cells, originalSize, newSize) {
+                var totalScaleSize = 0;
+                for (var cell of cells) totalScaleSize += (cell.to - cell.from);
+
+                var r = (newSize - (originalSize - totalScaleSize)) / totalScaleSize;
+
+                var models = [];
+                var total = 0;
+                var scaledTotal = 0;
+                var last = false;
+
+                //add a sentinel
+                cells = cells.concat([{from: originalSize, to: originalSize + 1}]);
+
+                for (var i = 0; i < cells.length; i ++) {
+                    var cell = cells[i];
+                    if (cell.from == cell.to) continue;
+
+                    var last = (i == cell.length - 2);
+
+                    var model = null;
+                    if (cell.from > total) {
+                        model = {
+                            start: total,
+                            size: cell.from - total,
+                            scaledStart: scaledTotal,
+                            scale: false
+                        };
+
+                        models.push(model);
+                        total = cell.from;
+                        scaledTotal += model.size;
+                    }
+
+                    if (cell.from >= originalSize) break;
+
+                    var scaledSize = (last ? (newSize - (originalSize - cell.to) - scaledTotal) : (r * (cell.to - cell.from)));
+
+                    model = {
+                        start: total,
+                        size: cell.to - cell.from,
+                        scaledStart: scaledTotal,
+                        scaledSize: scaledSize,
+                        scale: true
+                    };
+
+                    model.r = model.scaledSize / model.size;
+
+                    models.push(model);
+                    total = cell.to;
+                    scaledTotal += model.scaledSize;
+                }
+
+                return models;
+            };
+
+            collection.parsePathData = function (pathDataLiteral) {
+                function normalize(pin) {
+                    pin.x = Math.round(pin.x);
+                    if (typeof(pin.y) == "number") pin.y = Math.round(pin.y);
+                }
+                function normalizeAll(pins) {
+                    for (var pin of pins) normalize(pin);
+                }
+
+                function processMultiPoints(points, current, chunk, relative) {
+                    var count = Math.ceil(points.length / chunk);
+                    for (var i = 0; i < count; i ++) {
+                        var pin = points[i * chunk + (chunk - 1)];
+
+                        for (var j = 0; j < (chunk - 1); j ++) {
+                            var p = points[i * chunk + j];
+                            if (relative) {
+                                p.x += current.x;
+                                p.y += current.y;
+                            }
+
+                            p.fixed = true;
+                        }
+
+                        normalize(pin);
+
+                        if (relative) {
+                            pin.x += current.x;
+                            pin.y += current.y;
+                        }
+                        current = pin;
+                    }
+
+                    return current;
+                }
+
+                //parse the original data
+                var RE = /([A-Z])([^A-DF-Z]*)/gi;
+                var commands = [];
+                var result = null;
+                var current = {x: 0, y: 0};
+                while ((result = RE.exec(pathDataLiteral))) {
+                    var c = result[1];
+                    var command = {
+                        command: c.toUpperCase()
+                    };
+                    var data = result[2].trim();
+                    if (data) {
+                        var DATA_RE = /(\-?[0-9\.eE\-]+)(\,(\-?[0-9\.eE\-]+))?/g;
+                        var points = [];
+                        var result2 = null;
+                        while ((result2 = DATA_RE.exec(data))) {
+                            var x = parseFloat(result2[1]);
+                            var y = result2[3];
+                            if (y) y = parseFloat(y);
+                            points.push({
+                                x: x,
+                                y: y
+                            });
+                        }
+
+                        if (c == "M" || c == "L" || c == "T") {
+                            normalizeAll(points);
+                            command.points = points;
+                            current = points[points.length - 1];
+                        } else if (c == "m" || c == "l" || c == "t") {
+                            for (var p of points) {
+                                p.x += current.x;
+                                p.y += current.y;
+
+                                current = p;
+                            }
+                            normalizeAll(points);
+                            command.points = points;
+                        } else if (c == "H") {
+                            for (var p of points) {
+                                console.log("HX:", p.x);
+                                p.y = current.y;
+                                current = p;
+                            }
+                            normalizeAll(points);
+                            command.points = points;
+                            command.command = "L";
+                        } else if (c == "h") {
+                            for (var p of points) {
+                                p.x += current.x;
+                                p.y = current.y;
+                                current = p;
+                            }
+                            normalizeAll(points);
+                            command.points = points;
+                            command.command = "L";
+                        } else if (c == "V") {
+                            for (var p of points) {
+                                p.y = p.x;
+                                p.x = current.x;
+                                current = p;
+                            }
+                            normalizeAll(points);
+                            command.points = points;
+                            command.command = "L";
+                        } else if (c == "v") {
+                            for (var p of points) {
+                                p.y = p.x + current.y;
+                                p.x = current.x;
+                                current = p;
+                            }
+                            normalizeAll(points);
+                            command.points = points;
+                            command.command = "L";
+                        } else if (c == "c" || c == "C") {
+                            current = processMultiPoints(points, current, 3, c == "c");
+                            command.points = points;
+                        } else if (c == "s" || c == "S") {
+                            current = processMultiPoints(points, current, 2, c == "s");
+
+                            command.points = points;
+                        } else if (c == "q" || c == "Q") {
+                            current = processMultiPoints(points, current, 2, c == "q");
+                            command.points = points;
+                        } else if ((c == "a" || c == "A") && points.length == 5) {
+                            for (var p of points) {
+                                p.fixed = true;
+                                p.noRelativeRecalcuate = true;
+                                console.log("p.y", p.y);
+                            }
+                            var pin = points[4];
+                            pin.fixed = false;
+                            pin.noRelativeRecalcuate = false;
+                            if (c == "a") {
+                                pin.x += current.y;
+                                pin.y += current.y;
+                            }
+                            current = pin;
+
+                            normalizeAll(points);
+                            command.points = points;
+                            command.command = "A";
+                        }
+                    }
+
+                    commands.push(command);
+                }
+
+                return commands;
+
+            };
+
+            collection.calculateScaledPosition = function (value, models) {
+                if (!models || models.length == 0) return value;
+                var m = null;
+
+                if (value < models[0].start) {
+                    m = models[0];
+                } else {
+                    for (var model of models) {
+                        if (model.start <= value && value < (model.start + model.size)) {
+                            m = model;
+                            break;
+                        }
+                    }
+
+                    if (!m) m = models[models.length - 1];
+                }
+
+                if (m) {
+                    var d = value - m.start;
+
+                    if (m.scale) d *= m.r;
+
+                    return d + m.scaledStart;
+                }
+
+                return value;
+            };
+
+
+            collection.scalePathData = function (pathCommands, xCells, yCells, originalSize, newSize) {
+                xCells = xCells || [];
+                yCells = yCells || [];
+
+                var xModel = collection.buildNPatchModel(xCells, originalSize.w, newSize.w);
+                var yModel = collection.buildNPatchModel(yCells, originalSize.h, newSize.h);
+
+                var newData = "";
+
+                for (var command of pathCommands) {
+                    if (command.points) {
+                        var last = -1;
+                        for (var i = 0; i < command.points.length; i ++) {
+                            var pin = command.points[i];
+                            if (pin.fixed) {
+                                continue;
+                            }
+
+                            var x = collection.calculateScaledPosition(pin.x, xModel);
+                            var y = collection.calculateScaledPosition(pin.y, yModel);
+
+                            for (var j = last + 1; j < i; j ++) {
+                                if (command.points[j].noRelativeRecalcuate) continue;
+                                command.points[j].x = x + command.points[j].x - pin.x;
+                                if (typeof(command.points[j].y) == "number") command.points[j].y = y + command.points[j].y - pin.y;
+                            }
+
+                            pin.x = x;
+                            pin.y = y;
+                            last = i;
+                        }
+                    }
+
+                    if (newData) newData += " ";
+                    newData += command.command;
+                    if (command.points) {
+                        for (var i = 0; i < command.points.length; i ++) {
+                            var y = command.points[i].y;
+                            newData += (i > 0 ? " " : "") + command.points[i].x + (typeof(y) == "number" ? ("," + y) : "");
+                        }
+                    }
+                }
+
+                return newData;
+            };
+            collection.generatePathDOM = function (svgPathData, size, keepPathStyle) {
+                var specs = [];
+                var json = svgPathData.data;
+                if (!json.startsWith("json:")) return specs;
+                var parsedPathData = JSON.parse(json.substring(5));
+
+                for (var info of parsedPathData) {
+                    var d = collection.scalePathData(info.commands, svgPathData.xCells, svgPathData.yCells, svgPathData, size);
+                    specs.push({
+                        _name: "path",
+                        _uri: PencilNamespaces.svg,
+                        d: d,
+                        "stroke-linecap": "square",
+                        style: keepPathStyle ? info.style : ""
+                    });
+                }
+
+                return Dom.newDOMFragment(specs);
+            };
+            collection.generateAdvancedRectPathData = function (box, strokeStyle, r, withTop, withRight, withBottom, withLeft) {
+                var x = r * 4 * (Math.sqrt(2) - 1) / 3;
+                var w = box.w - strokeStyle.w * ((withLeft ? 0.5 : 0) + (withRight ? 0.5 : 0));
+                var h = box.h - strokeStyle.w * ((withTop ? 0.5 : 0) + (withBottom ? 0.5 : 0));
+                var parts = [
+                ];
+                var close = true;
+                if (withTop) {
+                    parts.push(L(w - (withRight ? r : 0),0));
+                    if (withRight && r > 0) parts.push(c(x,0,r,r-x,r,r));
+                } else {
+                    parts.push(M(w,0));
+                    close = false;
+                }
+
+                if (withRight) {
+                    parts.push(L(w,h - (withBottom ? r : 0)));
+                    if (withBottom && r > 0) parts.push(c(0,x,x-r,r,0-r,r));
+                } else {
+                    parts.push(M(w,h));
+                    close = false;
+                }
+
+                if (withBottom) {
+                    parts.push(L(withLeft ? r : 0,h));
+                    if (withLeft && r > 0) parts.push(c(x-r,0,0-r,x-r,0-r,0-r));
+                } else {
+                    parts.push(M(0,h));
+                    close = false;
+                }
+
+                if (withLeft) {
+                    parts.push(L(0,withTop ? r : 0));
+                    if (withTop && r > 0) parts.push(c(0,0-x,r-x,0-r,r,0-r));
+                } else {
+                    parts.push(M(0,0));
+                    close = false;
+                }
+
+                if (close) parts.push(z);
+
+                var firstMove = -1;
+                for (var i = 0; i < parts.length; i ++) {
+                    if (parts[i].indexOf("M") == 0) {
+                        firstMove = i;
+                        break;
+                    }
+                }
+
+                if (firstMove > 0) {
+                    while (firstMove > 0) {
+                        parts.push(parts.shift());
+                        firstMove --;
+                    }
+                } else {
+                    parts.unshift(M(withLeft ? r : 0,0));
+                }
+
+                return parts;
+            };
+
+            collection.toColorizedDOMNode = function (svgXML, color) {
+                if (!svgXML) return document.createDocumentFragment();
+
+                var svg = Dom.parseDocument(svgXML);
+
+                if (color) {
+                    var c = color.toRGBAString();
+                    Dom.workOn("//svg:*", svg, function (node) {
+                        if (node.style.fill != "none") {
+                            node.style.fill = c;
+                        }
+                        if (node.style.stroke && node.style.stroke != "none") {
+                            node.style.stroke = c;
+                        }
+
+                        var a = node.getAttribute("fill");
+                        if (a != "none") node.setAttribute("fill", c);
+
+                        a = node.getAttribute("stroke");
+                        if (a && a != "none") node.setAttribute("stroke", c);
+                    });
+                }
+
+                var g = svg.createElementNS(PencilNamespaces.svg, "g");
+                while (svg.documentElement.firstChild) {
+                    var child = svg.documentElement.firstChild;
+                    svg.documentElement.removeChild(child);
+                    g.appendChild(child);
+                }
+
+                return g;
+            };
+            collection.textWidth = function (elementName) {
+
+            };
+        ]]>
+    </Script>
+    <Properties>
+        <PropertyGroup name="Typography">
+            <Property name="defaultTextFont" type="Font" displayName="Default Font">Arial|normal|normal|14px</Property>
+            <Property name="defaultTextColor" type="Color" displayName="Default Text Color">#000000FF</Property>
+        </PropertyGroup>
+        <PropertyGroup name="Fill &amp; Stroke">
+            <Property name="defaultFillColor" type="Color" displayName="Default Fill Color">#336699FF</Property>
+            <Property name="defaultStrokeColor" type="Color" displayName="Default Line Color">#000000FF</Property>
+            <Property name="defaultStrokeStyle" type="StrokeStyle" displayName="Default Line Style">1|</Property>
+        </PropertyGroup>
+    </Properties>
+    <Shape id="baseShape" displayName="Base Element" system="true" icon="">
+        <Properties>
+            <PropertyGroup name="Bound">
+                <Property name="box" type="Dimension">100,100</Property>
+
+                <Property name="boundMode" type="Enum" displayName="Bound Mode" p:enumValues="['fixed|Fixed', 'policy|Use Sizing Policy', 'simple|Use Simple Expression', 'expression|Use Advanced Expression']">policy</Property>
+                <Property name="boundExpression" type="PlainText" displayName="Bound Expression" p:disabled="$boundMode.value != 'expression' &amp;&amp; $boundMode.value != 'simple'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Visibility &amp; Styling">
+                <Property name="visibilityMode" type="Enum" displayName="Visibility Mode" p:enumValues="['visible|Always Visible', 'expression|Controlled By Expression']">visible</Property>
+                <Property name="visibilityExpression" type="PlainText" displayName="Visibility Expression" p:disabled="$visibilityMode.value != 'expression'"></Property>
+                <Property name="advancedStylingExpressions" type="PlainText" displayName="Advanced Styling" p:help="Each line represents a custom style rule in the format of [name]=[expression], without brackets."></Property>
+                <Property name="advancedTransformExpression" type="PlainText" displayName="Advanced Transform" p:help="Transform expression using JavaScript array syntax. Ex: [scale(0,4), translate(10, 10)]"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Snapping Contribution">
+                <Property name="extraSnappingLeft" displayName="Left" type="PlainText"></Property>
+                <Property name="extraSnappingTop" displayName="Top" type="PlainText"></Property>
+                <Property name="extraSnappingRight" displayName="Right" type="PlainText"></Property>
+                <Property name="extraSnappingBottom" displayName="Bottom" type="PlainText"></Property>
+                <Property name="extraSnappingVCenter" displayName="VCenter" type="PlainText"></Property>
+                <Property name="extraSnappingHCenter" displayName="HCenter" type="PlainText"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Meta">
+                <Property name="elementName" type="PlainText" displayName="Element Name" p:renew="true"><E>collection.generateElementName(F._target)</E></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Clipping" order="9999">
+                <Property name="useAsClipPath" type="Enum" displayName="Use Shape as Clip Path" p:enumValues="['false|No', 'true|Yes']">false</Property>
+                <Property name="clipPathName" type="PlainText" displayName="Clip Path Name" p:disabled="$useAsClipPath.value != 'true'"></Property>
+                <Property name="clippedMode" type="Enum" displayName="Clipped by" p:disabled="$useAsClipPath.value == 'true'" p:enumValues="['none|Nothing', 'default|Default Shape\'s Clip Path', 'specific|Specific Clip Path:']">none</Property>
+                <Property name="clippedByClipPathName" type="PlainText" displayName="Specific Clip Path Name" p:disabled="$useAsClipPath.value == 'true' || $clippedMode.value != 'specific'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Shadow">
+                <Property name="shadowStyle" type="ShadowStyle" displayName="Shadow Style" p:disabled="$shadowStyleMode.value == 'none' || $shadowStyleMode.value == 'expression'">0|0|0</Property>
+                <Property name="shadowStyleMode" type="Enum" displayName="Shadow Mode" p:enumValues="['none|None', 'fixed|Fixed', 'primary|Use Primary Shadow Style', 'secondary|Use Secondary Shadow Style', 'expression|Use Advanced Expression']">none</Property>
+                <Property name="shadowStyleExpression" type="PlainText" displayName="Shadow Style Expression" p:disabled="$shadowStyleMode.value != 'expression'"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="shapeShadow">
+                <DomContent>
+                    (function () {
+                        if (['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0) {
+                            return Dom.newDOMFragment(
+                            [
+                                { _name: "feGaussianBlur", _uri: PencilNamespaces.svg, in: "SourceAlpha", stdDeviation: $shadowStyle.size },
+                                { _name: "feOffset", _uri: PencilNamespaces.svg, dx: $shadowStyle.dx, dy: $shadowStyle.dy },
+                                { _name: "feComponentTransfer", _uri: PencilNamespaces.svg, _children: [
+                                    { _name: "feFuncA", _uri: PencilNamespaces.svg, type: "linear", slope: $shadowStyle.opacity }
+                                ]},
+                                { _name: "feMerge", _uri: PencilNamespaces.svg, _children: [
+                                    { _name: "feMergeNode", _uri: PencilNamespaces.svg },
+                                    { _name: "feMergeNode", _uri: PencilNamespaces.svg, in: "SourceGraphic" }
+                                ]}
+                            ]);
+                        } else {
+                            return Dom.newDOMFragment([]);
+                        }
+                    }())
+                </DomContent>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var drawingLayer = this.canvas.drawingLayer;
+                    var svg = Dom.findUpward(this.svg, function (node) {
+                            return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                        });
+
+                    var targetElementName = this.getProperty("elementName");
+                    var defaultClipPathName = "sbDefaultClipPath";
+
+                    var useAsClipPath = this.getProperty("useAsClipPath").value == "true";
+                    var clipPathName = this.getProperty("clipPathName").value;
+
+                    var clippedMode = this.getProperty("clippedMode").value;
+                    var clippedByClipPathName = this.getProperty("clippedByClipPathName").value;
+                    var clippedByName = null;
+                    if (clippedMode == 'default') clippedByName = defaultClipPathName;
+                    if (clippedMode == 'specific') clippedByName = clippedByClipPathName || defaultClipPathName;
+
+                    var contribution = {
+                        properties: [],
+                        behaviorMap: {},
+                        actions: [],
+                        snaps: [],
+                        contentFragment: document.createDocumentFragment(),
+                        targetElementName: targetElementName,
+                        clipPathName: useAsClipPath ? (clipPathName || defaultClipPathName) : null,
+                        clippedByName: clippedByName,
+                        _contributedDomNode: {},
+                        addBehavior: function (ref, behaviorName, args) {
+                            var set = this.behaviorMap[ref];
+                            if (!set) {
+                                set = {
+                                    ref: ref,
+                                    items: []
+                                }
+                                this.behaviorMap[ref] = set;
+                            }
+
+                            var behavior = {
+                                behavior: behaviorName,
+                                args: args
+                            };
+                            set.items.push(behavior);
+
+                            return behavior;
+                         },
+                         findProperty: function (name) {
+                            for (var prop of this.properties) {
+                                if (prop.name == name) return prop;
+                            }
+
+                            return null;
+                         }
+                    };
+
+
+                    //BOUND
+                    var boundMode = this.getProperty("boundMode").value;
+                    var boundExpression = this.getProperty("boundExpression").value;
+                    if (boundMode == "policy" || boundMode == "simple" || (boundMode == "expression" && boundExpression.indexOf("$box") >= 0)) {
+                        contribution.properties.push({
+                            name: "box",
+                            displayName: "box",
+                            type: Dimension
+                        });
+                    }
+
+                    var boundExpressionLiteral = null;
+                    if (boundMode == "simple") {
+                        var boundExpression = this.getProperty("boundExpression").value;
+                        var trailing = "";
+                        if (boundExpression.indexOf("H0") >= 0) {
+                            if (boundExpression.indexOf("H1") >= 0) {
+                                trailing = ", $handle0, $handle1";
+                            } else {
+                                trailing = ", $handle0";
+                            }
+                        } else {
+                            if (boundExpression.indexOf("H1") >= 0) {
+                                trailing = ", null, $handle1";
+                            }
+                        }
+                        boundExpressionLiteral = "collection.toBounds($box, \"" + boundExpression + "\"" + trailing + ")";
+
+                        var combinedSnippet = "";
+
+                        boundExpression.replace(/([a-zA-Z0-9]+)\./g, function (zero, one) {
+                            var snippet = StencilCollectionBuilder.INSTANCE.boundDependencyCache[one];
+                            if (snippet) combinedSnippet += " " + snippet;
+                        });
+
+                        if (combinedSnippet) boundExpressionLiteral += "/" + "* @depends:" +  combinedSnippet + " *" + "/";
+                    } else if (boundMode == "expression") {
+                        boundExpressionLiteral = boundExpression;
+                    } else if (boundMode == "policy") {
+                        var bounding = this.getBounding(svg);
+                        var geo = this.getGeometry();
+
+                        var a = Svg.getAngle(geo.ctm.a, geo.ctm.b);
+
+                        if (a != 0) {
+                            this.rotateBy(0 - a);
+                            var bounding = this.getBounding(svg);
+                            var geo = this.getGeometry();
+                        }
+
+                        var originalInfo = {
+                            gw0: StencilCollectionBuilder._currentPage.width - 2 * pageMargin,
+                            gh0: StencilCollectionBuilder._currentPage.height - 2 * pageMargin,
+
+                            w0: geo.dim.w,
+                            h0: geo.dim.h,
+                            x0: (geo.ctm ? geo.ctm.e : bounding.x) - pageMargin,
+                            y0: (geo.ctm ? geo.ctm.f : bounding.y) - pageMargin
+                        };
+                        var policy = Group.getSizingPolicy(this);
+
+                        boundExpressionLiteral = "collection.calculateBoundsFromPolicy($box, " + JSON.stringify(originalInfo) + ", " + JSON.stringify(policy) + ")";
+
+                        if (a != 0) {
+                            this.rotateBy(a);
+                        }
+                    }
+
+                    if (boundExpressionLiteral) {
+                        contribution._boundExpressionLiteral = boundExpressionLiteral;
+
+                        var boundElementNameProp = this.getProperty("boundElementName");
+                        if (this.def.meta.skipBoundBehavior != "true") {
+                            var boundElementName = this.def.meta.boundElementName || "";
+                            contribution._boundBehavior = contribution.addBehavior(targetElementName + boundElementName, "Bound", [boundExpressionLiteral]);
+
+                            var box = this.getProperty("box");
+                            if (box) {
+                                var currentGeo = this.getGeometry();
+                                var a = Svg.getAngle(currentGeo.ctm.a, currentGeo.ctm.b);
+
+                                if (a != 0) {
+                                    var ctm2 = currentGeo.ctm.rotate(0 - a);
+                                    contribution._transformBehavior = contribution.addBehavior(targetElementName + boundElementName, "Transform", [`
+                                        (function () {
+                                            var b = ${boundExpressionLiteral};
+                                            return ["rotate(${a} " + (b.x + ${box.w / 2}) + " " + (b.y + ${box.h / 2}) + ")"];
+                                        }())
+                                    `]);
+                                }
+                            }
+                        }
+
+                        const EXTRA_SNAP_TYPES = ["Left", "Top", "Right", "Bottom", "VCenter", "HCenter"];
+                        const EXTRA_H_SNAP_TYPES = ["Left", "Right", "VCenter"];
+                        for (var typeName of EXTRA_SNAP_TYPES) {
+                            var specProp = this.getProperty("extraSnapping" + typeName);
+                            if (!specProp || !specProp.value) continue;
+                            var specs = specProp.value.split(",");
+
+                            var index = 0;
+                            for (var spec of specs) {
+                                contribution.snaps.push({
+                                    name: typeName + index,
+                                    accept: typeName,
+                                    horizontal: EXTRA_H_SNAP_TYPES.indexOf(typeName) >= 0,
+                                    expression: "collection.BOUND_CALCULATOR.calculate(@boundExpressionLiteral, \"" + spec + "\")",
+                                })
+
+                                index ++;
+                            }
+                        }
+                    }
+
+                    //VISIBILITY
+                    var visibilityMode = this.getProperty("visibilityMode").value;
+                    if (visibilityMode == "expression" && this.def.meta.skipVisibilityBehavior != "true") {
+                        var visibilityElementName = this.def.meta.visibilityElementName || "";
+                        contribution.addBehavior(targetElementName + visibilityElementName, "Visibility", [this.getProperty("visibilityExpression").value]);
+                    }
+
+                    //CUSTOM STYLES
+                    var customStyles = this.getProperty("advancedStylingExpressions").value;
+                    if (customStyles) {
+                        var stylingElementName = this.def.meta.stylingElementName || "";
+                        var lines = customStyles.split(/[\r\n]+/);
+                        for (var line of lines) {
+                            if (line.match(/^[ \t]*([^ \t\r\n=:]+)[ \t]*[=:][ \t]*([^\r\n]+)$/)) {
+                                var name = RegExp.$1;
+                                var expr = RegExp.$2;
+                                contribution.addBehavior(targetElementName + stylingElementName, "CustomStyle", [JSON.stringify(name), expr]);
+                            } else {
+                                console.log("Invalid line: ", line);
+                            }
+                        }
+                    }
+
+                    //CUSTOM TRANSFORM
+                    var advancedTransformExpression = this.getProperty("advancedTransformExpression").value;
+                    if (advancedTransformExpression) {
+                        var transformElementName = this.def.meta.transformElementName || "";
+                        contribution.addBehavior(targetElementName + transformElementName, "Transform", [advancedTransformExpression]);
+                    }
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="shapeShadow" x="-50%" width="200%" y="-50%" height="200%"></filter>
+            </defs>
+        </p:Content>
+    </Shape>
+    <Shape id="basePathRelatedShape" displayName="Base Path Related Element" system="true" icon="" inherits="baseShape">
+        <Properties>
+            <PropertyGroup name="Fill">
+                <Property name="fillColor" type="Color" displayName="Fill Color"><E>$$defaultFillColor</E></Property>
+
+                <Property name="fillColorMode" type="Enum" displayName="Fill Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Fill Color', 'secondary|Use Secondary Fill Color', '#textColor|Use Primary Text Color', '#strokeColor|Use Primary Stroke Color', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="fillColorExpression" type="PlainText" displayName="Fill Expression" p:disabled="$fillColorMode.value != 'expression'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Stroke">
+                <Property name="strokeColor" type="Color" displayName="Stroke Color"><E>$$defaultStrokeColor</E></Property>
+                <Property name="strokeColorMode" type="Enum" displayName="Stroke Color Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Stroke Color', 'secondary|Use Secondary Stroke Color', '#textColor|Use Primary Text Color', '#fillColor|Use Primary Fill Color', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="strokeColorExpression" type="PlainText" displayName="Stroke Color Expression" p:disabled="$strokeColorMode.value != 'expression'"></Property>
+
+                <Property name="strokeStyle" type="StrokeStyle" displayName="Stroke Style"><E>$$defaultStrokeStyle</E></Property>
+                <Property name="strokeStyleMode" type="Enum" displayName="Stroke Style Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Stroke Style', 'secondary|Use Secondary Stroke Style', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="strokeStyleExpression" type="PlainText" displayName="Stroke Style Expression" p:disabled="$strokeStyleMode.value != 'expression'"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Actions>
+            <Action id="getSnappingGuide">
+                <Impl>
+                    <![CDATA[
+                        var b = this.getBounding();
+                        var sw = this.getProperty("strokeStyle").w;
+                        var w = this.getProperty("box").w;
+                        var h = this.getProperty("box").h;
+                        return [
+                            new SnappingData("Left", b.x - sw / 2, "Left", true, this.id),
+                            new SnappingData("Top", b.y - sw / 2 , "Top", false, this.id),
+                            new SnappingData("Right", b.x - sw / 2 + w, "Right", true, this.id),
+                            new SnappingData("Bottom", b.y - sw / 2 + h, "Bottom", false, this.id)
+                        ]
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":baseShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    this.def.collection.generateContribution.call(this, "", contribution, "fillColor", "Background Color", Color, "Fill");
+                    this.def.collection.generateContribution.call(this, "", contribution, "strokeColor", "Line Color", Color, "StrokeColor");
+                    var strokeStyleInfo = this.def.collection.generateContribution.call(this, "", contribution, "strokeStyle", "Line Style", StrokeStyle, "StrokeStyle");
+
+                    if (contribution._boundBehavior && strokeStyleInfo && strokeStyleInfo.realValueLiteral) {
+                        var arg0 = contribution._boundBehavior.args[0];
+                        arg0 = "(" + arg0 + ").narrowed((" + strokeStyleInfo.realValueLiteral + ").w / 2)";
+                        contribution._boundBehavior.args[0] = arg0;
+                    }
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+        </p:Content>
+    </Shape>
+    <Shape id="rectangle" displayName="Rectangle" icon="" inherits="basePathRelatedShape">
+        <Properties>
+            <PropertyGroup name="Common">
+                <Property name="box" type="Dimension">200,100</Property>
+                <Property name="radius" displayName="Corner Radius" type="Handle" p:lockY="true" p:minX="0" p:maxX="$box.w / 2">0,0</Property>
+                <Property name="radiusMode" type="Enum" displayName="Radius Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Handle', 'secondary|Use Secondary Handle', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="radiusExpression" displayName="Radius Expression" type="PlainText" p:disabled="$radiusMode.value != 'expression'"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="rect">
+                <Box>$box.narrowed($strokeStyle.w)</Box>
+                <Transform>[translate(($strokeStyle.w / 2), ($strokeStyle.w / 2))]</Transform>
+                <Fill>$fillColor</Fill>
+                <StrokeColor>$strokeColor</StrokeColor>
+                <StrokeStyle>$strokeStyle</StrokeStyle>
+                <Radius>
+                    <Arg>$radius.x</Arg>
+                    <Arg>$radius.x</Arg>
+                </Radius>
+                <ApplyFilter>['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0</ApplyFilter>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":basePathRelatedShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var converter = function (e) {
+                        return "Math.max(0, (" + e + ").x)";
+                    };
+
+                    var meta = {minX: "0", lockY: "true"};
+
+                    if (contribution._boundExpressionLiteral) {
+                        meta.minX = "(" + contribution._boundExpressionLiteral + ").x";
+                        meta.maxX = "(" + contribution._boundExpressionLiteral + ").x + Math.round((" + contribution._boundExpressionLiteral + ").w / 2)";
+                    }
+
+                    this.def.collection.generateContribution.call(this, "", contribution, "radius", "Corner Radius", Handle, "Radius", converter, meta);
+
+                    this.def.collection.contributeContentDomNode(this, "rect", contribution);
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <rect id="rect" p:filter="url(#shapeShadow)" />
+        </p:Content>
+    </Shape>
+    <Shape id="pathRect" displayName="Rectangle" icon="" inherits="basePathRelatedShape" p:skipBoundBehavior="true">
+        <Properties>
+            <PropertyGroup name="Common">
+                <Property name="box" type="Dimension">200,100</Property>
+                <Property name="radius" displayName="Corner Radius" type="Handle" p:lockY="true" p:minX="0" p:maxX="$box.w / 2">0,0</Property>
+                <Property name="radiusMode" type="Enum" displayName="Radius Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Handle', 'secondary|Use Secondary Handle', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="radiusExpression" displayName="Radius Expression" type="PlainText" p:disabled="$radiusMode.value != 'expression'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Rounded Corners">
+                <Property name="withTopLeftCorner" displayName="Top Left Corner" type="Bool">true</Property>
+                <Property name="withTopLeftCornerMode" displayName="Top Left Corner Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withTopLeftCornerExpression" displayName="Top Left Corner Expression" type="PlainText" p:disabled="$withTopLeftCornerMode.value != 'expression'"></Property>
+                <Property name="withTopRightCorner" displayName="Top Right Corner" type="Bool">true</Property>
+                <Property name="withTopRightCornerMode" displayName="Top Right Corner Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withTopRightCornerExpression" displayName="Top Right Corner Expression" type="PlainText" p:disabled="$withTopRightCornerMode.value != 'expression'"></Property>
+                <Property name="withBottomRightCorner" displayName="Bottom Right Corner" type="Bool">true</Property>
+                <Property name="withBottomRightCornerMode" displayName="Bottom Right Corner Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withBottomRightCornerExpression" displayName="Bottom Right Corner Expression" type="PlainText" p:disabled="$withBottomRightCornerMode.value != 'expression'"></Property>
+                <Property name="withBottomLeftCorner" displayName="Bottom Left Corner" type="Bool">true</Property>
+                <Property name="withBottomLeftCornerMode" displayName="Bottom Left Corner Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withBottomLeftCornerExpression" displayName="Bottom Left Corner Expression" type="PlainText" p:disabled="$withBottomLeftCornerMode.value != 'expression'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Borders">
+                <Property name="withTop" displayName="Border Top" type="Bool">true</Property>
+                <Property name="withTopMode" displayName="Top Border Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withTopExpression" displayName="Top Border Expression" type="PlainText" p:disabled="$withTopMode.value != 'expression'"></Property>
+                <Property name="withRight" displayName="Border Right" type="Bool">true</Property>
+                <Property name="withRightMode" displayName="Right Border Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withRightExpression" displayName="Right Border Expression" type="PlainText" p:disabled="$withRightMode.value != 'expression'"></Property>
+                <Property name="withBottom" displayName="Border Bottom" type="Bool">true</Property>
+                <Property name="withBottomMode" displayName="Bottom Border Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withBottomExpression" displayName="Bottom Border Expression" type="PlainText" p:disabled="$withBottomMode.value != 'expression'"></Property>
+                <Property name="withLeft" displayName="Border Left" type="Bool">true</Property>
+                <Property name="withLeftMode" displayName="Left Border Mode" type="Enum" p:enumValues="['fixed|Fixed', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="withLeftExpression" displayName="Left Border Expression" type="PlainText" p:disabled="$withLeftMode.value != 'expression'"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="path">
+                <Transform>[translate($withLeft.value ? ($strokeStyle.w / 2) : 0, $withTop.value ? ($strokeStyle.w / 2) : 0)]</Transform>
+                <Fill>$fillColor</Fill>
+                <StrokeColor>$strokeColor</StrokeColor>
+                <StrokeStyle>$strokeStyle</StrokeStyle>
+                <D><![CDATA[
+                    (function () {
+                        return collection.generateAdvancedRectPathData($box, $strokeStyle, $radius.x, $withTop.value, $withRight.value, $withBottom.value, $withLeft.value);
+                    }())
+                ]]></D>
+                <ApplyFilter>['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0</ApplyFilter>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":basePathRelatedShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var converter = function (e) {
+                        return "Math.max(0, (" + e + ").x)";
+                    };
+
+                    var meta = {minX: "0", lockY: "true"};
+
+                    if (contribution._boundExpressionLiteral) {
+                        meta.minX = "(" + contribution._boundExpressionLiteral + ").x";
+                        meta.maxX = "(" + contribution._boundExpressionLiteral + ").x + Math.round((" + contribution._boundExpressionLiteral + ").w / 2)";
+                    }
+
+                    var radiusInfo = this.def.collection.generateContribution.call(this, "", contribution, "radius", "Corner Radius", Handle, "Radius", converter, meta);
+                    this.def.collection.contributeContentDomNode(this, "path", contribution);
+
+                    var boundLiteral = contribution._boundExpressionLiteral;
+                    if (!boundLiteral) {
+                        var svg = Dom.findUpward(this.svg, function (node) {
+                                return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                            });
+
+                        var ctm = this.svg.getTransformToElement(svg);
+                        var geo = this.getGeometry();
+                        boundLiteral = "new Bound(" + ([ctm.e - pageMargin, ctm.f - pageMargin, geo.dim.w, geo.dim.h].join(",")) + ")";
+                    }
+
+                    var elementName = contribution.targetElementName;
+
+
+                    var set = contribution.behaviorMap[elementName];
+                    var strokeLiteral = null;
+                    if (set) {
+                        for (var item of set.items) {
+                            if (item.behavior == "StrokeStyle") {
+                                strokeLiteral = item.args[0];
+                                break;
+                            }
+                        }
+                    }
+
+                    var border = function (name) {
+                        var mode = this.getProperty("with" + name + "Mode");
+                        if (mode == "fixed") return "" + this.getProperty("with" + name).value;
+                        return this.getProperty("with" + name + "Expression").value;
+                    }.bind(this);
+                    var corner = function (name) {
+                        var mode = this.getProperty("with" + name + "CornerMode");
+                        if (mode == "fixed") return "" + this.getProperty("with" + name + "Corner").value;
+                        return this.getProperty("with" + name + "CornerExpression").value;
+                    }.bind(this);
+
+                    contribution.addBehavior(elementName, "D",
+                        ["(function () { var b = " + boundLiteral + ";\n"
+                            + "var s = " + strokeLiteral + ";\n"
+                            + "var r = " + radiusInfo.realValueLiteral + ";\n"
+                            + "return collection.generateAdvancedRectPathData(b, s, r.x, "
+                                        + border("Top") + ", " + border("Right") + ", " + border("Bottom") + ", " + border("Left") + ", "
+                                        + corner("TopLeft") + ", " + corner("TopRight") + ", " + corner("BottomRight") + ", " + corner("BottomLeft")
+                                        + "); }())"]);
+
+                    contribution.addBehavior(elementName, "Transform",
+                        ["(function () { var s = " + strokeLiteral + ";\n"
+                            + "var b = " + boundLiteral + ";\n"
+                            + "return [translate(((" + border("Left") + ") ? (s.w / 2) : 0) + b.x, ((" + border("Top") + ") ? (s.w / 2) : 0) + b.y)];}())"]);
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <path id="path" p:filter="url(#shapeShadow)" />
+        </p:Content>
+    </Shape>
+    <Shape id="baseTextShape" displayName="Base Text Shape" system="true" icon="" inherits="baseShape">
+        <Properties>
+            <PropertyGroup name="Bound">
+                <Property name="textBoundConversion" type="PlainText" displayName="Text Bound Conversion"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Text">
+                <Property name="box" type="Dimension">150,30</Property>
+                <Property name="textColor" type="Color" displayName="Text Color"><E>$$defaultTextColor</E></Property>
+                <Property name="textFont" type="Font" displayName="Text Font"><E>$$defaultTextFont</E></Property>
+                <Property name="text" displayName="Text Content" type="RichText" p:editInfo="({targetName: 'text', bound: Bound.fromBox($box), font: $textFont, align: $textAlignment, richText: true})">Text Content</Property>
+                <Property name="textAlignment" displayName="Text Alignment" type="Alignment">0,1</Property>
+                <Property name="withTextShadow" displayName="With Text Shadow" type="Bool" p:disabled="true">false</Property>
+
+                <Property name="textColorMode" type="Enum" displayName="Text Color Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Text Color', 'secondary|Use Secondary Text Color', '#fillColor|Use Primary Fill Color', '#strokeColor|Use Primary Stroke Color', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="textColorExpression" type="PlainText" displayName="Text Color Expression" p:disabled="$textColorMode.value != 'expression'"></Property>
+                <Property name="textFontMode" type="Enum" displayName="Text Font Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Text Font', 'secondary|Use Secondary Text Font', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="textFontExpression" type="PlainText" displayName="Text Font Expression" p:disabled="$textFontMode.value != 'expression'"></Property>
+                <Property name="textAlignmentMode" type="Enum" displayName="Text Alignment Mode" p:enumValues="['fixed|Fixed', 'primary|Use Primary Text Alignment', 'secondary|Use Secondary Text Alignment', 'expression|Use Advanced Expression']">primary</Property>
+                <Property name="textAlignmentExpression" type="PlainText" displayName="Text Alignment Expression" p:disabled="$textAlignmentMode.value != 'expression'"></Property>
+                <Property name="textMode" displayName="Text Content Mode" type="Enum" p:enumValues="['fixed|Fixed', 'editable|Editable', 'expression|Use Advanced Expression']">editable</Property>
+                <Property name="textExpression" type="PlainText" displayName="Text Content Expression" p:disabled="$textMode.value != 'expression'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Icon">
+                <Property name="supportIcon" displayName="Support Icon" type="Bool">false</Property>
+                <Property name="iconName" type="PlainText" displayName="Name" p:disabled="!$supportIcon.value">Text Icon</Property>
+                <Property name="iconSide" displayName="Icon Alignment" type="Enum" p:enumValues="['leading|Leading', 'trailing|Trailing', 'customizable|Customizable']" p:disabled="!$supportIcon.value">leading</Property>
+                <Property name="iconType" displayName="Icon Type" type="Enum" p:enumValues="['bitmap|Bitmap', 'svg|SVG']" p:disabled="!$supportIcon.value">bitmap</Property>
+                <Property name="iconGap" displayName="Icon Gap Factor" type="PlainText" p:disabled="!$supportIcon.value">1</Property>
+                <Property name="iconSizeFactor" displayName="Icon Size Factor" type="PlainText" p:disabled="!$supportIcon.value">1.2</Property>
+                <Property name="iconImageDataResourceNames" type="PlainText" displayName="Icon Resource Set Names" p:disabled="!$supportIcon.value"></Property>
+                <Property name="iconColor" displayName="Icon Color Mode" type="Enum" p:enumValues="['asis|As-is', 'fixed|Fixed', 'text|Same as text', 'own|Use Separate Color']" p:disabled="!$supportIcon.value || $iconType.value != 'svg'">bitmap</Property>
+                <Property name="currentIconColor" displayName="Icon Color" type="Color" p:disabled="!$supportIcon.value || $iconType.value != 'svg' || ($iconColor.value != 'own' &amp;&amp; $iconColor.value != 'fixed')">#000000</Property>
+            </PropertyGroup>
+        </Properties>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":baseShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var textElementName = this.def.meta.textElementName || "text";
+
+                    var alignmentInfo = this.def.collection.generateContribution.call(this, "", contribution, "textAlignment", "Text Alignment", Alignment);
+                    var colorInfo = this.def.collection.generateContribution.call(this, textElementName, contribution, "textColor", "Text Color", Color, "Fill,Color");
+                    var fontInfo = this.def.collection.generateContribution.call(this, textElementName, contribution, "textFont", "Text Font", Font, "Font");
+
+                    var alignment = alignmentInfo ? alignmentInfo.valueLiteral : "";
+                    if (!alignment) alignment = "Alignment.fromString(\"" + this.getProperty("textAlignment").toString() + "\")";
+
+                    var font = fontInfo ? fontInfo.valueLiteral : "";
+                    if (!font) font = "Font.fromString(" + this.getProperty("textFont").toString() + ")";
+
+                    var boundLiteral = contribution._boundExpressionLiteral;
+                    var textBoundLiteral = boundLiteral;
+                    if (!boundLiteral) {
+                        var svg = Dom.findUpward(this.svg, function (node) {
+                                return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                            });
+
+                        var ctm = this.svg.getTransformToElement(svg);
+                        var geo = this.getGeometry();
+                        boundLiteral = "new Bound(" + ([ctm.e - pageMargin, ctm.f - pageMargin, geo.dim.w, geo.dim.h].join(",")) + ")";
+                        textBoundLiteral = "new Bound(" + ([0, 0, geo.dim.w, geo.dim.h].join(",")) + ")";
+                    }
+
+                    var boundDependencySnippet = alignment + ", " + font;
+
+                    var textMode = this.getProperty("textMode").value;
+                    var textProp = null;
+                    var textLiteral = null;
+                    if (textMode == "fixed") {
+                        textLiteral = "new RichText(" + JSON.stringify(this.getProperty("text").value) + ")";
+                    } else if (textMode == "editable") {
+                        textProp = {
+                            name: contribution.targetElementName,
+                            displayName: "Text",
+                            type: RichText,
+                            value: this.getProperty("text").toString(),
+                            meta: {
+                                editInfo: "({"
+                                    + "targetName: \"" + contribution.targetElementName + textElementName + "\","
+                                    + "bound: " + boundLiteral + ","
+                                    + "font: " + font + ","
+                                    + "align: " + alignment + ","
+                                    + "richText: true"
+                                + "})"
+                            }
+                        };
+
+                        contribution.properties.push(textProp);
+                        textLiteral = "$" + contribution.targetElementName;
+
+                        boundDependencySnippet += ", " + textLiteral;
+                    } else {
+                        textLiteral = this.getProperty("textExpression").value;
+                    }
+
+                    var textBoundConversion = this.getProperty("textBoundConversion").value;
+                    if (textBoundConversion) {
+                        textBoundLiteral = `(${textBoundConversion}(${textBoundLiteral}))`;
+                    }
+
+                    var supportIcon = this.getProperty("supportIcon").value;
+                    if (supportIcon) {
+                        var iconType = this.getProperty("iconType").value;
+                        var iconName = this.getProperty("iconName").value;
+                        var bitmap = iconType == CollectionResourceBrowserDialog.TYPE_BITMAP;
+
+                        var prop = {
+                            name: contribution.targetElementName + "ImageData",
+                            displayName: "Text icon",
+                            type: ImageData,
+                            value: bitmap ? "0,0,data:" : "0,0,data:image/svg+xml;utf8,<svg></svg>",
+                            meta: {}
+                        };
+
+                        if (bitmap) {
+                            contribution.actions.push({
+                                id: contribution.targetElementName + "CopyClipboard",
+                                displayName: "Use Clipboard Data as " + iconName,
+                                impl: "this.def.collection.copyClipboardImage(this, \"" + contribution.targetElementName + "ImageData" + "\");"
+                            });
+                        }
+
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Browse",
+                            displayName: "Select Resource Images for " + iconName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: "this.def.collection.browseResource(" + JSON.stringify(this.getProperty("iconImageDataResourceNames").value)
+                                + ", CollectionResourceBrowserDialog."  + (bitmap ? "TYPE_BITMAP" : "TYPE_SVG") + ", CollectionResourceBrowserDialog.RETURN_IMAGEDATA, function (imageData) {this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", imageData)}.bind(this));"
+                        });
+
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "BrowseFile",
+                            displayName: "Select Vector Image from File for " + iconName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: `
+                            var thiz = this;
+                            ImageData.prompt(function(data) {
+                                if (!data) return;
+                                thiz.setProperty("${contribution.targetElementName}ImageData", data);
+                            });
+                            `
+                        });
+
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Remove",
+                            displayName: "Remove " + iconName + "...",
+                            impl: "this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", new ImageData(0,0,\"data:\"));"
+                        });
+
+                        contribution.properties.push(prop);
+
+                        imageDataLiteral = "$" + prop.name;
+                        var iconSide = this.getProperty("iconSide").value;
+                        var iconGap = this.getProperty("iconGap").value;
+                        var iconSideLiteral = JSON.stringify(iconSide);
+                        if (iconSide == "customizable") {
+                            iconSideProp = {
+                                name: contribution.targetElementName + "IconSide",
+                                displayName: "Text icon side",
+                                type: Enum,
+                                value: "leading",
+                                meta: {
+                                    enumValues: "['leading|Leading', 'trailing|Trailing']"
+                                }
+                            };
+                            contribution.properties.push(iconSideProp);
+                            iconSideLiteral = "$" + iconSideProp.name;
+                        }
+
+                        boundDependencySnippet += ", " + imageDataLiteral;
+
+                        var originalTextBoundLiteral = textBoundLiteral;
+                        var iconSizeFactor = this.getProperty("iconSizeFactor").value;
+
+                        textBoundLiteral = `(function (bound) {
+                            if ((${imageDataLiteral}).w > 0) {
+                                //depends ${textLiteral}, ${fontInfo.valueLiteral}
+                                var iconGap = Math.round(${iconGap} * (${fontInfo.valueLiteral}).getPixelHeight());
+                                var iconHeight = Math.round(${iconSizeFactor} * (${fontInfo.valueLiteral}).getPixelHeight());
+                                var side = ${iconSideLiteral};
+                                var align = ${alignment};
+                                if (side == "leading") {
+                                    bound.x += iconHeight + iconGap;
+                                    bound.w -= iconHeight + iconGap;
+                                } else {
+                                    bound.w -= iconHeight + iconGap;
+                                }
+                            }
+
+                            return bound;
+
+                        }(${textBoundLiteral}))`;
+
+
+                        contribution.contentFragment.appendChild(Dom.newDOMElement({
+                            _name: "g",
+                            _uri: PencilNamespaces.svg,
+                            id: contribution.targetElementName + "Icon",
+                            _children: [
+                                bitmap ?
+                                {
+                                    _name: "image",
+                                    _uri: PencilNamespaces.svg,
+                                    id: contribution.targetElementName + "IconImage",
+                                    x: 0,
+                                    y: 0
+                                }:{
+                                    _name: "g",
+                                    _uri: PencilNamespaces.svg,
+                                    id: contribution.targetElementName + "IconImage",
+                                    x: 0,
+                                    y: 0
+                                }
+                            ]
+                        }));
+
+                        var textElementId = contribution.targetElementName + textElementName;
+
+                        var iconBoundLiteral = `(function (bound) {
+                            if ((${imageDataLiteral}).w > 0) {
+                                //depends ${textLiteral}, ${fontInfo.valueLiteral}
+                                var iconGap = Math.round(${iconGap} * (${fontInfo.valueLiteral}).getPixelHeight());
+                                var iconHeight = Math.round(${iconSizeFactor} * (${fontInfo.valueLiteral}).getPixelHeight());
+                                var y = bound.y + Math.round(bound.h - iconHeight) / 2;
+                                var side = ${iconSideLiteral};
+                                var align = ${alignment};
+                                if (side == "leading") {
+                                    if (align.h == 0) {
+                                        return new Bound(bound.x, y, iconHeight, iconHeight);
+                                    } else if (align.h == 1) {
+                                        var textWidth = F.getObjectBoundingBox("${textElementId}").w;
+                                        var w = iconHeight + textWidth + (textWidth ? iconGap : 0);
+                                        return new Bound(bound.x + Math.round((bound.w - w) / 2), y, iconHeight, iconHeight);
+                                    } else if (align.h == 2) {
+                                        var textWidth = F.getObjectBoundingBox("${textElementId}").w;
+                                        var w = iconHeight + textWidth + (textWidth ? iconGap : 0);
+                                        return new Bound(bound.x + bound.w - w, y, iconHeight, iconHeight);
+                                    }
+                                } else {
+                                    if (align.h == 0) {
+                                        var textWidth = F.getObjectBoundingBox("${textElementId}").w;
+                                        if (textWidth) textWidth += iconGap;
+                                        return new Bound(bound.x + textWidth, y, iconHeight, iconHeight);
+                                    } else if (align.h == 1) {
+                                        var textWidth = F.getObjectBoundingBox("${textElementId}").w;
+                                        var w = iconHeight + textWidth + (textWidth ? iconGap : 0);
+                                        return new Bound(bound.x + Math.round((bound.w + w) / 2) - iconHeight, y, iconHeight, iconHeight);
+                                    } else if (align.h == 2) {
+                                        return new Bound(bound.x + bound.w - iconHeight, y, iconHeight, iconHeight);
+                                    }
+                                }
+                            }
+
+                            return bound;
+
+                        }(${originalTextBoundLiteral}))`;
+
+
+
+                        contribution.addBehavior(contribution.targetElementName + "Icon", "Transform",
+                            ["var bound = (" + iconBoundLiteral + ");\n\nvar imageData = (" + imageDataLiteral + ");\n\n[translate(bound.x, bound.y), scale(bound.w / (imageData.w || 1), bound.h / (imageData.h || 1))];"]);
+
+                        //CUSTOM STYLES
+                        var customStyles = this.getProperty("advancedStylingExpressions").value;
+                        if (customStyles) {
+                            var lines = customStyles.split(/[\r\n]+/);
+                            for (var line of lines) {
+                                if (line.match(/^[ \t]*([^ \t\r\n=:]+)[ \t]*[=:][ \t]*([^\r\n]+)$/)) {
+                                    var name = RegExp.$1;
+                                    var expr = RegExp.$2;
+                                    contribution.addBehavior(contribution.targetElementName + "Icon", "CustomStyle", [JSON.stringify(name), expr]);
+                                } else {
+                                    console.log("Invalid line: ", line);
+                                }
+                            }
+                        }
+
+                        if (bitmap) {
+                            contribution.addBehavior(contribution.targetElementName + "IconImage", "Image",
+                                [imageDataLiteral]);
+                        } else {
+                            var colorMode = this.getProperty("iconColor").value;
+                            var currentIconColor = this.getProperty("currentIconColor");
+
+                            var colorLiteral = "null";
+                            if (colorMode == "own") {
+                                var iconColorProp = {
+                                    name: contribution.targetElementName + "IconColor",
+                                    displayName: iconName + " Color",
+                                    type: Color,
+                                    value: currentIconColor.toString()
+                                };
+                                contribution.properties.push(iconColorProp);
+                                colorLiteral = "$" + iconColorProp.name;
+                            } else if (colorMode == "fixed") {
+                                colorLiteral = "Color.fromString(" + JSON.stringify(currentIconColor.toString()) + ")";
+                            } else if (colorMode == "text") {
+                                colorLiteral = colorInfo.valueLiteral;
+                            }
+
+                            var xmlLiteral = `(${imageDataLiteral}).getDataAsXML()`;
+                            contribution.addBehavior(contribution.targetElementName + "IconImage", "DomContent",
+                                ["collection.toColorizedDOMNode(" + xmlLiteral + ", " + colorLiteral + ")"]);
+                        }
+                    }
+
+                    contribution.addBehavior(contribution.targetElementName + textElementName, "RichTextContent",
+                        [textLiteral, textBoundLiteral, alignment]);
+
+                    StencilCollectionBuilder.INSTANCE.boundDependencyCache[contribution.targetElementName] = boundDependencySnippet;
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+        </p:Content>
+    </Shape>
+    <Shape id="text" displayName="Text" icon="" inherits="baseTextShape" p:stylingElementName="text" p:textElementName="text" p:skipBoundBehavior="true" p:visibilityElementName="text">
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":baseTextShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    this.def.collection.contributeContentDomNode(this, "text", contribution, "text", {empty: true, noStyle: true});
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <Behaviors>
+            <For ref="bg">
+                <Bound>Bound.fromBox($box)</Bound>
+            </For>
+            <For ref="text">
+                <Font>$textFont</Font>
+                <Fill>$textColor</Fill>
+                <Color>$textColor</Color>
+                <RichTextContent>
+                    <Arg>$text</Arg>
+                    <Arg>Bound.fromBox($box)</Arg>
+                    <Arg>$textAlignment</Arg>
+                </RichTextContent>
+                <CustomStyle>
+                    <Arg>"text-shadow"</Arg>
+                    <Arg>
+                        $withTextShadow.value ? "1px 1px 0px rgba(255, 255, 255, 0.4)" : ""
+                    </Arg>
+                </CustomStyle>
+                <ApplyFilter>['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0</ApplyFilter>
+            </For>
+        </Behaviors>
+
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <rect id="bg" fill="#FFFFFF" fill-opacity="0" stroke-width="0" />
+            <g id="text" p:filter="url(#shapeShadow)" />
+        </p:Content>
+    </Shape>
+    <Shape id="bitmap" displayName="Bitmap Image" inherits="baseShape" icon="" p:skipBoundBehavior="true">
+        <Properties>
+            <PropertyGroup name="Bound">
+                <Property name="imageBoundConversion" type="PlainText" displayName="Image Bound Conversion"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Bitmap Image">
+                <Property name="imageData" type="ImageData">150,124,collection://bitmap/sample-bitmap.png</Property>
+                <Property name="imageDataMode" displayName="Image Data Mode" type="Enum" p:enumValues="['fixed|Fixed', 'editable|Editable']">editable</Property>
+                <Property name="imageDataResourceNames" type="PlainText" displayName="Resource set names" p:disabled="$imageDataMode.value != 'editable'"></Property>
+                <Property name="imageScaleMode" displayName="Image Scale Mode" type="Enum" p:enumValues="['scalable|Scalable', 'npatch|N-Patch Scalable']" p:disabled="$boundMode.value == 'fixed'">npatch</Property>
+                <Property name="imageDataName" type="PlainText" displayName="Data Display Name"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="imageFO">
+                <NPatchDomContentFromImage>
+                    <Arg>$imageData</Arg>
+                    <Arg>$box</Arg>
+                </NPatchDomContentFromImage>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="useClipboardImage" displayName="Use Clipboard Image">
+                <Impl>
+                    <![CDATA[
+                    this.def.collection.copyClipboardImage(this, "imageData", "box");
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="selectImageFile" displayName="Select Image From File...">
+                <Impl>
+                    <![CDATA[
+                        var thiz = this;
+                        ImageData.prompt(function(data) {
+                            if (!data) return;
+                            thiz.setProperty("imageData", data);
+                            thiz.setProperty("box", new Dimension(data.w, data.h));
+                        });
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="toOriginalSize" displayName="To Original Size">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        this.setProperty("box", new Dimension(data.w, data.h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="fixRatioW" displayName="Correct Ratio by Width">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        var box = this.getProperty("box");
+                        var h = Math.round(box.w * data.h / data.w);
+                        this.setProperty("box", new Dimension(box.w, h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="fixRatioH" displayName="Correct Ratio by Height">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        var box = this.getProperty("box");
+                        var w = Math.round(box.h * data.w / data.h);
+                        this.setProperty("box", new Dimension(w, box.h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":baseShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var imageDataMode = this.getProperty("imageDataMode").value;
+                    var imageDataLiteral = null;
+                    var importedImageData = StencilCollectionBuilder.INSTANCE.toCollectionReadyImageData(this.getProperty("imageData"), contribution.targetElementName, false);
+                    var imageDataName = this.getProperty("imageDataName").value || contribution.targetElementName;
+
+                    var prop = {
+                        name: contribution.targetElementName + "ImageData",
+                        displayName: "Image Data (" + imageDataName + ")",
+                        type: ImageData,
+                        value: importedImageData.toString(),
+                        meta: {}
+                    };
+
+                    if (imageDataMode == "fixed") {
+                        prop.meta.disabled = "true";
+                    } else {
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "CopyClipboard",
+                            displayName: "Use Clipboard Data as " + imageDataName,
+                            impl: "this.def.collection.copyClipboardImage(this, \"" + contribution.targetElementName + "ImageData" + "\");"
+                        });
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Browse",
+                            displayName: "Select Resource Images for " + imageDataName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: "this.def.collection.browseResource(" + JSON.stringify(this.getProperty("imageDataResourceNames").value)
+                                + ", CollectionResourceBrowserDialog.TYPE_BITMAP, CollectionResourceBrowserDialog.RETURN_IMAGEDATA, function (imageData) {this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", imageData)}.bind(this));"
+                        });
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "BrowseFile",
+                            displayName: "Select Bitmap from File for " + imageDataName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: `
+                            var thiz = this;
+                            ImageData.prompt(function(data) {
+                                if (!data) return;
+                                thiz.setProperty("${contribution.targetElementName}ImageData", data);
+                            });
+                            `
+                        });
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Remove",
+                            displayName: "Remove " + imageDataName,
+                            impl: "this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", new ImageData(0,0,\"data:\"));"
+                        });
+                    }
+
+                    contribution.properties.push(prop);
+
+                    imageDataLiteral = "$" + prop.name;
+
+                    var imageScaleMode = this.getProperty("imageScaleMode").value;
+                    var boxExpressionLiteral = null;
+                    var boundLiteral = contribution._boundExpressionLiteral;
+                    if (!boundLiteral) {
+                        var svg = Dom.findUpward(this.svg, function (node) {
+                                return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                            });
+
+                        var ctm = this.svg.getTransformToElement(svg);
+                        var geo = this.getGeometry();
+                        boundLiteral = "new Bound(" + ([ctm.e - pageMargin, ctm.f - pageMargin, geo.dim.w, geo.dim.h].join(",")) + ")";
+                    }
+
+                    if (imageScaleMode == "scalable") {
+                        contribution.contentFragment.appendChild(Dom.newDOMElement({
+                            _name: "g",
+                            _uri: PencilNamespaces.svg,
+                            id: contribution.targetElementName,
+                            _children: [
+                                {
+                                    _name: "image",
+                                    _uri: PencilNamespaces.svg,
+                                    id: contribution.targetElementName + "image",
+                                    x: 0,
+                                    y: 0
+                                }
+                            ]
+                        }));
+                        contribution.addBehavior(contribution.targetElementName, "Transform",
+                            ["var bound = (" + boundLiteral + ");\nvar imageData = (" + imageDataLiteral + ");\n\n[translate(bound.x, bound.y), scale(imageData.w <= 0 ? 1 : bound.w / imageData.w, imageData.h <= 0 ? 1 : bound.h / imageData.h)];"]);
+
+                        contribution.addBehavior(contribution.targetElementName + "image", "Image",
+                            [imageDataLiteral]);
+
+                    } else {
+                        contribution.contentFragment.appendChild(Dom.newDOMElement({
+                            _name: "foreignObject",
+                            _uri: PencilNamespaces.svg,
+                            id: contribution.targetElementName
+                        }));
+
+                        contribution.addBehavior(contribution.targetElementName, "NPatchDomContentFromImage",
+                            [imageDataLiteral, boundLiteral]);
+
+                        contribution.addBehavior(contribution.targetElementName, "Transform",
+                            ["[translate((" + boundLiteral + ").x, (" + boundLiteral + ").y)]"]);
+                    }
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <foreignObject x="0" y="0" width="100" height="100" id="imageFO"></foreignObject>
+        </p:Content>
+    </Shape>
+    <Shape id="vectorImage" displayName="Vector Image" inherits="baseShape" icon="" p:skipBoundBehavior="true">
+        <Properties>
+            <PropertyGroup name="Bound">
+                <Property name="box" type="Dimension">50,50</Property>
+                <Property name="imageBoundConversion" type="PlainText" displayName="Image Bound Conversion"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Color">
+                <Property name="fillColor" type="Color" displayName="Icon Color" p:disabled="$fillColorMode.value == 'asis'"><E>$$defaultTextColor</E></Property>
+                <Property name="fillColorMode" type="Enum" displayName="Icon Color Mode" p:enumValues="['fixed|Fixed', 'asis|As-is', 'primary|Use Primary Fill Color', 'secondary|Use Secondary Fill Color', '#textColor|Use Primary Text Color', '#strokeColor|Use Primary Stroke Color', 'expression|Use Advanced Expression']">fixed</Property>
+                <Property name="fillColorExpression" type="PlainText" displayName="Icon Color Expression" p:disabled="$fillColorMode.value != 'expression'"></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Vector Image">
+                <Property name="imageData" type="ImageData">16,16,collection://vector/image-x-generic-symbolic.svg</Property>
+                <Property name="imageDataMode" displayName="Image Data Mode" type="Enum" p:enumValues="['fixed|Fixed', 'editable|Editable']">editable</Property>
+                <Property name="imageDataResourceNames" type="PlainText" displayName="Resource set names" p:disabled="$imageDataMode.value != 'editable'"></Property>
+                <Property name="imageDataName" type="PlainText" displayName="Data Display Name"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="bg">
+                <Bound>Bound.fromBox($box)</Bound>
+            </For>
+            <For ref="container">
+                <Scale>
+                    <Arg>$box.w / ($imageData.w || 1)</Arg>
+                    <Arg>$box.h / ($imageData.h || 1)</Arg>
+                </Scale>
+            </For>
+            <For ref="image">
+                <DomContent>collection.toColorizedDOMNode($imageData.getDataAsXML(), $fillColorMode.value == "asis" ? null : $fillColor)</DomContent>
+                <ApplyFilter>['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0</ApplyFilter>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="useClipboardImage" displayName="Use Clipboard Image">
+                <Impl>
+                    <![CDATA[
+                    this.def.collection.copyClipboardSVGImage(this, "imageData", null, "dontParsePathData");
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="selectImageFile" displayName="Select Image from File...">
+                <Impl>
+                    <![CDATA[
+                        var thiz = this;
+                        ImageData.prompt(function(data) {
+                            if (!data) return;
+                            thiz.setProperty("imageData", data);
+                        }, ["svg"]);
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="browseImageFile" displayName="Select Image from Collection Resources...">
+                <Impl>
+                    <![CDATA[
+                        var thiz = this;
+
+                        var options = {
+                            type: CollectionResourceBrowserDialog.TYPE_SVG,
+                            returnType: CollectionResourceBrowserDialog.RETURN_IMAGEDATA
+                        };
+
+                        CollectionResourceBrowserDialog.open(this.def.collection, options, function(data) {
+                            if (!data) return;
+                            thiz.setProperty("imageData", data);
+                        });
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="toOriginalSize" displayName="To Original Size">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        this.setProperty("box", new Dimension(data.w, data.h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="fixRatioW" displayName="Correct Ratio by Width">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        var box = this.getProperty("box");
+                        var h = Math.round(box.w * data.h / data.w);
+                        this.setProperty("box", new Dimension(box.w, h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="fixRatioH" displayName="Correct Ratio by Height">
+                <Impl>
+                    <![CDATA[
+                        var data = this.getProperty("imageData");
+                        var box = this.getProperty("box");
+                        var w = Math.round(box.h * data.w / data.h);
+                        this.setProperty("box", new Dimension(w, box.h));
+                    ]]>
+                </Impl>
+            </Action>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":baseShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var imageDataName = this.getProperty("imageDataName").value || contribution.targetElementName;
+
+                    var colorInfo = this.def.collection.generateContribution.call(this, null, contribution, "fillColor", imageDataName + " Color", Color);
+
+                    var imageDataMode = this.getProperty("imageDataMode").value;
+                    var imageDataLiteral = null;
+                    var importedImageData = StencilCollectionBuilder.INSTANCE.toCollectionReadyImageData(this.getProperty("imageData"), contribution.targetElementName, true);
+
+                    var prop = {
+                        name: contribution.targetElementName + "ImageData",
+                        displayName: "Image Data (" + imageDataName + ")",
+                        type: ImageData,
+                        value: importedImageData.toString(),
+                        meta: {}
+                    };
+
+                    if (imageDataMode == "fixed") {
+                        prop.meta.disabled = "true";
+                    } else {
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Browse",
+                            displayName: "Select Resource Images for " + imageDataName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: "this.def.collection.browseResource(" + JSON.stringify(this.getProperty("imageDataResourceNames").value)
+                                + ", CollectionResourceBrowserDialog.TYPE_SVG, CollectionResourceBrowserDialog.RETURN_IMAGEDATA, function (imageData) {this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", imageData)}.bind(this));"
+                        });
+
+
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "BrowseFile",
+                            displayName: "Select Vector Image from File for " + imageDataName + "...",
+                            meta: {
+                                "content-action": "true"
+                            },
+                            impl: `
+                            var thiz = this;
+                            ImageData.prompt(function(data) {
+                                if (!data) return;
+                                thiz.setProperty("${contribution.targetElementName}ImageData", data);
+                            });
+                            `
+                        });
+
+                        contribution.actions.push({
+                            id: contribution.targetElementName + "Remove",
+                            displayName: "Remove " + imageDataName,
+                            impl: "this.setProperty(\"" + contribution.targetElementName + "ImageData" + "\", new ImageData(0,0,\"data:\"));"
+                        });
+
+                    }
+
+                    contribution.properties.push(prop);
+
+                    imageDataLiteral = "$" + prop.name;
+
+                    var boxExpressionLiteral = null;
+                    var boundLiteral = contribution._boundExpressionLiteral;
+                    if (!boundLiteral) {
+                        var svg = Dom.findUpward(this.svg, function (node) {
+                                return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                            });
+
+                        var ctm = this.svg.getTransformToElement(svg);
+                        var geo = this.getGeometry();
+                        boundLiteral = "new Bound(" + ([ctm.e - pageMargin, ctm.f - pageMargin, geo.dim.w, geo.dim.h].join(",")) + ")";
+                    }
+
+                    contribution.contentFragment.appendChild(Dom.newDOMElement({
+                        _name: "g",
+                        _uri: PencilNamespaces.svg,
+                        id: contribution.targetElementName,
+                        _children: [
+                            {
+                                _name: "g",
+                                _uri: PencilNamespaces.svg,
+                                id: contribution.targetElementName + "Image",
+                                x: 0,
+                                y: 0
+                            }
+                        ]
+                    }));
+                    var imageBoundConversion = this.getProperty("imageBoundConversion").value;
+                    if (imageBoundConversion) {
+                        boundLiteral = `(${imageBoundConversion}(${boundLiteral}))`;
+                    }
+
+                    contribution.addBehavior(contribution.targetElementName, "Transform",
+                        ["var bound = (" + boundLiteral + ");\n\nvar imageData = (" + imageDataLiteral + ");\n\n[translate(bound.x, bound.y), scale(bound.w / (imageData.w || 1), bound.h / (imageData.h || 1))];"]);
+
+                    var xmlLiteral = `(${imageDataLiteral}).getDataAsXML()`;
+                    var asis = this.getProperty("fillColorMode").value == "asis";
+                    contribution.addBehavior(contribution.targetElementName + "Image", "DomContent",
+                        ["collection.toColorizedDOMNode(" + xmlLiteral + ", " + (asis ? "null" : colorInfo.valueLiteral) + ")"]);
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <rect fill="rgba(255, 255, 255, 0)" stroke="none" id="bg" />
+            <g id="container"><g id="image" p:filter="url(#shapeShadow)" /></g>
+        </p:Content>
+    </Shape>
+    <Shape id="vector" displayName="Vector Path" inherits="basePathRelatedShape" icon="" p:skipBoundBehavior="true">
+        <Properties>
+            <PropertyGroup name="Vector Image">
+                <Property name="svgPathData" displayName="SVG Path 1" type="ImageData" p:npatch-edit="$imageScaleMode.value == 'npatch'">155,110,json:[{"commands":[{"command":"M","points":[{"x":0,"y":69}]},{"command":"C","points":[{"x":0,"y":69,"fixed":true},{"x":90.00000064,"y":-40,"fixed":true},{"x":143,"y":16},{"x":195.99999,"y":71.999998,"fixed":true},{"x":34.999994,"y":29.999997999999998,"fixed":true},{"x":95,"y":63},{"x":155.000005,"y":96.000001,"fixed":true},{"x":131.000005,"y":108.99998500000001,"fixed":true},{"x":131,"y":109}]}],"style":"fill:none;stroke:#000000;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"}]</Property>
+                <Property name="imageScaleMode" displayName="Image Scale Mode" type="Enum" p:enumValues="['scalable|Scalable', 'npatch|N-Patch Scalable']" p:disabled="$boundMode.value == 'fixed'">scalable</Property>
+                <Property name="strokeInside" displayName="Stroke Inside" type="Bool">true</Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="svgGroup">
+                <DomContent>
+                    (function () {
+                        var data = $svgPathData;
+                        if ($imageScaleMode == "scalable") {
+                            data = ImageData.fromString($svgPathData.toString());
+                            data.xCells = null;
+                            data.yCells = null;
+                        }
+                        return collection.generatePathDOM(data, $box.narrowed($strokeInside.value ? $strokeStyle.w : 0), false);
+                    }())
+                </DomContent>
+                <Transform>
+                    (function () {
+                        if ($svgPathData.w &lt;= 0) return [];
+                        var delta = $strokeInside.value ? $strokeStyle.w / 2 : 0;
+                        if ($imageScaleMode == "scalable") {
+                            var b = $box.narrowed($strokeInside.value ? $strokeStyle.w : 0);
+                            b.w = Math.max(b.w, $strokeStyle.w);
+                            b.h = Math.max(b.h, $strokeStyle.w);
+                            return [translate(delta, delta), scale(b.w / $svgPathData.w, b.h / $svgPathData.h)];
+                        } else {
+                            return [translate(delta, delta)];
+                        }
+                    }())
+                </Transform>
+                <StrokeColor>$strokeColor</StrokeColor>
+                <StrokeStyle>
+                    (function () {
+                        if ($imageScaleMode == "scalable") {
+                            var b = $box.narrowed($strokeInside.value ? $strokeStyle.w : 0);
+                            b.w = Math.max(b.w, $strokeStyle.w);
+                            b.h = Math.max(b.h, $strokeStyle.w);
+                            var r = (b.w / $svgPathData.w + b.h / $svgPathData.h) / 2;
+                            return new StrokeStyle($strokeStyle.w / r, $strokeStyle.array)
+                        } else {
+                            return $strokeStyle;
+                        }
+
+                    }())
+                </StrokeStyle>
+                <Fill>$fillColor</Fill>
+                <ApplyFilter>['fixed', 'primary', 'secondary'].indexOf($shadowStyleMode.value) >= 0</ApplyFilter>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="useSVGClipboard" displayName="Use Clipboard as SVG Image">
+                <Impl>this.def.collection.copyClipboardSVGImage(this, "svgPathData", "box");</Impl>
+            </Action>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var parentAction = this.def.collection.getShapeDefById(this.def.collection.id + ":basePathRelatedShape").actionMap["buildShapeContribution"];
+                    contribution = parentAction.implFunction.call(this);
+
+                    var boundLiteral = contribution._boundExpressionLiteral;
+                    if (!boundLiteral) {
+                        var svg = Dom.findUpward(this.svg, function (node) {
+                                return node.localName == "svg" && node.namespaceURI == PencilNamespaces.svg;
+                            });
+
+                        var ctm = this.svg.getTransformToElement(svg);
+                        var geo = this.getGeometry();
+                        boundLiteral = "new Bound(" + ([ctm.e - pageMargin, ctm.f - pageMargin, geo.dim.w, geo.dim.h].join(",")) + ")";
+                    }
+
+                    var elementName = contribution.targetElementName;
+                    this.def.collection.contributeContentDomNode(this, "svgGroup", contribution, "", {empty: true});
+
+                    var imageScaleMode = this.getProperty("imageScaleMode").value;
+                    var boundMode = this.getProperty("boundMode").value;
+                    var strokeInside = this.getProperty("strokeInside").value;
+                    if (imageScaleMode == "scalable") {
+                        var copy = ImageData.fromString(this.getProperty("svgPathData").toString());
+                        copy.xCells = null;
+                        copy.yCells = null;
+
+                        var imageDataLiteral = "ImageData.fromString(" + JSON.stringify(copy.toString()) + ")";
+
+                        var set = contribution.behaviorMap[elementName];
+                        var strokeLiteral = null;
+                        if (set) {
+                            for (var item of set.items) {
+                                if (item.behavior == "StrokeStyle") {
+                                    var literal = item.args[0];
+                                    strokeLiteral = literal;
+                                    item.args[0] = "(function () { var b = " + boundLiteral + ";\n var r = (b.w / " + copy.w + " + b.h / " + copy.h + ") / 2; var style = " + literal + ";\n return new StrokeStyle(style.w / r, style.array);}())";
+                                    break;
+                                }
+                            }
+                        }
+
+                        contribution.addBehavior(elementName, "DomContent",
+                            ["(function () { var b = " + boundLiteral + ";\n"
+                                + (strokeInside && strokeLiteral ? "var s = " + strokeLiteral + "; b.w -= s.w; b.h -= s.w;\n" : "")
+                                + "return collection.generatePathDOM(" + imageDataLiteral + ", b, false); }())"]);
+
+                        contribution.addBehavior(elementName, "Transform",
+                            ["(function () { var b = " + boundLiteral + ";\n"
+                                + (strokeInside && strokeLiteral ? "var s = " + strokeLiteral + "; b.x += s.w / 2; b.y += s.w / 2; b.w -= s.w; b.h -= s.w;\n" : "")
+                                + "return [translate(b.x, b.y), scale(b.w / " + copy.w + ", b.h / " + copy.h + ")];}())"]);
+                    } else {
+                        var imageDataLiteral = "ImageData.fromString(" + JSON.stringify(this.getProperty("svgPathData").toString()) + ")";
+
+                        var set = contribution.behaviorMap[elementName];
+                        var strokeLiteral = null;
+                        if (set) {
+                            for (var item of set.items) {
+                                if (item.behavior == "StrokeStyle") {
+                                    strokeLiteral = item.args[0];
+                                    break;
+                                }
+                            }
+                        }
+
+
+                        contribution.addBehavior(elementName, "DomContent",
+                            ["(function () { var b = " + boundLiteral + ";\n"
+                                + (strokeInside && strokeLiteral ? "var s = " + strokeLiteral + "; b.w -= s.w; b.h -= s.w;\n" : "")
+                                + "return collection.generatePathDOM(" + imageDataLiteral + ", b, false); }())"]);
+
+                        var advancedTransformExpression = this.getProperty("advancedTransformExpression").value || "[]";
+                        var transformLiteral = "(function () { var b = " + boundLiteral + ";\n"
+                            + (strokeInside && strokeLiteral ? "var s = " + strokeLiteral + "; b.x += s.w / 2; b.y += s.w / 2;\n" : "")
+                            + "return [translate(b.x, b.y)].concat(" + advancedTransformExpression + ");}())";
+
+                        console.log("transform: ", transformLiteral);
+                        contribution.addBehavior(elementName, "Transform",
+                            [transformLiteral]);
+                    }
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <p:ParentContent />
+            <g id="svgGroup" p:filter="url(#shapeShadow)" />
+        </p:Content>
+    </Shape>
+    <Shape id="handle" displayName="Handle" icon="">
+        <Properties>
+            <PropertyGroup name="Common">
+                <Property name="box1" type="Dimension" p:disabled="true">10,10</Property>
+                <Property name="propName" type="PlainText" displayName="Handle Name"><E>collection.generateElementName(F._target)</E></Property>
+            </PropertyGroup>
+            <PropertyGroup name="Policy">
+                <Property name="minX" type="PlainText" displayName="minX Expression"></Property>
+                <Property name="maxX" type="PlainText" displayName="maxX Expression"></Property>
+                <Property name="minY" type="PlainText" displayName="minY Expression"></Property>
+                <Property name="maxY" type="PlainText" displayName="maxY Expression"></Property>
+                <Property name="lockX" type="PlainText" displayName="lockX Expression"></Property>
+                <Property name="lockY" type="PlainText" displayName="lockY Expression"></Property>
+                <Property name="noScale" type="Bool" displayName="No Scale">false</Property>
+                <Property name="disabled" type="PlainText" displayName="disabled Expression"></Property>
+                <Property name="connectTo" type="PlainText" displayName="Connect to"></Property>
+                <Property name="unconnectedValue" type="PlainText" displayName="unconnectedValue Expression"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Actions>
+            <Action id="getSnappingGuide">
+                <Impl><![CDATA[
+                    var snaps = [
+                        new SnappingData("Left", 0, "Left", true, this.id).makeLocal(true),
+                        new SnappingData("Right", 0, "Right", true, this.id).makeLocal(true),
+                        new SnappingData("Top", 0, "Top", false, this.id).makeLocal(true),
+                        new SnappingData("Bottom", 0, "Bottom", false, this.id).makeLocal(true),
+                        new SnappingData("VCenter", 0, "VCenter", true, this.id).makeLocal(true),
+                        new SnappingData("HCenter", 0, "HCenter", false, this.id).makeLocal(true)
+                    ];
+                    return snaps;
+                ]]></Impl>
+            </Action>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var pageMargin = StencilCollectionBuilder.INSTANCE.getPageMargin();
+
+                    var ctm = this.getGeometry().ctm;
+                    var prop = {
+                        name: this.getProperty("propName"),
+                        displayName: this.getProperty("propName"),
+                        type: Handle,
+                        value: (ctm.e - pageMargin) + "," + (ctm.f - pageMargin),
+                        meta: {}
+                    };
+
+                    const META_NAMES = ["minX", "maxX", "minY", "maxY", "lockX", "lockY", "disabled", "connectTo", "unconnectedValue"];
+                    for (var name of META_NAMES) {
+                        var v = this.getProperty(name).value;
+                        if (v) prop.meta[name] = v;
+                    }
+
+                    if (this.getProperty("noScale").value) {
+                        prop.meta.noScale = "true";
+                    }
+
+                    var contribution = {
+                        properties: [prop],
+                        behaviorMap: {},
+                        actions: [],
+                        snaps: [],
+                        contentFragment: document.createDocumentFragment(),
+                    };
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <Behaviors>
+            <For ref="handle">
+                <Bound>Bound.fromBox($box1)</Bound>
+                <Transform>[translate(0 - $box1.w / 2, 0 - $box1.h / 2)]</Transform>
+            </For>
+        </Behaviors>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <rect id="handle" fill="#FFDE08" fill-opacity="0.8" stroke-width="10" stroke-opacity="0" stroke="#FFFFFF" width="10" height="10" />
+        </p:Content>
+    </Shape>
+    <Shape id="property" displayName="Property" icon="" p:excludeSizeCalculation="true">
+        <Properties>
+            <PropertyGroup name="Common">
+                <Property name="name" type="PlainText" displayName="Property Name"><E>collection.generateElementName(F._target)</E></Property>
+                <Property name="type" type="Enum" displayName="Type" p:enumValues="['Alignment|Alignment', 'Bool|Bool', 'Color|Color', 'Enum|Enum', 'Font|Font', 'Handle|Handle', 'ImageData|ImageData', 'PlainText|PlainText', 'RichText|RichText', 'ShadowStyle|ShadowStyle', 'StrokeStyle|StrokeStyle']">PlainText</Property>
+                <Property name="displayName" type="PlainText" displayName="Display Name"><E>collection.generateElementName(F._target)</E></Property>
+
+                <Property name="alignmentValue" type="Alignment" displayName="Initial Value" p:disabled="$type.value != 'Alignment'">0,0</Property>
+                <Property name="boolValue" type="Enum" displayName="Initial Value" p:disabled="$type.value != 'Bool'" p:enumValues="['true|True', 'false|False']">false</Property>
+                <Property name="colorValue" type="Color" displayName="Initial Value" p:disabled="$type.value != 'Color'"><E>$$defaultFillColor</E></Property>
+                <Property name="enumValue" type="PlainText" displayName="Initial Value" p:disabled="$type.value != 'Enum'">value1|Value One&#10;value2|Value Two</Property>
+                <Property name="fontValue" type="Font" displayName="Initial Value" p:disabled="$type.value != 'Font'"><E>$$defaultTextFont</E></Property>
+                <Property name="handleValue" type="PlainText" displayName="Initial Value" p:disabled="$type.value != 'Handle'">0,0</Property>
+                <Property name="imageValueWidth" type="PlainText" displayName="Initial Width" p:disabled="$type.value != 'ImageData'">100</Property>
+                <Property name="imageValueHeight" type="PlainText" displayName="Initial Height" p:disabled="$type.value != 'ImageData'">100</Property>
+                <Property name="imageValueData" type="PlainText" displayName="Initial Data" p:disabled="$type.value != 'ImageData'">data:</Property>
+                <Property name="plainTextValue" type="PlainText" displayName="Initial Value" p:disabled="$type.value != 'PlainText'">Lorem ipsum</Property>
+                <Property name="richTextValue" type="PlainText" displayName="Initial Value" p:disabled="$type.value != 'RichText'"><![CDATA[<strong>Lorem</strong> ipsum]]></Property>
+                <Property name="shadowStyleValue" type="ShadowStyle" displayName="Initial Value" p:disabled="$type.value != 'ShadowStyle'">1|1|3</Property>
+                <Property name="strokeStyleValue" type="StrokeStyle" displayName="Initial Value" p:disabled="$type.value != 'StrokeStyle'">1|</Property>
+
+                <Property name="meta" type="PlainText" displayName="Meta Expressions"></Property>
+                <Property name="global" type="Bool" displayName="Use as Collection Property">false</Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="text">
+                <Font>$type.value != 'Font' ? Font.fromString("Arial|normal|normal|16px") : $fontValue</Font>
+                <Fill>$type.value != 'Color' ? Color.fromString("#000000FF") : $colorValue</Fill>
+                <Color>$type.value != 'Color' ? Color.fromString("#000000FF") : $colorValue</Color>
+                <RichTextContent>
+                    <Arg><![CDATA[RichText.fromString('<span style="color: #F00;">' +  ($global.value ? '$$' : '$') + '</span>' + $name.value)]]></Arg>
+                    <Arg>new Bound(0, -10, 200, 20)</Arg>
+                    <Arg>new Alignment(0, 1)</Arg>
+                </RichTextContent>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var type = this.getProperty("type").value;
+
+                    var value = "";
+                    if (type == "Alignment") value = this.getProperty("alignmentValue").toString();
+                    if (type == "Bool") value = this.getProperty("boolValue").value;
+                    if (type == "Color") value = this.getProperty("colorValue").toString();
+                    if (type == "Enum") {
+                        value = this.getProperty("enumValue").value;
+                    }
+                    if (type == "Font") value = this.getProperty("fontValue").toString();
+                    if (type == "Handle") value = this.getProperty("handleValue").value;
+                    if (type == "ImageData") {
+                        value = new ImageData(parseInt(this.getProperty("imageValueWidth"), 10), parseInt(this.getProperty("imageValueHeight"), 10), this.getProperty("imageValueData")).toString();
+                    }
+                    if (type == "PlainText") value = this.getProperty("plainTextValue").value;
+                    if (type == "RichText") value = this.getProperty("richTextValue").value;
+                    if (type == "ShadowStyle") value = this.getProperty("shadowStyleValue").toString();
+                    if (type == "StrokeStyle") value = this.getProperty("strokeStyleValue").toString();
+
+                    var prop = {
+                        name: this.getProperty("name"),
+                        displayName: this.getProperty("displayName"),
+                        type: window[type],
+                        value: value,
+                        meta: {},
+                        global: this.getProperty("global").value
+                    };
+
+                    var metaExpressions = this.getProperty("meta").value;
+                    if (metaExpressions) {
+                        var lines = metaExpressions.split(/[\r\n]+/);
+                        for (var line of lines) {
+                            if (line.match(/^[ \t]*([^ \t\r\n=:]+)[ \t]*[=:][ \t]*([^\r\n]+)$/)) {
+                                var name = RegExp.$1;
+                                var expr = RegExp.$2;
+                                prop.meta[name] = expr;
+                            } else {
+                                console.log("Invalid line: ", line);
+                            }
+                        }
+                    }
+
+                    var contribution = {
+                        properties: [prop],
+                        behaviorMap: {},
+                        actions: [],
+                        snaps: [],
+                        contentFragment: document.createDocumentFragment(),
+                    };
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <g id="text" />
+        </p:Content>
+    </Shape>
+    <Shape id="action" displayName="Action" icon="" p:excludeSizeCalculation="true">
+        <Properties>
+            <PropertyGroup name="Common">
+                <Property name="actionId" type="PlainText" displayName="Action ID"><E>collection.generateElementName(F._target)</E></Property>
+                <Property name="displayName" type="PlainText" displayName="Display name"><E>collection.generateElementName(F._target)</E></Property>
+                <Property name="impl" type="PlainText" displayName="Implementation"></Property>
+                <Property name="meta" type="PlainText" displayName="Meta Expressions"></Property>
+            </PropertyGroup>
+        </Properties>
+        <Behaviors>
+            <For ref="text">
+                <Font>Font.fromString("Arial|normal|normal|16px")</Font>
+                <Fill>Color.fromString("$000000FF")</Fill>
+                <Color>Color.fromString("$000000FF")</Color>
+                <RichTextContent>
+                    <Arg><![CDATA[RichText.fromString($actionId.value + '<span style="color: #F00;">()</span>')]]></Arg>
+                    <Arg>new Bound(0, -10, 200, 20)</Arg>
+                    <Arg>new Alignment(0, 1)</Arg>
+                </RichTextContent>
+            </For>
+        </Behaviors>
+        <Actions>
+            <Action id="buildShapeContribution">
+                <Impl><![CDATA[
+                    var contribution = {
+                        properties: [],
+                        behaviorMap: {},
+                        actions: [],
+                        snaps: [],
+                        contentFragment: document.createDocumentFragment(),
+                    };
+
+                    var action = {
+                        id: this.getProperty("actionId").value,
+                        displayName: this.getProperty("displayName").value,
+                        meta: [],
+                        impl: this.getProperty("impl").value
+                    };
+
+                    var metaExpressions = this.getProperty("meta").value;
+                    if (metaExpressions) {
+                        var lines = metaExpressions.split(/[\r\n]+/);
+                        for (var line of lines) {
+                            if (line.match(/^[ \t]*([^ \t\r\n=:]+)[ \t]*[=:][ \t]*([^\r\n]+)$/)) {
+                                var name = RegExp.$1;
+                                var expr = RegExp.$2;
+                                action.meta[name] = expr;
+                            } else {
+                                console.log("Invalid line: ", line);
+                            }
+                        }
+                    }
+
+                    contribution.actions.push(action);
+
+                    return contribution;
+                ]]></Impl>
+            </Action>
+        </Actions>
+        <p:Content xmlns="http://www.w3.org/2000/svg">
+            <g id="text" />
+        </p:Content>
+    </Shape>
+</Shapes>
