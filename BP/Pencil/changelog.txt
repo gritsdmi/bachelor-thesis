@@ -1,0 +1,29 @@
+Po testovani 2. verze prototypu mame nasledujici feedback: 
+Je to na hovno!
+
+Oproti minulemu prototypu v2 mame nasledujici zmeny:
+1. funcional prototypu je rozsiren o pohled pro ucitele. 
+	V nemz ucitel bude schopen oznacit svoji ucast ve statnicich a take ziskat(doporucit) za sebe nahradu.
+2. Jsou smazazny tlacitka Login SSO a Logout.
+	Naprosto system nebude pristupny neprihlasenym uzivatelum
+3. Automaticke generovani komise:
+	TODO
+4. Pridan pohled pro "admina" tedy pro "hlavni" sekretarku.
+	Admin bude moci 
+		1. Pridavat/odebirat dalsi adminy.
+		2. Editovat sablony e-malilu(?).
+
+
+
+Domain Model:
+1. Pridal stavy komisi (approved, editable)
+2. Pridal attribute Semester[String] k tride Date.3
+3. TODO add class email (3 typy - nomunated, final a recommended)
+4. TODO pridat class reprezentujici sekretarku
+	budou 2 typy: obecna a admin(muze pridavat dalsi lisde do systemu)
+
+Process Model:
+0. Opravil anglistinu
+1. Udelal povinnym doporucovat nahradu za sebe.
+2. Pridal novou activitu "posilani mailu".
+ 
