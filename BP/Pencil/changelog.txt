@@ -7,7 +7,10 @@ Oproti minulemu prototypu v2 mame nasledujici zmeny:
 2. Jsou smazazny tlacitka Login SSO a Logout.
 	Naprosto system nebude pristupny neprihlasenym uzivatelum
 3. Automaticke generovani komise:
-	TODO
+	Smazany tlacitka "Edit" a "Info" u sgenerovanych kombinaci.
+	Tlacitko "Approve" prejmenovano v "Create".
+
+
 4. Pridan pohled pro "admina" tedy pro "hlavni" sekretarku.
 	Admin bude moci 
 		1. Pridavat/odebirat dalsi adminy.
@@ -18,8 +21,10 @@ Oproti minulemu prototypu v2 mame nasledujici zmeny:
 Domain Model:
 1. Pridal stavy komisi (approved, editable)
 2. Pridal attribute Semester[String] k tride Date.3
-3. TODO add class email (3 typy - nomunated, final a recommended)
-4. TODO pridat class reprezentujici sekretarku
+3. add class email (3 typy - nominated, final a recommended)
+3. renamed class "Member" to "Teacher"
+	3.1 renamed enum "MemberType" to "TeacherDegree"
+4. pridan class "User" reprezentujici sekretarku
 	budou 2 typy: obecna a admin(muze pridavat dalsi lisde do systemu)
 
 Process Model:
