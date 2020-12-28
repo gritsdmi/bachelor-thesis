@@ -193,6 +193,17 @@ function generateTOC() {
     document.body.appendChild(toc);
 }
 
+function fixNavBar() {
+    let tocButtons = document.getElementsByClassName("TOC")[0].childNodes;
+    tocButtons.forEach(item => {
+        item.onclick = function(){
+            let getHref = item.childNodes[0].getAttribute("href")
+            window.location.hash = getHref
+        }
+    });
+}
+
+
 function boot() {
     document.addEventListener("mousemove", handleMouseMove);
     var style = document.createElement("link");
@@ -201,6 +212,7 @@ function boot() {
     document.querySelector("head").appendChild(style);
     workingThreadFunction();
     generateTOC();
+    fixNavBar();
 }
 
 window.onload = boot;
