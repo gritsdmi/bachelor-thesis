@@ -6,11 +6,13 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.PrimaryKeyJoinColumn;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@PrimaryKeyJoinColumn(name = "userId")
 public class Teacher extends User {
 
     private TeacherDegree degree;
