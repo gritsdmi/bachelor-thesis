@@ -1,0 +1,4 @@
+Prototype:
+	reoreder pages in header in prototype
+	fix some links in buttoms
+	left side (navbar) become clickable
