@@ -1,4 +1,4 @@
-package cz.cvut.fel.bachelor_thesis.TO;
+package cz.cvut.fel.bachelor_thesis.to;
 
 import cz.cvut.fel.bachelor_thesis.model.Email;
 import lombok.Getter;

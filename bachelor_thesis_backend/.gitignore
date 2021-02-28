@@ -53,3 +53,5 @@ build/
 *.rar
 
 ### manual ###
+**/*.xlsx
+**/*.xlsx*

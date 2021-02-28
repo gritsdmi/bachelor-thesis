@@ -2,17 +2,21 @@ package cz.cvut.fel.bachelor_thesis.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class AbstractEntity {
+@ToString
+public abstract class AbstractEntity implements Serializable {
 
     @Id
-    @GeneratedValue
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Integer id;
 }
