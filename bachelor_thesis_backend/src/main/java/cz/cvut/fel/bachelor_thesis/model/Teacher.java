@@ -22,6 +22,8 @@ public class Teacher extends AbstractEntity {
 
     private String name;
 
+    private String surname;
+
     private String emailAddress;
 
     private String login;
@@ -50,5 +52,7 @@ public class Teacher extends AbstractEntity {
 
     //TODO rename this
     private String titul;
+
+    private String department;
 
 }

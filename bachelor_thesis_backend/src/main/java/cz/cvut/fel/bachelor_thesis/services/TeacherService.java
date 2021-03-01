@@ -3,6 +3,8 @@ package cz.cvut.fel.bachelor_thesis.services;
 import cz.cvut.fel.bachelor_thesis.model.Teacher;
 import cz.cvut.fel.bachelor_thesis.repository.TeacherRepository;
 import cz.cvut.fel.bachelor_thesis.to.TeacherTO;
+import cz.cvut.fel.bachelor_thesis.utils.CsvParser;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,13 +13,16 @@ import java.util.List;
 
 @Service
 @Transactional
+@Log
 public class TeacherService {
 
     private final TeacherRepository teacherRepository;
+    private final CsvParser csvParser;
 
     @Autowired
-    public TeacherService(TeacherRepository teacherRepository) {
+    public TeacherService(TeacherRepository teacherRepository, CsvParser csvParser) {
         this.teacherRepository = teacherRepository;
+        this.csvParser = csvParser;
     }
 
     public Teacher create(TeacherTO teacherTO) {
@@ -42,9 +47,10 @@ public class TeacherService {
 
     @Transactional
     Teacher save(Teacher teacher, TeacherTO teacherTO) {
-
+        log.info("saving teacher");
         teacher.setPersonalNumber(teacherTO.getPersonalNumber());
         teacher.setName(teacherTO.getName());
+        teacher.setSurname(teacherTO.getSurname());
         teacher.setEmailAddress(teacherTO.getEmailAddress());
         teacher.setLogin(teacherTO.getLogin());
         teacher.setPassword(teacherTO.getPassword());
@@ -56,6 +62,7 @@ public class TeacherService {
         teacher.setContract(teacherTO.getContract());
         teacher.setPosition(teacherTO.getPosition());
         teacher.setTitul(teacherTO.getTitul());
+        teacher.setDepartment(teacherTO.getDepartment());
 
         return teacherRepository.save(teacher);
     }
@@ -66,5 +73,24 @@ public class TeacherService {
 
     public void delete(Teacher teacher) {
         teacherRepository.delete(teacher);
+    }
+
+    @Transactional
+    public String readXLS(Integer sheetNumber) {
+        if (sheetNumber.equals(4)) {
+            var data = csvParser.getData(sheetNumber);
+            data.forEach((k, v) -> System.out.println("key " + k + " val" + v.toString()));
+            data.forEach((k, v) -> {
+                if (k != 0) {
+                    var teacher = new Teacher();
+                    var to = new TeacherTO();
+                    to.setSurname(v.get(0));
+                    to.setContract(Double.parseDouble(v.get(1)));
+                    to.setEmailAddress(v.get(2));
+                    save(teacher, to);
+                }
+            });
+        }
+        return "Ok";
     }
 }

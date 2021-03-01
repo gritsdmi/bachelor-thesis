@@ -8,17 +8,21 @@ import cz.cvut.fel.bachelor_thesis.model.Email;
 import cz.cvut.fel.bachelor_thesis.model.enums.PositionEnum;
 import cz.cvut.fel.bachelor_thesis.model.enums.TeacherDegree;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
 
 @Getter
 @ToString
+@Setter
 public class TeacherTO {
 
     private Integer personalNumber;
 
     private String name;
+
+    private String surname;
 
     private String emailAddress;
 
@@ -44,9 +48,13 @@ public class TeacherTO {
     //TODO rename this
     private String titul;
 
+    private String department;
+
+
     @JsonCreator
     public TeacherTO(@JsonProperty("personalNumber") Integer personalNumber,
                      @JsonProperty("name") String name,
+                     @JsonProperty("surname") String surname,
                      @JsonProperty("emailAddress") String emailAddress,
                      @JsonProperty("login") String login,
                      @JsonProperty("password") String password,
@@ -57,10 +65,12 @@ public class TeacherTO {
                      @JsonProperty("sendEmails") List<Email> sendEmails,
                      @JsonProperty("contract") Double contract,
                      @JsonProperty("position") PositionEnum position,
-                     @JsonProperty("titul") String titul
+                     @JsonProperty("titul") String titul,
+                     @JsonProperty("department") String department
     ) {
         this.personalNumber = personalNumber;
         this.name = name;
+        this.surname = surname;
         this.emailAddress = emailAddress;
         this.login = login;
         this.password = password;
@@ -72,6 +82,7 @@ public class TeacherTO {
         this.contract = contract;
         this.position = position;
         this.titul = titul;
+        this.department = department;
     }
 
     public TeacherTO() {
