@@ -1,14 +1,17 @@
 package cz.cvut.fel.bachelor_thesis.services;
 
 import cz.cvut.fel.bachelor_thesis.model.Commission;
+import cz.cvut.fel.bachelor_thesis.model.enums.CommissionState;
 import cz.cvut.fel.bachelor_thesis.repository.CommissionRpository;
 import cz.cvut.fel.bachelor_thesis.to.CommissionTO;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Log
 public class CommissionService {
 
     @Autowired
@@ -34,10 +37,11 @@ public class CommissionService {
     }
 
     public Commission save(CommissionTO commissionTO) {
+        log.info("saving new commission");
         var commission = new Commission();
 
         commission.setExam(commissionTO.getExam());
-        commission.setState(commissionTO.getState());
+        commission.setState(CommissionState.EDITABLE);
         commission.setTeachers(commissionTO.getTeachers());
 
         return commissionRpository.save(commission);

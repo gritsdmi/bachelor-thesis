@@ -76,7 +76,7 @@ public class TeacherService {
     }
 
     @Transactional
-    public String readXLS(Integer sheetNumber) {
+    public List<Teacher> readXLS(Integer sheetNumber) {
         if (sheetNumber.equals(4)) {
             var data = csvParser.getData(sheetNumber);
             data.forEach((k, v) -> System.out.println("key " + k + " val" + v.toString()));
@@ -85,12 +85,27 @@ public class TeacherService {
                     var teacher = new Teacher();
                     var to = new TeacherTO();
                     to.setSurname(v.get(0));
-                    to.setContract(Double.parseDouble(v.get(1)));
-                    to.setEmailAddress(v.get(2));
+                    to.setContract(Double.parseDouble(v.get(2)));
+                    to.setEmailAddress(v.get(4));
+                    save(teacher, to);
+                }
+            });
+        } else if (sheetNumber.equals(1)) {
+
+            var data = csvParser.getData(sheetNumber);
+            data.forEach((k, v) -> System.out.println("key " + k + " val" + v.toString()));
+            data.forEach((k, v) -> {
+                if (k != 0) {
+                    var teacher = new Teacher();
+                    var to = new TeacherTO();
+                    to.setTitul(v.get(0));
+//                    to.setName(v.get(1));
+                    to.setSurname(v.get(2));
+                    to.setPersonalNumber((int) Double.parseDouble(v.get(4)));
                     save(teacher, to);
                 }
             });
         }
-        return "Ok";
+        return teacherRepository.findAll();
     }
 }

@@ -23,11 +23,7 @@ public class CsvParser {
 
     private final String fileLocation = "src/main/resources/data.xlsx";
 
-    private Map<Integer, List<String>> document = new HashMap<>();
-
-//    public CsvParser(Integer page){
-//        this.document = parse(page);
-//    }
+    private final Map<Integer, List<String>> document = new HashMap<>();
 
     public Map<Integer, List<String>> parse(int pageNumber) {
         FileInputStream file;
@@ -62,7 +58,7 @@ public class CsvParser {
                     emptyRow = false;
                     buffer.add(cell.toString());
                 } else {
-//                    buffer.add("");
+                    buffer.add(" ");
                 }
             }
             if (emptyRow)

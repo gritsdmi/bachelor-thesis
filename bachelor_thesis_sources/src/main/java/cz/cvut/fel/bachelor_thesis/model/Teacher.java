@@ -47,6 +47,7 @@ public class Teacher extends AbstractEntity {
     private Double contract;
 
     //position in commission
+    //TODO make class instead of enum
     @Enumerated(EnumType.STRING)
     private PositionEnum position;
 
