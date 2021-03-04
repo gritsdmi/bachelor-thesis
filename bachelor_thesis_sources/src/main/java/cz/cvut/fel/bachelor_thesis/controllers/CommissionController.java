@@ -24,7 +24,7 @@ public class CommissionController {
         this.teacherService = teacherService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public List<Commission> getAll() {
         return commissionService.getAll();
     }
@@ -34,7 +34,7 @@ public class CommissionController {
         return commissionService.getOne(id);
     }
 
-    @PostMapping("")
+    @PostMapping
     public Commission create(@RequestBody CommissionTO to) {
         return commissionService.save(to);
     }
@@ -47,5 +47,10 @@ public class CommissionController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         commissionService.remove(id);
+    }
+
+    @DeleteMapping
+    public void deleteAll() {
+        commissionService.remove();
     }
 }

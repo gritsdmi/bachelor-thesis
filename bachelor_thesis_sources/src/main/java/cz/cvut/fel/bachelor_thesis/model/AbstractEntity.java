@@ -17,6 +17,6 @@ import java.io.Serializable;
 public abstract class AbstractEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE) //TODO change strategy
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 }

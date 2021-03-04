@@ -47,7 +47,6 @@ public class TeacherService {
 
     @Transactional
     Teacher save(Teacher teacher, TeacherTO teacherTO) {
-        log.info("saving teacher");
         teacher.setPersonalNumber(teacherTO.getPersonalNumber());
         teacher.setName(teacherTO.getName());
         teacher.setSurname(teacherTO.getSurname());
@@ -79,7 +78,6 @@ public class TeacherService {
     public List<Teacher> readXLS(Integer sheetNumber) {
         if (sheetNumber.equals(4)) {
             var data = csvParser.getData(sheetNumber);
-            data.forEach((k, v) -> System.out.println("key " + k + " val" + v.toString()));
             data.forEach((k, v) -> {
                 if (k != 0) {
                     var teacher = new Teacher();
@@ -93,7 +91,6 @@ public class TeacherService {
         } else if (sheetNumber.equals(1)) {
 
             var data = csvParser.getData(sheetNumber);
-            data.forEach((k, v) -> System.out.println("key " + k + " val" + v.toString()));
             data.forEach((k, v) -> {
                 if (k != 0) {
                     var teacher = new Teacher();

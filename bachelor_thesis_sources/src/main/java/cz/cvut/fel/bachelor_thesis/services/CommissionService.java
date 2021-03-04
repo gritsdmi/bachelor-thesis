@@ -37,7 +37,6 @@ public class CommissionService {
     }
 
     public Commission save(CommissionTO commissionTO) {
-        log.info("saving new commission");
         var commission = new Commission();
 
         commission.setExam(commissionTO.getExam());
@@ -54,5 +53,9 @@ public class CommissionService {
 
     public void remove(Long id) {
         commissionRpository.deleteById(id);
+    }
+
+    public void remove() {
+        commissionRpository.deleteAll();
     }
 }

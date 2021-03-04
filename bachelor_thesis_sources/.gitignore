@@ -55,3 +55,4 @@ build/
 ### manual ###
 **/*.xlsx
 **/*.xlsx*
+**/*.code-workspace
