@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @Log
 @RequestMapping(value = "/commission", produces = {"application/json; charset=UTF-8"})
-public class CommissionController {
+public class CommissionController implements Controller {
 
     private final CommissionService commissionService;
     private final TeacherService teacherService;
@@ -26,6 +26,7 @@ public class CommissionController {
 
     @GetMapping
     public List<Commission> getAll() {
+        log.info("/commission/get request received");
         return commissionService.getAll();
     }
 

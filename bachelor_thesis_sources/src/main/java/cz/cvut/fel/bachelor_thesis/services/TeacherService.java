@@ -47,6 +47,8 @@ public class TeacherService {
 
     @Transactional
     Teacher save(Teacher teacher, TeacherTO teacherTO) {
+        //todo convertor DTO to model
+        //existuji automaticke convertory
         teacher.setPersonalNumber(teacherTO.getPersonalNumber());
         teacher.setName(teacherTO.getName());
         teacher.setSurname(teacherTO.getSurname());

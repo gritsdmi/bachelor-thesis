@@ -1,12 +1,12 @@
 import './App.css';
-import Header from "./components/Header";
+import CommissionsListPage from "./pages/CommissionsList"
 
 function App() {
-  return (
-      <Header>
+    return (
+        <CommissionsListPage>
 
-      </Header>
-  );
+        </CommissionsListPage>
+    );
 }
 
 export default App;

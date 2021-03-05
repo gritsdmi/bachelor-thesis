@@ -12,7 +12,7 @@ import java.util.List;
 @Log
 @RequestMapping(value = "/teacher", produces = {"application/json; charset=UTF-8"})
 @RestController
-public class TeacherController {
+public class TeacherController implements Controller {
 
     private final TeacherService teacherService;
 
