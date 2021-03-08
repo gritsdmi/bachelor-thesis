@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @Log
 @RequestMapping(value = "/util", produces = {"application/json; charset=UTF-8"})
-public class UtilController {
+public class UtilController implements Controller {
 
     private final TeacherService teacherService;
     private final CommissionMaker commissionMaker;
