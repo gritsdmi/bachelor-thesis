@@ -77,6 +77,14 @@ public class TeacherService {
         teacherRepository.delete(teacher);
     }
 
+    public void delete() {
+        teacherRepository.deleteAll();
+    }
+
+    public List<Teacher> getTeachersWhoCan() {
+        return teacherRepository.getTeachersWhoCan();
+    }
+
     @Transactional
     public List<Teacher> readXLS(Integer sheetNumber) {
         if (sheetNumber.equals(4)) {

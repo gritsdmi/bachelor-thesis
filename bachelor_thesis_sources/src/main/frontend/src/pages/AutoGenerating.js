@@ -2,7 +2,6 @@ import React from "react";
 import Container from "@material-ui/core/Container";
 import {get} from "../utils/request";
 import Button from "@material-ui/core/Button";
-import Box from "@material-ui/core/Box";
 
 class AutoGeneratingPage extends React.Component {
 
@@ -15,7 +14,7 @@ class AutoGeneratingPage extends React.Component {
 
     onGenerateButtonClick() {
         get("/util/gen/2").then((response) => {
-            this.state({commissions: response.data})
+            this.setState({commissions: response.data});
         })
     }
 

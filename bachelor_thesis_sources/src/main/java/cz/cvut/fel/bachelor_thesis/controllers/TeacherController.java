@@ -26,6 +26,11 @@ public class TeacherController implements Controller {
         return teacherService.getAll();
     }
 
+    @GetMapping("/can")
+    public List<Teacher> test() {
+        return teacherService.getTeachersWhoCan();
+    }
+
     @GetMapping("/{id}")
     public Teacher get(@PathVariable Long id) {
         return teacherService.get(id);
@@ -44,6 +49,11 @@ public class TeacherController implements Controller {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         teacherService.delete(id);
+    }
+
+    @DeleteMapping
+    public void delete() {
+        teacherService.delete();
     }
 
 }

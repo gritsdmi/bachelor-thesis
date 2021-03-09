@@ -5,7 +5,7 @@ import Card from "@material-ui/core/Card";
 import {Divider, ListItem, ListItemText, Paper} from "@material-ui/core";
 
 import List from '@material-ui/core/List';
-import {get, del} from "../utils/request"
+import {del, get} from "../utils/request"
 import Button from "@material-ui/core/Button";
 
 class CommissionsListPage extends React.Component {
@@ -20,8 +20,7 @@ class CommissionsListPage extends React.Component {
 
     componentDidMount() {
         get("/commission").then((response) => {
-            this.setState({commissions: response.data},
-                () => console.log(this.state.commissions))
+            this.setState({commissions: response.data})
         })
     }
 
@@ -31,15 +30,13 @@ class CommissionsListPage extends React.Component {
 
     onGenerateButtonClick = () => {
         get("/util/gen/2").then((response) => {
-            this.setState({commissions: response.data},
-                () => console.log(this.state.commissions))
+            this.setState({commissions: response.data})
         })
     }
 
     onClearButtonClick = () => {
         del("/commission").then((response) => {
-            this.setState({commissions: response.data},
-                () => console.log(this.state.commissions))
+            this.setState({commissions: response.data})
         })
     }
 
