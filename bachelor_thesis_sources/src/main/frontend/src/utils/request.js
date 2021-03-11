@@ -11,11 +11,11 @@ export function get(url) {
 export function post(url, data) {
     const payload = base_URL + url;
     console.log("sending post request to ", payload)
-    return axios.post(payload);
+    return axios.post(payload, data);
 }
 
 export function del(url) {
     const payload = base_URL + url;
-    console.log("sending del request to ", payload)
+    // console.log("sending del request to ", payload)
     return axios.delete(payload);
 }

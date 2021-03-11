@@ -36,6 +36,13 @@ public class TeacherController implements Controller {
         return teacherService.get(id);
     }
 
+//    @GetMapping("/{name}")
+//    public List<Teacher> get(@PathVariable String name) {
+//        log.warning("this name");
+//
+//        return teacherService.get(name);
+//    }
+
     @PostMapping
     public Teacher create(@RequestBody TeacherTO teacherTO) {
         return teacherService.create(teacherTO);
@@ -43,6 +50,7 @@ public class TeacherController implements Controller {
 
     @PostMapping("/{id}")
     public Teacher update(@PathVariable Long id, @RequestBody TeacherTO to) {
+        log.warning("request post " + to.toString());
         return teacherService.update(id, to);
     }
 

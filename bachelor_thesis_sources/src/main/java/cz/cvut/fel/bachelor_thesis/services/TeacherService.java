@@ -37,7 +37,16 @@ public class TeacherService {
     }
 
     public Teacher get(Long id) {
+        var test = teacherRepository.getOne(id);
+        System.out.println("before");
+        log.warning(test.toString());
+        System.out.println("after");
+
         return teacherRepository.getOne(id);
+    }
+
+    public List<Teacher> get(String name) {
+        return teacherRepository.getAllByName(name);
     }
 
     public Teacher update(Long id, TeacherTO teacherTO) {
