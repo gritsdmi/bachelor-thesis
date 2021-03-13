@@ -12,8 +12,7 @@ import {
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
-import {get, post} from "../utils/request";
-
+import {get, post} from "../../utils/request";
 
 const useStyles = theme => ({
     item: {
@@ -21,7 +20,6 @@ const useStyles = theme => ({
         paddingTop: theme.spacing(1.5),
         paddingBottom: theme.spacing(1.5),
         paddingRight: theme.spacing(2),
-
     },
     cell: {
         border: 'none',
@@ -166,11 +164,6 @@ class EditTeacherDialogClass extends React.Component {
                                         <TextField
                                             id={"contractInput"}
                                             autoFocus={true}
-                                            // defaultValue={this.state.currentTeacherContract
-                                            //     ? this.state.currentTeacherContract
-                                            //     : teacher.contract}
-
-                                            // variant={"filled"}
                                             size={"small"}
                                             onChange={this.handleContractInput}
                                         />
@@ -188,7 +181,6 @@ class EditTeacherDialogClass extends React.Component {
                                     <TableCell className={classes.firstCol}>Position</TableCell>
                                     <TableCell className={classes.cell}>{teacher.position}</TableCell>
                                 </TableRow>
-
                             </TableBody>
                         </Table>
                     </DialogContent>

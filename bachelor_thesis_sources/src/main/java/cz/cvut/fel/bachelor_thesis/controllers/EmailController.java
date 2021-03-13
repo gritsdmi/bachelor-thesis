@@ -1,7 +1,9 @@
 package cz.cvut.fel.bachelor_thesis.controllers;
 
 import cz.cvut.fel.bachelor_thesis.model.Email;
+import cz.cvut.fel.bachelor_thesis.model.enums.EmailType;
 import cz.cvut.fel.bachelor_thesis.services.EmailService;
+import cz.cvut.fel.bachelor_thesis.services.EmailTemplateService;
 import cz.cvut.fel.bachelor_thesis.to.EmailTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +14,16 @@ import java.util.List;
 @Log
 @RequestMapping(value = "/email", produces = {"application/json; charset=UTF-8"})
 @RestController
-public class EmailController {
+public class EmailController implements Controller {
 
     private final EmailService emailService;
 
+    private final EmailTemplateService emailTemplateService;
+
     @Autowired
-    public EmailController(EmailService emailService) {
+    public EmailController(EmailService emailService, EmailTemplateService emailTemplateService) {
         this.emailService = emailService;
+        this.emailTemplateService = emailTemplateService;
     }
 
     @GetMapping
@@ -29,6 +34,11 @@ public class EmailController {
     @GetMapping("/{id}")
     public Email get(@PathVariable Long id) {
         return emailService.get(id);
+    }
+
+    @GetMapping("/types")
+    public List<EmailType> get() {
+        return emailService.getTypes();
     }
 
     @PostMapping

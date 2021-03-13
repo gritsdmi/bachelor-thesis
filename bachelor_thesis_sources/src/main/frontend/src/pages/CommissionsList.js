@@ -1,12 +1,23 @@
 import React from "react";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
-import Card from "@material-ui/core/Card";
-import {Divider, ListItem, ListItemText, Paper} from "@material-ui/core";
+import {Paper} from "@material-ui/core";
 
-import List from '@material-ui/core/List';
 import {del, get} from "../utils/request"
 import Button from "@material-ui/core/Button";
+import CommissionCard from "../components/commission/CommissionCard";
+import {withStyles} from "@material-ui/core/styles";
+
+import CommissionSearchBox from "../components/commission/CommissionSearchBox";
+import CommissionInfoDialog from "../components/commission/CommissionInfoDialog";
+
+const useStyles = theme => ({
+    cardContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+    }
+});
 
 class CommissionsListPage extends React.Component {
 
@@ -14,8 +25,10 @@ class CommissionsListPage extends React.Component {
         super(props);
         this.state = {
             commissions: [],
+            commissionInfoDialogOpen: false,
+            currentCommission: null,
+            cardView: true,
         }
-
     }
 
     componentDidMount() {
@@ -25,7 +38,7 @@ class CommissionsListPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // console.log(this.state.commissions);
+        console.log("componentDidUpdate");
     }
 
     onGenerateButtonClick = () => {
@@ -40,27 +53,65 @@ class CommissionsListPage extends React.Component {
         })
     }
 
-    render() {
+    onCommissionInfoButtonClick = (commission) => {
+        console.log("onCommissionInfoButtonClick", commission.teachers)
+        this.setState({
+            commissionInfoDialogOpen: true,
+            currentCommission: commission,
+        })
+    }
 
-        const list =
-            this.state.commissions &&
-            this.state.commissions.map((commission, key) => {
-                let text = commission.id + ". ";
-                commission.teachers.forEach(teacher => {
-                        text += teacher.surname + " ";
-                    }
-                )
+    updateCommission = (commission) => {
+        console.log("updateCommission", commission)
+        const comm = this.state.commissions;
+        comm[comm.indexOf(this.state.currentCommission)] = commission;
+        this.setState({
+            commissions: comm,
+        })
+    }
+
+    onCommissionInfoClose = () => {
+        console.log("onCommissionInfoClose")
+        //todo refresh edited commisiion
+        this.setState({
+            commissionInfoDialogOpen: false,
+            currentCommission: null,
+        })
+
+    }
+
+    onCommissionEditButtonClick = (commission) => {
+        //todo redirect to manual commission
+        console.log("onCommissionEditButtonClick", commission.teachers)
+    }
+
+    render() {
+        const {classes} = this.props
+
+        const cardsList = this.state.commissions
+            && this.state.commissions.map((commission, k) => {
                 return (
-                    <Box key={key}>
-                        <ListItem>
-                            <ListItemText primary={text}/>
-                        </ListItem>
-                        <Divider/>
-                    </Box>
+                    <CommissionCard
+                        key={k}
+                        commission={commission}
+                        onInfoClick={this.onCommissionInfoButtonClick}
+                        onEditClick={this.onCommissionEditButtonClick}
+                        onClose={this.onCommissionInfoClose}
+                    />
                 )
             })
+
         return (
             <>
+
+                <CommissionInfoDialog
+                    open={this.state.commissionInfoDialogOpen}
+                    commission={this.state.currentCommission}
+                    onEditClick={this.onCommissionEditButtonClick}
+                    onClose={this.onCommissionInfoClose}
+                    updComm={this.updateCommission}
+                />
+
                 <Container>
                     <Box>
                         <h1>
@@ -70,19 +121,13 @@ class CommissionsListPage extends React.Component {
                     <Box>
                         <Button onClick={this.onGenerateButtonClick}>Generate 2</Button>
                         <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
-                        <Paper>
-                            bla bla bla
-                        </Paper>
-                        <Card>
-                            bla bla bla
-                        </Card>
-                        <Card>
-                            bla bla bla
-                        </Card>
-                        <List>
-                            {list}
-                        </List>
                     </Box>
+                    <CommissionSearchBox>
+
+                    </CommissionSearchBox>
+                    <Paper className={classes.cardContainer}>
+                        {cardsList}
+                    </Paper>
                 </Container>
             </>
 
@@ -92,4 +137,4 @@ class CommissionsListPage extends React.Component {
 
 }
 
-export default CommissionsListPage;
+export default withStyles(useStyles)(CommissionsListPage);

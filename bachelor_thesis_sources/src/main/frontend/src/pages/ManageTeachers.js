@@ -3,7 +3,7 @@ import Container from "@material-ui/core/Container";
 import {get} from "../utils/request";
 import SearchBox from "../components/SearchBox";
 import SearchResultPanel from "../components/SearchResultPanel";
-import EditTeacherDialogClass from "../components/EditTeacherDialogClass";
+import EditTeacherDialogClass from "../components/manage/EditTeacherDialogClass";
 
 class ManageTeachersPage extends React.Component {
 
