@@ -1,11 +1,14 @@
 package cz.cvut.fel.bachelor_thesis.services;
 
 import cz.cvut.fel.bachelor_thesis.model.Email;
+import cz.cvut.fel.bachelor_thesis.model.enums.EmailType;
 import cz.cvut.fel.bachelor_thesis.repository.EmailRepository;
 import cz.cvut.fel.bachelor_thesis.to.EmailTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,6 +23,10 @@ public class EmailService {
 
     public List<Email> getAll() {
         return emailRepository.findAll();
+    }
+
+    public List<EmailType> getTypes() {
+        return new ArrayList<>(Arrays.asList(EmailType.FINAL, EmailType.NOMINATED, EmailType.RECOMMENDED));
     }
 
     public Email save(EmailTO emailTO) {

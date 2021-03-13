@@ -8,6 +8,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,11 @@ public class CommissionController implements Controller {
     @GetMapping
     public List<Commission> getAll() {
         log.info("/commission/get request received");
-        return commissionService.getAll();
+        var temp = commissionService.getAll();
+        Collections.shuffle(temp);
+        temp = temp.subList(0, temp.size() / 10);
+        log.warning(String.valueOf(temp.size()));
+        return temp;
     }
 
     @GetMapping("/{id}")

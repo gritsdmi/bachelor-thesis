@@ -1,7 +1,7 @@
 import React from "react";
 import {Dialog, DialogActions, DialogContent, DialogTitle, Grid, makeStyles, TextField,} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {post} from "../utils/request";
+import {post} from "../../utils/request";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -202,9 +202,7 @@ export default function EditTeacherDialog({open, onClose, teacher}) {
                             <Grid className={styles.item} item>{teacher.personalNumber}</Grid>
                             <Grid className={styles.item} item>{teacher.position}</Grid>
                         </Grid>
-
                     </Grid>
-
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose}>Close</Button>

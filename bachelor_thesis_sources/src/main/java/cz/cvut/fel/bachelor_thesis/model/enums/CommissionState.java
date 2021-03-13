@@ -4,4 +4,5 @@ public enum CommissionState {
 
     APPROVED,
     EDITABLE,
+    DRAFT,
 }

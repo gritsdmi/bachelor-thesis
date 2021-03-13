@@ -37,11 +37,6 @@ public class TeacherService {
     }
 
     public Teacher get(Long id) {
-        var test = teacherRepository.getOne(id);
-        System.out.println("before");
-        log.warning(test.toString());
-        System.out.println("after");
-
         return teacherRepository.getOne(id);
     }
 

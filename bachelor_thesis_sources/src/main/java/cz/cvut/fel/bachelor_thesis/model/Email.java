@@ -17,16 +17,17 @@ import java.util.List;
 public class Email extends AbstractEntity {
 
     @ManyToOne
-    private User author;
-//    private String author;
+    //manager or admin
+    private Manager author;
 
     @OneToMany
     @JsonIgnore
-    private List<User> to;
-//    private String to;
+    private List<Teacher> to;
 
     @Enumerated(EnumType.STRING)
     private EmailType type;
+
+    private String subject;
 
     private String messageText;
 
