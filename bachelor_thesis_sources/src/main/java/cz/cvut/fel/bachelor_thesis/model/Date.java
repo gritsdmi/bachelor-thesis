@@ -12,11 +12,7 @@ import javax.persistence.Table;
 @Table(name = "Date")
 public class Date extends AbstractEntity {
 
-    private Integer day;
-
-    private Integer month;
-
-    private Integer year;
+    private String date;
 
     private String semester;
 }

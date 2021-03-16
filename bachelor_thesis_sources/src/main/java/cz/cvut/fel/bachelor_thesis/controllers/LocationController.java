@@ -7,12 +7,14 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Log
 @RestController
 @RequestMapping(value = "/location", produces = {"application/json; charset=UTF-8"})
-public class LocationController {
+public class LocationController implements Controller {
 
     private final LocationService locationService;
 
@@ -29,6 +31,23 @@ public class LocationController {
     @GetMapping("/{id}")
     public Location get(@PathVariable Long id) {
         return locationService.get(id);
+    }
+
+    @GetMapping("/map")
+    public Map<String, List<String>> getByMap() {
+        return locationService.getMap();
+    }
+
+    @GetMapping("/map2")
+    public List<Map<String, List<String>>> getByMap2() {
+        var lol = new ArrayList<Map<String, List<String>>>();
+        lol.add(locationService.getMap());
+        return lol;
+    }
+
+    @GetMapping("/free")
+    public List<Location> getFree(@RequestBody String date) {
+        return locationService.getFreeLocationByDate(date);
     }
 
     @PostMapping

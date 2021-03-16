@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -87,6 +88,22 @@ public class TeacherService {
 
     public List<Teacher> getTeachersWhoCan() {
         return teacherRepository.getTeachersWhoCan();
+    }
+
+    public List<Teacher> getAvailableTeachersByDate(String dateStr) {
+        var teachersWhoCan = getTeachersWhoCan();
+
+        log.warning(teachersWhoCan.toString());
+        var canToday = teachersWhoCan
+                .stream()
+                .filter(teacher -> teacher.getUnavailableDates()
+                        .stream()
+                        .noneMatch(date -> date.getDate().equals(dateStr)))
+                .collect(Collectors.toList());
+
+        log.warning(canToday.toString());
+        return canToday;
+
     }
 
     @Transactional

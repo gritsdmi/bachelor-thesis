@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -37,10 +38,11 @@ public class Teacher extends AbstractEntity {
 
     @ManyToMany(mappedBy = "teachers")
     @JsonIgnore
+    @ToString.Exclude
     private List<Commission> commissionList;
 
-    @ManyToMany
-    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.REMOVE)
+//    @JsonIgnore
     private List<Date> unavailableDates;
 
     //uvazek
@@ -56,4 +58,28 @@ public class Teacher extends AbstractEntity {
 
     private String department;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Teacher teacher = (Teacher) o;
+        return Objects.equals(personalNumber, teacher.personalNumber)
+                && Objects.equals(name, teacher.name)
+                && Objects.equals(surname, teacher.surname)
+                && Objects.equals(emailAddress, teacher.emailAddress)
+                && Objects.equals(login, teacher.login)
+                && Objects.equals(password, teacher.password)
+                && Objects.equals(firstLogin, teacher.firstLogin)
+                && degree == teacher.degree
+                && Objects.equals(contract, teacher.contract)
+                && position == teacher.position
+                && Objects.equals(titul, teacher.titul)
+                && Objects.equals(department, teacher.department);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(personalNumber, name, surname, emailAddress, login,
+                password, firstLogin, degree, contract, position, titul, department);
+    }
 }

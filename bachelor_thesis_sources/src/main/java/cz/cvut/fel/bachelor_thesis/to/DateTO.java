@@ -7,11 +7,7 @@ import lombok.ToString;
 @ToString
 public class DateTO {
 
-    private Integer day;
-
-    private Integer month;
-
-    private Integer year;
+    private String date;
 
     private String semester;
 }

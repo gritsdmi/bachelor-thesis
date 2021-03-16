@@ -35,14 +35,29 @@ public class CommissionController implements Controller {
         return temp;
     }
 
+    @GetMapping("/draft")
+    public List<Commission> getDraft() {
+        return commissionService.getDrafts();
+    }
+
+    @GetMapping("/notDraft")
+    public List<Commission> getOthers() {
+        return commissionService.getNotDraft();
+    }
+
     @GetMapping("/{id}")
     public Commission get(@PathVariable Long id) {
         return commissionService.getOne(id);
     }
 
-    @PostMapping
-    public Commission create(@RequestBody CommissionTO to) {
-        return commissionService.save(to);
+//    @PostMapping
+//    public Commission create(@RequestBody CommissionTO to) {
+//        return commissionService.saveManual(to);
+//    }
+
+    @PostMapping("/{commId}/nextState")
+    public Commission nextState(@PathVariable Long commId, @RequestBody Commission commission) {
+        return commissionService.updateToEditedState(commId, commission);
     }
 
     @PostMapping("/{id}")

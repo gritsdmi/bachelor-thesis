@@ -18,5 +18,4 @@ public class Location extends AbstractEntity {
 
     private String building;
 
-
 }

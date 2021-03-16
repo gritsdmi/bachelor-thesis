@@ -24,20 +24,23 @@ public class DateService {
 
     public Date save(DateTO dateTO) {
         var date = new Date();
-        date.setDay(dateTO.getDay());
-        date.setMonth(dateTO.getMonth());
-        date.setYear(dateTO.getYear());
+        date.setDate(dateTO.getDate());
         date.setSemester(dateTO.getSemester());
 
         return dateRepository.save(date);
     }
 
+    public Date create(String date) {
+        var dateNew = new Date();
+        dateNew.setDate(date);
+        return dateRepository.save(dateNew);
+
+    }
+
     public Date update(Long dateId, DateTO dateTO) {
         var date = dateRepository.getOne(dateId);
 
-        date.setDay(dateTO.getDay());
-        date.setMonth(dateTO.getMonth());
-        date.setYear(dateTO.getYear());
+        date.setDate(dateTO.getDate());
         date.setSemester(dateTO.getSemester());
 
         return dateRepository.save(date);

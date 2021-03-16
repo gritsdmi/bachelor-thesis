@@ -1,6 +1,7 @@
 package cz.cvut.fel.bachelor_thesis.controllers;
 
 import cz.cvut.fel.bachelor_thesis.model.Exam;
+import cz.cvut.fel.bachelor_thesis.model.enums.Degree;
 import cz.cvut.fel.bachelor_thesis.services.ExamService;
 import cz.cvut.fel.bachelor_thesis.to.ExamTO;
 import lombok.extern.java.Log;
@@ -12,7 +13,7 @@ import java.util.List;
 @Log
 @RequestMapping(value = "/exam", produces = {"application/json; charset=UTF-8"})
 @RestController
-public class ExamController {
+public class ExamController implements Controller {
 
     private final ExamService examService;
 
@@ -29,6 +30,11 @@ public class ExamController {
     @GetMapping("/{id}")
     public Exam get(@PathVariable Long id) {
         return examService.get(id);
+    }
+
+    @GetMapping("/degrees")
+    public List<Degree> getDegrees() {
+        return examService.getDegrees();
     }
 
     @PostMapping

@@ -16,8 +16,11 @@ import javax.persistence.Table;
 @ToString
 @Table(name = "Student")
 @PrimaryKeyJoinColumn(name = "userId")
-public class Student extends User {
+public class Student extends AbstractEntity {
 
     @ManyToOne
     private FieldOfStudy fieldOfStudy;
+
+    @ManyToOne
+    private Exam exam;
 }

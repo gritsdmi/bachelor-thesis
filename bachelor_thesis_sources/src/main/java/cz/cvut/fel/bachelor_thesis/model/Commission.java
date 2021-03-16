@@ -20,7 +20,7 @@ public class Commission extends AbstractEntity {
 //    @JsonIgnore
     private List<Teacher> teachers;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Exam exam;
 
     @Enumerated(EnumType.STRING)

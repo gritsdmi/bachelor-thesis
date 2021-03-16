@@ -1,6 +1,9 @@
 package cz.cvut.fel.bachelor_thesis.services;
 
+import cz.cvut.fel.bachelor_thesis.model.Exam;
 import cz.cvut.fel.bachelor_thesis.model.Location;
+import cz.cvut.fel.bachelor_thesis.model.enums.CommissionState;
+import cz.cvut.fel.bachelor_thesis.repository.DateRepository;
 import cz.cvut.fel.bachelor_thesis.repository.LocationRepository;
 import cz.cvut.fel.bachelor_thesis.to.LocationTO;
 import lombok.extern.java.Log;
@@ -8,7 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -18,6 +25,11 @@ public class LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
+    @Autowired
+    private ExamService examService;
+
+    @Autowired
+    private DateRepository dateRepository;
 
     public List<Location> getAll() {
         return locationRepository.findAll();
@@ -25,6 +37,40 @@ public class LocationService {
 
     public Location get(Long locationId) {
         return locationRepository.getOne(locationId);
+    }
+
+    public Map<String, List<String>> getMap() {
+        var allData = locationRepository.findAll();
+        var map = new HashMap<String, List<String>>();
+
+        for (var loc : allData) {
+            if (map.containsKey(loc.getBuilding())) {
+                map.get(loc.getBuilding()).add(loc.getClassroom());
+            } else {
+                var arr = new ArrayList<String>();
+                arr.add(loc.getClassroom());
+                map.put(loc.getBuilding(), arr);
+            }
+        }
+        return map;
+    }
+
+    public List<Location> getFreeLocationByDate(String date) {
+
+        var examsToday = examService.getByDate(date);
+        var allLocations = locationRepository.findAll();
+
+        if (!examsToday.isEmpty()) {
+            var fullLocations = examsToday.stream()
+                    .filter(exam -> !exam.getCommission().getState().equals(CommissionState.DRAFT))
+                    .map(Exam::getLocation)
+                    .collect(Collectors.toList());
+            log.warning("full loc: " + fullLocations.toString());
+            log.warning("all loc: " + allLocations.toString());
+            allLocations.removeAll(fullLocations);
+        }
+
+        return allLocations;
     }
 
     public Location save(LocationTO locationTO) {

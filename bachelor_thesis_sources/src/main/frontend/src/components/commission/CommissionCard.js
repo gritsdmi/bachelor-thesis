@@ -18,7 +18,7 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
 
     const classes = useStyles();
 
-    if (!commission || commission.exam) {
+    if (!commission || !commission.exam) {
         return
     }
 
@@ -31,20 +31,26 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
             )
         })
     }
+    const editButtonText = () => {
+        if (commission.state === "DRAFT") {
+            return "Create"
+        } else {
+            return "Edit"
+        }
+    }
 
     return (
         <>
             <Card className={classes.card}>
-                <CardHeader title={"Exam date "}>
+                <CardHeader title={`Exam date ${commission.exam.date.date}`}/>
 
-                </CardHeader>
                 <CardContent>
                     <List>
                         <ListItem>
                             <ListItemText>State: {commission.state}</ListItemText>
                         </ListItem>
                         <ListItem>
-                            <ListItemText>Degree: </ListItemText>
+                            <ListItemText>Degree: {commission.exam.degree}</ListItemText>
                         </ListItem>
                         <ListItem>
                             <List>
@@ -54,13 +60,14 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                     </List>
                 </CardContent>
                 <CardActions className={classes.cardActions}>
+                    {commission.state !== 'DRAFT' &&
                     <Button
                         onClick={() => onInfoClick(commission)}
-                    >Info</Button>
+                    >Info</Button>}
                     {commission.state !== 'APPROVED' &&
                     <Button
                         onClick={() => onEditClick(commission)}
-                    >Edit</Button>}
+                    >{editButtonText()}</Button>}
                 </CardActions>
             </Card>
         </>
