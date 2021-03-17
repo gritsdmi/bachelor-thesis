@@ -20,7 +20,10 @@ public class Commission extends AbstractEntity {
 //    @JsonIgnore
     private List<Teacher> teachers;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    //owner side
+    @OneToOne
+            (cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 
     @Enumerated(EnumType.STRING)

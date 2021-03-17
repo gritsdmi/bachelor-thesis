@@ -1,8 +1,8 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import CreatingParametersField from "../components/CreatingParametersField";
+import CommissionParameters from "../components/CommissionParameters";
 import {Paper} from "@material-ui/core";
-import {post} from "../utils/request"
+import {get, post} from "../utils/request"
 import CommissionCard from "../components/commission/CommissionCard";
 
 
@@ -10,7 +10,7 @@ const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
         flexWrap: 'wrap',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
     }
 });
 
@@ -25,6 +25,12 @@ class AutoGeneratingPage extends React.Component {
 
     componentDidMount() {
         console.log("AutoGeneratingPage DID MOUNT")
+        get("/commission/draft")
+            .then(res => {
+                this.setState({
+                    commissions: res.data,
+                })
+            })
     }
 
     onGenerationComplete = (resp) => {
@@ -42,12 +48,14 @@ class AutoGeneratingPage extends React.Component {
     }
 
     onClickCreate = (commission) => {
+        //todo make disable, after click
+
         const payload = {
             commission: commission,
         }
         console.log("onClickCreate", commission)
         post(`/commission/${commission.id}/nextState`, commission)
-            .then(response => console.log(response))
+            .then(response => console.log(response.data))
     }
 
 
@@ -70,7 +78,7 @@ class AutoGeneratingPage extends React.Component {
                 <h1>
                     AutoGenerating Page
                 </h1>
-                <CreatingParametersField
+                <CommissionParameters
                     onComplete={this.onGenerationComplete}
                 />
                 <Paper className={classes.cardContainer}>

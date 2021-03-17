@@ -53,6 +53,9 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                             <ListItemText>Degree: {commission.exam.degree}</ListItemText>
                         </ListItem>
                         <ListItem>
+                            <ListItemText>Loc: {commission.exam.location.building}:{commission.exam.location.classroom}</ListItemText>
+                        </ListItem>
+                        <ListItem>
                             <List>
                                 {teachers()}
                             </List>

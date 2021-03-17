@@ -10,7 +10,6 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +25,9 @@ public class CommissionService {
 
     @Autowired
     private DateService dateService;
+
+    @Autowired
+    private TeacherService teacherService;
 
     @Autowired
     private LocationService locationService;
@@ -108,50 +110,67 @@ public class CommissionService {
         //after that need to remove all commissions, where teacher was
         //and rerender
 
+        //remove comm by (day and location)
+        // where state==DRAFT && comm.exam.date==day && comm.exam.location==location
+        removeByDateLocation(commission.getExam().getLocation().getId(), commission.getExam().getDate().getDate());
+
         return commissionRepository.save(comm);
     }
 
+    //do not work
+    private void removeByDateLocation(Long locId, String date) {
+        var allCom = commissionRepository.findAll();
+        var loc = locationService.get(locId);
+        System.out.println(loc.toString());
+        System.out.println(date);
 
-    public void removeByTeacher(List<Teacher> teacherList) {
-        var all = commissionRepository.findAll()
+        var comToRemove = allCom.stream()
+                .filter(commission -> commission.getState().equals(CommissionState.DRAFT)
+                        && commission.getExam().getDate().getDate().equals(date)
+                        && commission.getExam().getLocation().equals(loc)
+                ).collect(Collectors.toList());
+        log.warning("removeByDateLocation " + comToRemove.size());
+        remove(comToRemove);
+//        log.info("comm to remove" + comToRemove.toString());
+
+    }
+
+
+    private void removeByTeacher(List<Teacher> teacherList) {
+        var allDraft = commissionRepository.findAll()
                 .stream().filter(commission -> commission.getState().equals(CommissionState.DRAFT))
                 .collect(Collectors.toList());
-//        System.out.println("all " + all);
+
         for (Teacher teacher : teacherList) {
 
-//            var toRemove = all.stream()
-//                    .filter(commission ->
-//                            commission.getTeachers().contains(teacher))
-//                    .collect(Collectors.toList());
-            var toRemove = new ArrayList<Commission>();
-            for (Commission commission : all) {
-                System.out.println(commission.getTeachers());
-                System.out.println("tryin " + teacher);
-                if (commission.getTeachers().contains(teacher)) {
-                    System.out.println("contains");
-                    toRemove.add(commission);
-                }
-            }
+            var toRemove = allDraft.stream()
+                    .filter(commission -> commission.getTeachers().contains(teacher))
+                    .collect(Collectors.toList());
 
-            System.out.println(toRemove + "to remove");
-            var iter = toRemove.iterator();
-            while (iter.hasNext()) {
-                remove(iter.next());
-            }
-            log.info(teacher + " removed");
+            remove(toRemove);
+        }
+    }
+
+    private void remove(List<Commission> toRemove) {
+        var iter = toRemove.iterator();
+        while (iter.hasNext()) {
+            remove(iter.next());
         }
     }
 
     public void remove(Commission commission) {
-        System.out.println("remove " + commission);
-        commissionRepository.delete(commission);
+        remove(commission.getId());
     }
 
     public void remove(Long id) {
+        //todo when remove commission, clear teachers unavailable date
         commissionRepository.deleteById(id);
     }
 
     public void remove() {
+        //todo when remove commission, clear teachers unavailable date
+        teacherService.removeAllDates();
         commissionRepository.deleteAll();
+
     }
 }

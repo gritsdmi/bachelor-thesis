@@ -33,7 +33,8 @@ class CommissionsListPage extends React.Component {
 
     componentDidMount() {
         get("/commission/notDraft").then((response) => {
-            this.setState({commissions: response.data})
+            this.setState({commissions: response.data}
+                , () => console.log(this.state.commissions))
         })
     }
 

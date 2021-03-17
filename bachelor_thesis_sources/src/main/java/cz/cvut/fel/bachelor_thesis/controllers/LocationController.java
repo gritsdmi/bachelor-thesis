@@ -45,8 +45,8 @@ public class LocationController implements Controller {
         return lol;
     }
 
-    @GetMapping("/free")
-    public List<Location> getFree(@RequestBody String date) {
+    @GetMapping("/free/{date}")
+    public List<Location> getFree(@PathVariable String date) {
         return locationService.getFreeLocationByDate(date);
     }
 

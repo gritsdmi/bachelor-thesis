@@ -25,7 +25,7 @@ public class DateService {
     public Date save(DateTO dateTO) {
         var date = new Date();
         date.setDate(dateTO.getDate());
-        date.setSemester(dateTO.getSemester());
+//        date.setSemester(dateTO.getSemester());
 
         return dateRepository.save(date);
     }
@@ -41,7 +41,7 @@ public class DateService {
         var date = dateRepository.getOne(dateId);
 
         date.setDate(dateTO.getDate());
-        date.setSemester(dateTO.getSemester());
+//        date.setSemester(dateTO.getSemester());
 
         return dateRepository.save(date);
     }

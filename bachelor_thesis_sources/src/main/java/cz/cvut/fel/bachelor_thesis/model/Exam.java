@@ -16,14 +16,17 @@ import java.util.List;
 @Table(name = "Exam")
 public class Exam extends AbstractEntity {
 
-    @OneToOne
+    @OneToOne(mappedBy = "exam")// w/o mapped was OK
+    @JsonIgnore
+    @ToString.Exclude
     private Commission commission;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     private Location location;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
+//            (cascade = CascadeType.REMOVE)
     private Date date;
 
     private String semester;

@@ -25,7 +25,7 @@ const useStyles = theme => ({
 
 const dateFormat = 'dd.MM.yyyy'
 
-class CreatingParametersField extends React.Component {
+class CommissionParameters extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -44,7 +44,7 @@ class CreatingParametersField extends React.Component {
     }
 
     componentDidMount() {
-        console.log("CreatingParametersField DID MOUNT")
+        console.log("CommissionParameters DID MOUNT")
         get("/exam/degrees")
             .then(response => {
                 this.setState({
@@ -60,14 +60,7 @@ class CreatingParametersField extends React.Component {
         //         })
         //     })
         //     .catch(error => console.log(error))
-        get("/location")
-            .then(response => {
-                this.setState({
-                    // locations: this.test(response.data),
-                    locations: response.data,
-                }, () => console.log(this.state.locations))
-            })
-            .catch(error => console.log(error))
+        this.fetchLocations(this.state.selectedDate);
 
     }
 
@@ -101,7 +94,25 @@ class CreatingParametersField extends React.Component {
         console.log("handleChangeDate", format(event, dateFormat))
         this.setState({
             selectedDate: format(event, dateFormat),
-        })
+        }, () => this.fetchLocations(this.state.selectedDate))
+
+    }
+
+    fetchLocations(dateF) {
+        const payload = {
+            date: '',
+            semester: ''
+        }
+        console.log("fetchLocations payload", payload)
+
+        get(`/location/free/${dateF}`)
+            .then(response => {
+                this.setState({
+                    // locations: this.test(response.data),
+                    locations: response.data,
+                }, () => console.log(this.state.locations))
+            })
+            .catch(error => console.log(error))
     }
 
     handleChangeDegree = (event) => {
@@ -119,6 +130,7 @@ class CreatingParametersField extends React.Component {
     }
 
     onClickGenerateButton = () => {
+        //todo make button disable, until generation complete
 
         //creationTO object
         const payload = {
@@ -176,8 +188,8 @@ class CreatingParametersField extends React.Component {
                                 //todo css
                                 disableToolbar
                                 // variant="inline"
-                                format="MM.dd.yyyy"//poebat мб это изза разных версий пикера и форматера
-
+                                // format="MM.dd.yyyy"//poebat мб это изза разных версий пикера и форматера
+                                // dateFormat="dd.MM.yyyy"
                                 autoOk={true}
                                 // placeholderText={"Enter date"}
                                 // margin="normal"
@@ -410,4 +422,4 @@ const data = {
     ]
 }
 
-export default withStyles(useStyles)(CreatingParametersField);
+export default withStyles(useStyles)(CommissionParameters);

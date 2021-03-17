@@ -4,12 +4,20 @@ import Button from "@material-ui/core/Button";
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import Paper from '@material-ui/core/Paper';
 import {NavLink} from "react-router-dom";
+import {get} from "../utils/request"
 
 class Header extends React.Component {
     //TODO reset styles
 
     constructor(props) {
         super(props)
+    }
+
+    onClickParseTeachers = () => {
+        console.log("onClickParseTeachers")
+        get("/util/4")
+            .then(() => console.log("parse ok"))
+            .catch((error) => console.log(error))
     }
 
     render() {
@@ -36,6 +44,11 @@ class Header extends React.Component {
                         </Button>
                         <Button>
                             <AccountBoxIcon/>
+                        </Button>
+                        <Button
+                            onClick={this.onClickParseTeachers}
+                        >
+                            Parse teachers
                         </Button>
                     </Box>
                 </Paper>

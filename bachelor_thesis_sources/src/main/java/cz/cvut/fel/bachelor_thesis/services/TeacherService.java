@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,12 @@ public class TeacherService {
 
         log.warning(canToday.toString());
         return canToday;
+
+    }
+
+    public void removeAllDates() {
+        var all = teacherRepository.findAll();
+        all.forEach(teacher -> teacher.setUnavailableDates(new ArrayList<>()));
 
     }
 
