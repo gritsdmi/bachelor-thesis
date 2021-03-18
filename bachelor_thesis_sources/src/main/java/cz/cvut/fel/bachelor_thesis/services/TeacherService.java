@@ -1,5 +1,6 @@
 package cz.cvut.fel.bachelor_thesis.services;
 
+import cz.cvut.fel.bachelor_thesis.model.Date;
 import cz.cvut.fel.bachelor_thesis.model.Teacher;
 import cz.cvut.fel.bachelor_thesis.repository.TeacherRepository;
 import cz.cvut.fel.bachelor_thesis.to.TeacherTO;
@@ -50,6 +51,12 @@ public class TeacherService {
         var teacher = teacherRepository.getOne(id);
 
         return save(teacher, teacherTO);
+    }
+
+    public void updDate(List<Teacher> list, Date date) {
+        list.forEach(teacher -> {
+            teacherRepository.getOne(teacher.getId()).getUnavailableDates().add(date);
+        });
     }
 
     @Transactional

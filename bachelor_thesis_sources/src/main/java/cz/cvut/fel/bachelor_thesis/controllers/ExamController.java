@@ -3,7 +3,6 @@ package cz.cvut.fel.bachelor_thesis.controllers;
 import cz.cvut.fel.bachelor_thesis.model.Exam;
 import cz.cvut.fel.bachelor_thesis.model.enums.Degree;
 import cz.cvut.fel.bachelor_thesis.services.ExamService;
-import cz.cvut.fel.bachelor_thesis.to.ExamTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,15 +36,17 @@ public class ExamController implements Controller {
         return examService.getDegrees();
     }
 
-    @PostMapping
-    public Exam create(@RequestBody ExamTO examTO) {
-        return examService.save(examTO);
-    }
 
-    @PostMapping("/{id}")
-    public Exam update(@PathVariable Long id, @RequestBody ExamTO to) {
-        return examService.update(id, to);
-    }
+    //DO NOT USE THEM
+//    @PostMapping
+//    public Exam create(@RequestBody ExamTO examTO) {
+//        return examService.save(examTO);
+//    }
+
+//    @PostMapping("/{id}")
+//    public Exam update(@PathVariable Long id, @RequestBody ExamTO to) {
+//        return examService.update(id, to);
+//    }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

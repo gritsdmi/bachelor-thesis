@@ -52,14 +52,7 @@ class CommissionParameters extends React.Component {
                 }, () => console.log(response.data))
             })
             .catch(error => console.log(error))
-        // get("/location/map")
-        //     .then(response => {
-        //         this.setState({
-        //             // locations: this.test(response.data),
-        //             locations: response.data,
-        //         })
-        //     })
-        //     .catch(error => console.log(error))
+
         this.fetchLocations(this.state.selectedDate);
 
     }
@@ -137,6 +130,7 @@ class CommissionParameters extends React.Component {
             date: this.state.selectedDate,
             degree: this.state.selectedDegree,
             locationId: this.state.selectedLocation.id,
+            teachers: null,
         }
         console.log("onClickGenerateButton", payload)
 

@@ -4,6 +4,7 @@ import cz.cvut.fel.bachelor_thesis.model.Commission;
 import cz.cvut.fel.bachelor_thesis.services.CommissionService;
 import cz.cvut.fel.bachelor_thesis.services.TeacherService;
 import cz.cvut.fel.bachelor_thesis.to.CommissionTO;
+import cz.cvut.fel.bachelor_thesis.to.CreatorTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +51,11 @@ public class CommissionController implements Controller {
         return commissionService.getOne(id);
     }
 
-//    @PostMapping
-//    public Commission create(@RequestBody CommissionTO to) {
-//        return commissionService.saveManual(to);
-//    }
+    @PostMapping("/create")
+    public Commission create(@RequestBody CreatorTO to) {
+        log.warning(to.toString());
+        return commissionService.saveManual(to);
+    }
 
     @PostMapping("/{commId}/nextState")
     public Commission nextState(@PathVariable Long commId, @RequestBody Commission commission) {

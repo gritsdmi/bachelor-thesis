@@ -97,7 +97,6 @@ class ManageTeachersPage extends React.Component {
 
     render() {
         const teachersFilteredList = this.teachersFilteredList()
-        console.log(teachersFilteredList)
 
         return (
             <>

@@ -36,6 +36,11 @@ public class TeacherController implements Controller {
         return teacherService.get(id);
     }
 
+    @GetMapping("/date/{date}")
+    public List<Teacher> getByDate(@PathVariable String date) {
+        return teacherService.getAvailableTeachersByDate(date);
+    }
+
 //    @GetMapping("/{name}")
 //    public List<Teacher> get(@PathVariable String name) {
 //        log.warning("this name");

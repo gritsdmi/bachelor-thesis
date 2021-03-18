@@ -40,8 +40,7 @@ public class ExamService {
     public Exam save(ExamTO examTO) {
         var exam = new Exam();
 
-        exam.setCommission(examTO.getCommission());
-        exam.setDate(examTO.getDate());
+//        exam.setDate(examTO.getDate());
         exam.setLocation(examTO.getLocation());
         exam.setFieldOfStudy(examTO.getFieldOfStudy());
         exam.setDegree(examTO.getDegree());
@@ -56,8 +55,7 @@ public class ExamService {
     public Exam update(Long id, ExamTO examTO) {
         var exam = examRepository.getOne(id);
 
-        exam.setCommission(examTO.getCommission());
-        exam.setDate(examTO.getDate());
+//        exam.setDate(examTO.getDate());
         exam.setLocation(examTO.getLocation());
         exam.setFieldOfStudy(examTO.getFieldOfStudy());
         exam.setDegree(examTO.getDegree());

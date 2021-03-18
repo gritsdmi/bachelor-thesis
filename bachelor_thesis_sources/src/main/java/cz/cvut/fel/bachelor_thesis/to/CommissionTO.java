@@ -1,6 +1,5 @@
 package cz.cvut.fel.bachelor_thesis.to;
 
-import cz.cvut.fel.bachelor_thesis.model.Exam;
 import cz.cvut.fel.bachelor_thesis.model.Teacher;
 import cz.cvut.fel.bachelor_thesis.model.enums.CommissionState;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class CommissionTO {
 
     private List<Teacher> teachers;
 
-    private Exam exam;
+    private ExamTO exam;
 
     private CommissionState state;
 }

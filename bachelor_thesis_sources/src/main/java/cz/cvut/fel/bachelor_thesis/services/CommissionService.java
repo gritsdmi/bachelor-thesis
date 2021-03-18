@@ -52,28 +52,31 @@ public class CommissionService {
     public Commission update(Long commissionId, CommissionTO commissionTO) {
         var commission = commissionRepository.getOne(commissionId);
 
-        commission.setExam(commissionTO.getExam());
+//        commission.setExam(commissionTO.getExam());
         commission.setState(commissionTO.getState());
         commission.setTeachers(commissionTO.getTeachers());
 
         return commissionRepository.save(commission);
     }
 
-    public Commission saveManual(CommissionTO commissionTO, String date, Long locationId) {
+    public Commission saveManual(CreatorTO creatorTO) {
         var commission = new Commission();
         var exam = examService.create();
-        var loc = locationService.get(locationId);
+        var loc = locationService.get(creatorTO.getLocationId());
         //todo do smth with date
-        var dateNew = dateService.create(date);
+        var dateNew = dateService.create(creatorTO.getDate());
 
         exam.setDate(dateNew);
         exam.setLocation(loc);
-        exam.setLocation(loc);
+        exam.setDegree(creatorTO.getDegree());
 //        examService.save(exam);
 
+        //todo add date to teacher's unavialable date
+        teacherService.updDate(creatorTO.getTeachers(), dateNew);
+
         commission.setExam(exam);
-        commission.setState(CommissionState.DRAFT);
-        commission.setTeachers(commissionTO.getTeachers());
+        commission.setState(CommissionState.EDITABLE);
+        commission.setTeachers(creatorTO.getTeachers());
 
         return commissionRepository.save(commission);
     }
