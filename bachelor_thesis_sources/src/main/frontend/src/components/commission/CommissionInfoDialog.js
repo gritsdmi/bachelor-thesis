@@ -86,6 +86,7 @@ class CommissionInfoDialog extends React.Component {
             ...this.props.commission,
             state: 'APPROVED',
         }
+        console.log(payload)
         post(`/commission/${commission.id}`, payload)
             .then(response => this.setState({commission: response.data}
                 , () => this.props.updComm(response.data)))
@@ -135,14 +136,15 @@ class CommissionInfoDialog extends React.Component {
                             direction={'column'}
                         >
                             <Typography>
-                                Exam date
+                                Exam date {this.state.commission.exam.date.date}
                             </Typography>
                             <Typography>
                                 State {this.state.commission.state}
                             </Typography>
                             <Typography>
                                 Location
-                                {/*{this.props.commission.exam.location}*/}
+                                {" " + this.props.commission.exam.location.building + ": " +
+                                this.props.commission.exam.location.classroom}
                             </Typography>
                             <Table>
                                 <TableBody>

@@ -3,7 +3,6 @@ package cz.cvut.fel.bachelor_thesis.controllers;
 import cz.cvut.fel.bachelor_thesis.model.Commission;
 import cz.cvut.fel.bachelor_thesis.services.CommissionService;
 import cz.cvut.fel.bachelor_thesis.services.TeacherService;
-import cz.cvut.fel.bachelor_thesis.to.CommissionTO;
 import cz.cvut.fel.bachelor_thesis.to.CreatorTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +62,8 @@ public class CommissionController implements Controller {
     }
 
     @PostMapping("/{id}")
-    public Commission update(@PathVariable Long id, @RequestBody CommissionTO to) {
-        return commissionService.update(id, to);
+    public Commission update(@PathVariable Long id, @RequestBody Commission commission) {
+        return commissionService.update(id, commission);
     }
 
     @DeleteMapping("/{id}")

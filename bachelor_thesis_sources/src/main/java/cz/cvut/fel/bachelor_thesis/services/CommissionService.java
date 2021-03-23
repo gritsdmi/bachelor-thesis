@@ -49,14 +49,17 @@ public class CommissionService {
     }
 
 
-    public Commission update(Long commissionId, CommissionTO commissionTO) {
-        var commission = commissionRepository.getOne(commissionId);
+    public Commission update(Long commissionId, Commission commission) {
+        var comm = commissionRepository.getOne(commissionId);
 
-//        commission.setExam(commissionTO.getExam());
-        commission.setState(commissionTO.getState());
-        commission.setTeachers(commissionTO.getTeachers());
+//        comm.setExam(commissionTO.getExam());
+        comm.setState(commission.getState());
+        comm.setTeachers(commission.getTeachers());
+        //todo add date to teacher's unavialable date
+        teacherService.updDate(commission.getTeachers(), commission.getExam().getDate());
 
-        return commissionRepository.save(commission);
+
+        return commissionRepository.save(comm);
     }
 
     public Commission saveManual(CreatorTO creatorTO) {

@@ -54,9 +54,16 @@ public class TeacherService {
     }
 
     public void updDate(List<Teacher> list, Date date) {
-        list.forEach(teacher -> {
-            teacherRepository.getOne(teacher.getId()).getUnavailableDates().add(date);
-        });
+        for (Teacher t : list) {
+            var storedTeacher = teacherRepository.getOne(t.getId());
+            if (!storedTeacher.getUnavailableDates().contains(date)) {
+                storedTeacher.getUnavailableDates().add(date);
+            }
+        }
+        //TODO add only if not contains
+//        list.forEach(teacher -> {
+//            teacherRepository.getOne(teacher.getId()).getUnavailableDates().add(date);
+//        });
     }
 
     @Transactional

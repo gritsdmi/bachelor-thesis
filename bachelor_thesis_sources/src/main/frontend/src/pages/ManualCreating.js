@@ -44,26 +44,29 @@ class ManualCreatingPage extends React.Component {
     }
 
     componentDidMount() {
-        if (!this.props.commission) {
+        if (!this.props.location.commission) {
             //click on header's button
             //there are none any graft
             console.log("ManualCreatingPage DID MOUNT props new == true")
-            this.fetchLocations(this.state.selectedDate);
-            this.fetchDegrees()
         } else {
             //edit some commission
 
-            console.log("ManualCreatingPage DID MOUNT props new == false")
-            this.setState({...this.props})
+            // console.log("ManualCreatingPage DID MOUNT props new == false", this.props)
+            this.setState({
+                commission: this.props.location.commission,
+                selectedDegree: this.props.location.commission.exam.degree,
+                selectedLocation: this.props.location.commission.exam.location,
+                selectedDate: this.props.location.commission.exam.date.date,
+            }, () => console.log(this.state))
 
         }
-        this.fetchTeachers()
+        console.log("ManualCreatingPage DID MOUNT props new == false", this.props)
+
+        this.fetchAll()
 
     }
 
     fetchLocations(dateF) {
-        console.log("fetchLocations payload")
-
         get(`/location/free/${dateF}`)
             .then(response => {
                 this.setState({
@@ -84,12 +87,18 @@ class ManualCreatingPage extends React.Component {
     }
 
     fetchTeachers() {
-        // get("/teacher")
         get(`/teacher/date/${this.state.selectedDate}`)
             .then((response) => {
                 this.setState({teachers: response.data})
             })
             .catch(err => console.log(err))
+    }
+
+    fetchAll() {
+        console.log("fetchAll")
+        this.fetchTeachers()
+        this.fetchDegrees()
+        this.fetchLocations(this.state.selectedDate);
     }
 
 
@@ -109,7 +118,7 @@ class ManualCreatingPage extends React.Component {
         console.log("handleChangeDate", format(event, dateFormat))
         this.setState({
             selectedDate: format(event, dateFormat),
-        }, () => this.fetchLocations(this.state.selectedDate))
+        }, () => this.fetchAll())
 
     }
 
@@ -129,9 +138,9 @@ class ManualCreatingPage extends React.Component {
 
     teachersFilteredList() {
 
-        if (this.state.searchPattern.length < 2) {
-            return []
-        }
+        // if (this.state.searchPattern.length < 2) {
+        //     return []
+        // }
 
         if (this.state.searchPattern === '') {
             return this.state.teachers
@@ -140,8 +149,8 @@ class ManualCreatingPage extends React.Component {
         return this.state.teachers
             && this.state.searchPattern
             && this.state.teachers.filter(teacher => {
-                    return (
-                        (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+                return (
+                    (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
                         || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
                         || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
                 }
@@ -193,30 +202,45 @@ class ManualCreatingPage extends React.Component {
         if (!this.state.commission) {
             return
         }
-        //creationTO object
-        const payload = {
-            date: this.state.selectedDate,
-            degree: this.state.selectedDegree,
-            locationId: this.state.selectedLocation.id,
-            teachers: this.state.commission.teachers,
+
+        let payload
+        if (this.props.location.commission) {
+            payload = {
+                ...this.state.commission,
+            }
+            post(`/commission/${this.state.commission.id}`, payload)
+                .then(res => console.log(res))
+            this.setState({
+                ...InitialState
+            }, () => this.fetchAll())
+        } else {
+            //creationTO object
+            payload = {
+                date: this.state.selectedDate,
+                degree: this.state.selectedDegree,
+                locationId: this.state.selectedLocation.id,
+                teachers: this.state.commission.teachers,
+            }
+            post(`/commission/create`, payload)
+                .then(res => console.log(res))
+            this.setState({
+                ...InitialState
+            }, () => this.fetchAll())
         }
 
-        // let payload = {
-        //     ...this.state.commission,
-        // }
         console.log(payload)
 
 
-        post(`/commission/create`, payload)
-            .then(res => console.log(res))
-        this.setState({
-            ...InitialState
-        }, () => this.fetchTeachers())
     }
 
 
     render() {
         const teachersFilteredList = this.teachersFilteredList()
+        const defaults = {
+            date: this.state.selectedDate,
+            loc: this.state.selectedLocation,
+            degree: this.state.selectedDegree,
+        }
 
         return (
             <>
@@ -240,9 +264,9 @@ class ManualCreatingPage extends React.Component {
                         onChangeDate={this.handleChangeDate}
                         onChangeDegree={this.handleChangeDegree}
                         onChangeLoc={this.handleChangeLocation}
-                    >
+                        defaults={defaults}
+                    />
 
-                    </CommissionProps>
 
                     <Grid container>
                         <Grid item xs>

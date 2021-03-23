@@ -1,7 +1,7 @@
 import './App.css';
 import CommissionsListPage from "./pages/CommissionsList"
 import Header from "./components/Header";
-import {Switch, Route, BrowserRouter, Redirect} from 'react-router-dom';
+import {Redirect, Route, Switch} from 'react-router-dom';
 import Container from "@material-ui/core/Container";
 import AutoGeneratingPage from "./pages/AutoGenerating";
 import ManualCreatingPage from "./pages/ManualCreating";

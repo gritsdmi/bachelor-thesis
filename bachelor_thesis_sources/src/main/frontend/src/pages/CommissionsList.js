@@ -42,11 +42,11 @@ class CommissionsListPage extends React.Component {
         console.log("componentDidUpdate");
     }
 
-    onGenerateButtonClick = () => {
-        get("/util/gen/2").then((response) => {
-            this.setState({commissions: response.data})
-        })
-    }
+    // onGenerateButtonClick = () => {
+    //     get("/util/gen/2").then((response) => {
+    //         this.setState({commissions: response.data})
+    //     })
+    // }
 
     onClearButtonClick = () => {
         del("/commission").then((response) => {
@@ -83,7 +83,14 @@ class CommissionsListPage extends React.Component {
 
     onCommissionEditButtonClick = (commission) => {
         //todo redirect to manual commission
-        console.log("onCommissionEditButtonClick", commission.teachers)
+        console.log("onCommissionEditButtonClick", commission)
+        // return <Redirect to="/manual/"/> //todo do not work
+        // this.props.history.push('/manual'); //todo but add props
+        this.props.history.push({
+            pathname: "/manual",
+            commission: commission,
+        });
+
     }
 
     render() {
@@ -120,7 +127,7 @@ class CommissionsListPage extends React.Component {
                         </h1>
                     </Box>
                     <Box>
-                        <Button onClick={this.onGenerateButtonClick}>Generate 2</Button>
+                        {/*<Button onClick={this.onGenerateButtonClick}>Generate 2</Button>*/}
                         <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
                     </Box>
                     <CommissionSearchBox>

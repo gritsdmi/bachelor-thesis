@@ -130,7 +130,7 @@ class CommissionParameters extends React.Component {
             date: this.state.selectedDate,
             degree: this.state.selectedDegree,
             locationId: this.state.selectedLocation.id,
-            teachers: null,
+            teachers: [],
         }
         console.log("onClickGenerateButton", payload)
 

@@ -61,6 +61,6 @@ public class CommissionMaker {
                     comTo.setTeachers(teacherList);
                     commissionService.save(comTo, creatorTO);
                 });
-        return commissionService.getAll();
+        return commissionService.getDrafts();
     }
 }

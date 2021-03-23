@@ -1,18 +1,45 @@
 import React from "react";
-import {MenuItem, Paper, Select} from "@material-ui/core";
+import {makeStyles, MenuItem, Paper, Select} from "@material-ui/core";
 import DateFnsUtils from "@date-io/date-fns";
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 
-export default function CommissionProps({date, onChangeDate, onChangeDegree, onChangeLoc, degrees, locations}) {
+
+const useStyles = makeStyles((theme) => ({
+    card: {
+        margin: theme.spacing(2),
+        width: '250px',
+    },
+    cardActions: {
+        display: "flex",
+        justifyContent: "center"
+    },
+    item: {
+        margin: theme.spacing(1),
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+    }
+}));
+
+export default function CommissionProps({
+                                            date,
+                                            onChangeDate,
+                                            onChangeDegree,
+                                            onChangeLoc,
+                                            degrees,
+                                            locations,
+                                            defaults
+                                        }) {
+    const classes = useStyles();
 
 
     return (
 
         <Paper>
-            commission props
             <Select
                 // fullWidth
+                defaultValue={defaults ? defaults.degree : " "}
                 onChange={onChangeDegree}
+                className={classes.item}
             >
                 {
                     degrees.map((degree, idx) => {
@@ -42,6 +69,7 @@ export default function CommissionProps({date, onChangeDate, onChangeDegree, onC
 
                     value={date}
                     onChange={onChangeDate}
+                    className={classes.item}
 
                     // KeyboardButtonProps={{
                     //     'aria-label': 'change date',
@@ -52,6 +80,8 @@ export default function CommissionProps({date, onChangeDate, onChangeDegree, onC
             <Select
                 // fullWidth
                 onChange={onChangeLoc}
+                className={classes.item}
+
             >
                 {
                     locations.map((loc, idx) => {
