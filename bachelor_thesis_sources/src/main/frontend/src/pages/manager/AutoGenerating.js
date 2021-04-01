@@ -1,9 +1,9 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import CommissionParameters from "../components/CommissionParameters";
+import CommissionParameters from "../../components/CommissionParameters";
 import {Paper} from "@material-ui/core";
-import {get, post} from "../utils/request"
-import CommissionCard from "../components/commission/CommissionCard";
+import {get, post} from "../../utils/request"
+import CommissionCard from "../../components/commission/CommissionCard";
 
 
 const useStyles = theme => ({

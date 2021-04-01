@@ -1,9 +1,9 @@
 import React from "react";
 import Container from "@material-ui/core/Container";
-import {get} from "../utils/request";
-import SearchBox from "../components/SearchBox";
-import SearchResultPanel from "../components/SearchResultPanel";
-import EditTeacherDialogClass from "../components/manage/EditTeacherDialogClass";
+import {get} from "../../utils/request";
+import SearchBox from "../../components/SearchBox";
+import SearchResultPanel from "../../components/SearchResultPanel";
+import EditTeacherDialogClass from "../../components/manage/EditTeacherDialogClass";
 
 class ManageTeachersPage extends React.Component {
 
@@ -126,10 +126,11 @@ class ManageTeachersPage extends React.Component {
                     <SearchResultPanel
                         // data={this.state.teachers}
                         data={teachersFilteredList}
-                        onEditClick={this.onClickEditTeacherButton}//works w/o argument
+                        onClick={this.onClickEditTeacherButton}//works w/o argument
                         // test={this.onClickEditTeacherButtonTest.bind(this)} // test
                         // parentCallback={this.callbackFunction()} // idk how, but its pass value, but call component did update
                         // handleTest={this.handleEditButtonClickTest}
+                        edit={true}
                     />
                 </Container>
 

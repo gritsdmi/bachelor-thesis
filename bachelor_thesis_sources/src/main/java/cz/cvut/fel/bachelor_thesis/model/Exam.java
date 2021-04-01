@@ -38,4 +38,6 @@ public class Exam extends AbstractEntity {
 
     @OneToMany(mappedBy = "exam")
     private List<Student> students;
+
+//    private String time;
 }

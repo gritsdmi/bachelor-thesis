@@ -4,7 +4,7 @@ import {Divider, ListItem, ListItemText, Paper} from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 
-export default function SearchResultPanel({data, onEditClick, add}) {
+export default function SearchResultPanel({data, onClick, add, edit, rec}) {
     // const [data] = data;
 
     // componentDidMount() {
@@ -30,12 +30,13 @@ export default function SearchResultPanel({data, onEditClick, add}) {
                         <ListItemText primary={
                             item.name + " " + item.surname}/>
                         <Button
-                            onClick={() => onEditClick(item)}// only this handle
+                            onClick={() => onClick(item)}// only this handle
                             // onClick={() => this.props.onEditClick(item.id)}// only this handle
                             // onClick={this.sendBackData(item)} // idk how, but its pass value, but call component did update
                         >
                             {add && "Add"}
-                            {!add && "Edit"}
+                            {edit && "Edit"}
+                            {rec && "Recommend"}
                         </Button>
                     </ListItem>
                     <Divider/>

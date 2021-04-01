@@ -3,6 +3,7 @@ package cz.cvut.fel.bachelor_thesis.services;
 import cz.cvut.fel.bachelor_thesis.model.Date;
 import cz.cvut.fel.bachelor_thesis.model.Teacher;
 import cz.cvut.fel.bachelor_thesis.repository.TeacherRepository;
+import cz.cvut.fel.bachelor_thesis.to.DateTO;
 import cz.cvut.fel.bachelor_thesis.to.TeacherTO;
 import cz.cvut.fel.bachelor_thesis.utils.CsvParser;
 import lombok.extern.java.Log;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,12 @@ public class TeacherService {
 
     private final TeacherRepository teacherRepository;
     private final CsvParser csvParser;
+
+    @Autowired
+    private DateService dateService;
+
+    @Autowired
+    private ExamService examService;
 
     @Autowired
     public TeacherService(TeacherRepository teacherRepository, CsvParser csvParser) {
@@ -53,17 +61,48 @@ public class TeacherService {
         return save(teacher, teacherTO);
     }
 
-    public void updDate(List<Teacher> list, Date date) {
+    public void addDate(List<Teacher> list, Date date) {
         for (Teacher t : list) {
-            var storedTeacher = teacherRepository.getOne(t.getId());
-            if (!storedTeacher.getUnavailableDates().contains(date)) {
-                storedTeacher.getUnavailableDates().add(date);
-            }
+            addDate(t, date);
         }
         //TODO add only if not contains
 //        list.forEach(teacher -> {
 //            teacherRepository.getOne(teacher.getId()).getUnavailableDates().add(date);
 //        });
+    }
+
+    public Teacher addDate(Long teacherId, DateTO dateTO) {
+        var teacher = teacherRepository.getOne(teacherId);
+        addDate(teacher, dateService.create(dateTO.getDate()));
+        return teacherRepository.getOne(teacherId);
+    }
+
+    public void addDate(Teacher teacher, Date date) {
+        var storedTeacher = teacherRepository.getOne(teacher.getId());
+        if (!storedTeacher.getUnavailableDates().contains(date)) {
+            storedTeacher.getUnavailableDates().add(date);
+        }
+    }
+
+    public void removeDate(Teacher teacher, Date date) {
+        System.out.println(teacher.getUnavailableDates());
+        teacher.getUnavailableDates().removeIf(d -> d.getDate().equals(date.getDate()));
+        var t = teacherRepository.getOne(teacher.getId()).getUnavailableDates();
+        System.out.println(t);
+    }
+
+    public Teacher removeDate(Long teacherId, Date date) {
+        removeDate(teacherRepository.getOne(teacherId), date);
+        return teacherRepository.getOne(teacherId);
+    }
+
+    public List<Date> getExamDates(Long teacherId) {
+        var teacher = teacherRepository.getOne(teacherId);
+
+        return teacher.getCommissionList()
+                .stream()
+                .map(commission -> commission.getExam().getDate())
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -101,12 +140,23 @@ public class TeacherService {
         teacherRepository.deleteAll();
     }
 
+    /**
+     * Returns teachers who has contract more than 0.
+     *
+     * @return List of Teacher
+     */
     public List<Teacher> getTeachersWhoCan() {
         return teacherRepository.getTeachersWhoCan();
     }
 
     public List<Teacher> getAvailableTeachersByDate(String dateStr) {
         var teachersWhoCan = getTeachersWhoCan();
+        var examsToday = examService.getByDate(dateStr);
+        var teacherExamToday = examsToday
+                .stream()
+                .map(exam -> exam.getCommission().getTeachers())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
         log.warning(teachersWhoCan.toString());
         var canToday = teachersWhoCan
@@ -114,6 +164,7 @@ public class TeacherService {
                 .filter(teacher -> teacher.getUnavailableDates()
                         .stream()
                         .noneMatch(date -> date.getDate().equals(dateStr)))
+                .filter(teacher -> !teacherExamToday.contains(teacher)) //exclude when teacher have exam today
                 .collect(Collectors.toList());
 
         log.warning(canToday.toString());

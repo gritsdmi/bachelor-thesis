@@ -1,13 +1,13 @@
 import React from "react";
 import Container from "@material-ui/core/Container";
 import {withStyles} from "@material-ui/core/styles";
-import SearchBox from "../components/SearchBox";
+import SearchBox from "../../components/SearchBox";
 import {Grid, ListItem, Paper, Table, TableBody, TableCell, TableRow} from "@material-ui/core";
-import CommissionProps from "../components/CommissionProps";
-import {get, post} from "../utils/request"
+import CommissionProps from "../../components/CommissionProps";
+import {get, post} from "../../utils/request"
 import format from "date-fns/format";
 import List from "@material-ui/core/List";
-import SearchResultPanel from "../components/SearchResultPanel";
+import SearchResultPanel from "../../components/SearchResultPanel";
 import Button from "@material-ui/core/Button";
 import ClearIcon from '@material-ui/icons/Clear';
 
@@ -274,7 +274,7 @@ class ManualCreatingPage extends React.Component {
                                 Search results
                                 <SearchResultPanel
                                     data={teachersFilteredList}
-                                    onEditClick={this.onClickAddTeacherButton}
+                                    onClick={this.onClickAddTeacherButton}
                                     add={true}
                                 />
                             </Paper>

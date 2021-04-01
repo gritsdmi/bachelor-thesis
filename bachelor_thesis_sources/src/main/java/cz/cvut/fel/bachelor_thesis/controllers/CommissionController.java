@@ -1,6 +1,7 @@
 package cz.cvut.fel.bachelor_thesis.controllers;
 
 import cz.cvut.fel.bachelor_thesis.model.Commission;
+import cz.cvut.fel.bachelor_thesis.model.Teacher;
 import cz.cvut.fel.bachelor_thesis.services.CommissionService;
 import cz.cvut.fel.bachelor_thesis.services.TeacherService;
 import cz.cvut.fel.bachelor_thesis.to.CreatorTO;
@@ -48,6 +49,17 @@ public class CommissionController implements Controller {
     @GetMapping("/{id}")
     public Commission get(@PathVariable Long id) {
         return commissionService.getOne(id);
+    }
+
+    @GetMapping("/byTeacher/{teacherId}")
+    public List<Commission> getByTeacher(@PathVariable Long teacherId) {
+        return commissionService.getByTeacher(teacherId);
+    }
+
+    @PostMapping("/replace/{commId}/{teacherIdToRemove}")
+    public Commission replaceTeacher(@PathVariable Long commId, @RequestBody Teacher teacher, @PathVariable Long teacherIdToRemove) {
+        log.warning("replacing teacher");
+        return commissionService.addTeacherToCommission(teacher, commId, teacherIdToRemove);
     }
 
     @PostMapping("/create")

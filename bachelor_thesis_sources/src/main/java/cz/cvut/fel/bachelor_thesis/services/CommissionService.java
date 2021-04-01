@@ -48,6 +48,33 @@ public class CommissionService {
         return commissionRepository.findByStateNot(CommissionState.DRAFT);
     }
 
+    public List<Commission> getByTeacher(Long teacherId) {
+        var all = commissionRepository.findAll();
+        return all.stream()
+                .filter(commission -> commission.getTeachers().stream().anyMatch(t -> t.getId().equals(teacherId)))
+                .collect(Collectors.toList());
+    }
+
+    public Commission addTeacherToCommission(Teacher teacher, Long commId, Long teacherIdToRemove) {
+        var comm = commissionRepository.getOne(commId);
+        var date = comm.getExam().getDate();
+        var teacherToRemove = teacherService.get(teacherIdToRemove);
+
+//        teacherService.addDate(teacher, date);
+
+        comm.getTeachers().add(teacher);
+        removeTeacherFromCommission(teacherToRemove, comm);
+        return comm;
+    }
+
+    public void removeTeacherFromCommission(Teacher teacher, Commission commission) {
+        //todo think about that
+        teacherService.removeDate(teacher, commission.getExam().getDate());
+        //
+
+        commission.getTeachers().removeIf(t -> t.getId().equals(teacher.getId()));
+        update(commission.getId(), commission);
+    }
 
     public Commission update(Long commissionId, Commission commission) {
         var comm = commissionRepository.getOne(commissionId);
@@ -55,8 +82,9 @@ public class CommissionService {
 //        comm.setExam(commissionTO.getExam());
         comm.setState(commission.getState());
         comm.setTeachers(commission.getTeachers());
-        //todo add date to teacher's unavialable date
-        teacherService.updDate(commission.getTeachers(), commission.getExam().getDate());
+
+        //add date to teacher's unavailable date
+//        teacherService.addDate(commission.getTeachers(), commission.getExam().getDate());
 
 
         return commissionRepository.save(comm);
@@ -74,8 +102,8 @@ public class CommissionService {
         exam.setDegree(creatorTO.getDegree());
 //        examService.save(exam);
 
-        //todo add date to teacher's unavialable date
-        teacherService.updDate(creatorTO.getTeachers(), dateNew);
+        // add date to teacher's unavailable date
+//        teacherService.addDate(creatorTO.getTeachers(), dateNew);
 
         commission.setExam(exam);
         commission.setState(CommissionState.EDITABLE);

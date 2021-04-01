@@ -1,11 +1,13 @@
 import './App.css';
-import CommissionsListPage from "./pages/CommissionsList"
+import CommissionsListPage from "./pages/manager/CommissionsList"
 import Header from "./components/Header";
 import {Redirect, Route, Switch} from 'react-router-dom';
 import Container from "@material-ui/core/Container";
-import AutoGeneratingPage from "./pages/AutoGenerating";
-import ManualCreatingPage from "./pages/ManualCreating";
-import ManageTeachersPage from "./pages/ManageTeachers";
+import AutoGeneratingPage from "./pages/manager/AutoGenerating";
+import ManualCreatingPage from "./pages/manager/ManualCreating";
+import ManageTeachersPage from "./pages/manager/ManageTeachers";
+import TeacherOverview from "./pages/teacher/TeacherOverview";
+import TeacherCalendar from "./pages/teacher/TeacherCalendar";
 
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
                     <Route exact path="/auto" component={AutoGeneratingPage}/>
                     <Route exact path="/manual" component={ManualCreatingPage}/>
                     <Route exact path="/manage" component={ManageTeachersPage}/>
+                    <Route exact path="/teacher" component={TeacherOverview}/>
+                    <Route exact path="/teacher/cal" component={TeacherCalendar}/>
                 </Switch>
             </Container>
         </>

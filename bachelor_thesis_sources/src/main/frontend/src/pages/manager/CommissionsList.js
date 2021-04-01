@@ -3,13 +3,13 @@ import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import {Paper} from "@material-ui/core";
 
-import {del, get} from "../utils/request"
+import {del, get} from "../../utils/request"
 import Button from "@material-ui/core/Button";
-import CommissionCard from "../components/commission/CommissionCard";
+import CommissionCard from "../../components/commission/CommissionCard";
 import {withStyles} from "@material-ui/core/styles";
 
-import CommissionSearchBox from "../components/commission/CommissionSearchBox";
-import CommissionInfoDialog from "../components/commission/CommissionInfoDialog";
+import CommissionSearchBox from "../../components/commission/CommissionSearchBox";
+import CommissionInfoDialog from "../../components/commission/CommissionInfoDialog";
 
 const useStyles = theme => ({
     cardContainer: {

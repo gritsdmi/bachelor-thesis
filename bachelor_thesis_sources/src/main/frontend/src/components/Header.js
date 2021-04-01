@@ -42,6 +42,7 @@ class Header extends React.Component {
                         <Button>
                             <NavLink to="/manage">Manage teachers</NavLink>
                         </Button>
+
                         <Button>
                             <AccountBoxIcon/>
                         </Button>
@@ -49,6 +50,13 @@ class Header extends React.Component {
                             onClick={this.onClickParseTeachers}
                         >
                             Parse teachers
+                        </Button>
+
+                        <Button>
+                            <NavLink to="/teacher">Teacher</NavLink>
+                        </Button>
+                        <Button>
+                            <NavLink to="/teacher/cal">Teacher cal</NavLink>
                         </Button>
                     </Box>
                 </Paper>
