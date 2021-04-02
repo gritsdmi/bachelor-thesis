@@ -4,6 +4,7 @@ import {Paper, TextField} from "@material-ui/core";
 export default function SearchBox({onClickButton, searchPattern, onChange}) {
     const [target] = useState('');
 
+    //todo pass label to props
     return (
         <>
             <Paper> {/*todo css*/}

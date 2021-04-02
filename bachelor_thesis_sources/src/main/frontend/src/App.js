@@ -8,6 +8,7 @@ import ManualCreatingPage from "./pages/manager/ManualCreating";
 import ManageTeachersPage from "./pages/manager/ManageTeachers";
 import TeacherOverview from "./pages/teacher/TeacherOverview";
 import TeacherCalendar from "./pages/teacher/TeacherCalendar";
+import EmailTemplates from "./pages/manager/EmailTemplates";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
                     <Route exact path="/manage" component={ManageTeachersPage}/>
                     <Route exact path="/teacher" component={TeacherOverview}/>
                     <Route exact path="/teacher/cal" component={TeacherCalendar}/>
+                    <Route exact path="/emails" component={EmailTemplates}/>
                 </Switch>
             </Container>
         </>

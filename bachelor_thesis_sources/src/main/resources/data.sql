@@ -13,3 +13,12 @@ VALUES (2, 'SIT', 'Bc');
 
 INSERT INTO teacher (id, personal_number, name, surname, email_address, login, password, first_login)
 VALUES (999, 1111111, 'Jiri', 'Sebek', 'sebek@sebek', 'sebek', 'sebek', true);
+
+INSERT INTO email_template (id, email_type, subject, text)
+VALUES (1, 'FINAL', 'testSubject', 'lorem ipsum');
+
+INSERT INTO email_template (id, email_type, subject, text)
+VALUES (2, 'NOMINATED', 'testSubject', 'lorem ipsum');
+
+INSERT INTO email_template (id, email_type, subject, text)
+VALUES (2, 'RECOMMENDED', 'testSubject', 'lorem ipsum');

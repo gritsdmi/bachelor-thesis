@@ -44,7 +44,7 @@ class Header extends React.Component {
                         </Button>
 
                         <Button>
-                            <AccountBoxIcon/>
+                            <NavLink to="/emails"><AccountBoxIcon/></NavLink>
                         </Button>
                         <Button
                             onClick={this.onClickParseTeachers}

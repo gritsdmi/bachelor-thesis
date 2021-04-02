@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
@@ -15,6 +17,7 @@ import javax.persistence.Table;
 @Table(name = "email_template")
 public class EmailTemplate extends AbstractEntity {
 
+    @Enumerated(EnumType.STRING)
     private EmailType emailType;
 
     private String text;
