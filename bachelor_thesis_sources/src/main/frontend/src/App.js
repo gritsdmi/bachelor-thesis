@@ -9,6 +9,7 @@ import ManageTeachersPage from "./pages/manager/ManageTeachers";
 import TeacherOverview from "./pages/teacher/TeacherOverview";
 import TeacherCalendar from "./pages/teacher/TeacherCalendar";
 import EmailTemplates from "./pages/manager/EmailTemplates";
+import Login from "./pages/login/Login";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
                 <Header/>
                 <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                     <Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>
+                    <Route exact path="/login" component={Login}/>
                     <Route exact path="/commissions" component={CommissionsListPage}/>
                     <Route exact path="/auto" component={AutoGeneratingPage}/>
                     <Route exact path="/manual" component={ManualCreatingPage}/>

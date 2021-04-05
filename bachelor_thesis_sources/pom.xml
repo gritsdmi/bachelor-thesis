@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>cz.cvut.fel</groupId>
-    <artifactId>bachelor_thesis</artifactId>
+    <artifactId>fem</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>bachelor_thesis</name>
-    <description>Bachelor thesis</description>
+    <name>Final exam topic manager</name>
+    <description>Final exam topic manager</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -56,7 +56,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!--		FOR parsing xlsx-->
+        <!-- FOR parsing xlsx-->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
@@ -82,6 +82,7 @@
             <version>2.3.9</version>
         </dependency>
 
+        <!--   tests     -->
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
@@ -92,6 +93,12 @@
                     <artifactId>hamcrest-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
     </dependencies>
