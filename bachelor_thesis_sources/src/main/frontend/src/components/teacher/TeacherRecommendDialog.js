@@ -39,7 +39,6 @@ class TeacherRecommendDialog extends React.Component {
     }
 
     componentDidMount() {
-        console.log("TeacherRecommendDialog DID MOUNT")
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -52,7 +51,7 @@ class TeacherRecommendDialog extends React.Component {
 
     //fetch teachers who is available on this day
     fetchTeacher() {
-        get(`/teacher/date/${this.props.date}`)
+        get(`/user/teacher/date/${this.props.date}`)
             .then(response => {
                 this.setState({
                     teachers: response.data,
@@ -66,7 +65,10 @@ class TeacherRecommendDialog extends React.Component {
         // /add/{commId}/{teacherId}
         console.log(this.props)
         post(`/commission/replace/${this.props.commission.id}/${this.props.currentTeacherId}`, teacher)
-            .then(res => console.log(res))
+            .then(res => {
+                console.log(res)
+                this.props.onClose()
+            })
             .catch(err => console.log(err))
 
         console.log("onClickRecommendTeacher", teacher)

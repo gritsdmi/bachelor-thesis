@@ -42,12 +42,6 @@ class CommissionsListPage extends React.Component {
         console.log("componentDidUpdate");
     }
 
-    // onGenerateButtonClick = () => {
-    //     get("/util/gen/2").then((response) => {
-    //         this.setState({commissions: response.data})
-    //     })
-    // }
-
     onClearButtonClick = () => {
         del("/commission").then((response) => {
             this.setState({commissions: response.data})
@@ -97,10 +91,10 @@ class CommissionsListPage extends React.Component {
         const {classes} = this.props
 
         const cardsList = this.state.commissions
-            && this.state.commissions.map((commission, k) => {
+            && this.state.commissions.map((commission, idx) => {
                 return (
                     <CommissionCard
-                        key={k}
+                        key={idx}
                         commission={commission}
                         onInfoClick={this.onCommissionInfoButtonClick}
                         onEditClick={this.onCommissionEditButtonClick}
@@ -111,7 +105,6 @@ class CommissionsListPage extends React.Component {
 
         return (
             <>
-
                 <CommissionInfoDialog
                     open={this.state.commissionInfoDialogOpen}
                     commission={this.state.currentCommission}
@@ -127,7 +120,6 @@ class CommissionsListPage extends React.Component {
                         </h1>
                     </Box>
                     <Box>
-                        {/*<Button onClick={this.onGenerateButtonClick}>Generate 2</Button>*/}
                         <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
                     </Box>
                     <CommissionSearchBox>
@@ -138,11 +130,8 @@ class CommissionsListPage extends React.Component {
                     </Paper>
                 </Container>
             </>
-
-
         )
     }
-
 }
 
-export default withStyles(useStyles)(CommissionsListPage);
+export default withStyles(useStyles)(CommissionsListPage)

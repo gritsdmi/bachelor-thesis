@@ -45,12 +45,10 @@ class CommissionInfoDialog extends React.Component {
     }
 
     componentDidMount() {
-        console.log("CommissionInfoDialog DID mount")
         this.setState({...this.props})
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log("CommissionInfoDialog DID update")
         if (this.props.open) {
             if (this.props !== prevProps) {
                 console.log("CommissionInfoDialog UPDATE newprops ")
@@ -95,15 +93,10 @@ class CommissionInfoDialog extends React.Component {
     }
 
     render() {
-        if (!this.props.open) {
-            if (!this.state.commission) {
-                return (<></>)
-            }
+        if (!this.props.open || !this.state.commission) {
             return (<></>)
         }
-        if (this.state.commission === null) {
-            return (<></>)
-        }
+
         const {classes} = this.props;
 
         const teacherTable = this.props.commission.teachers.map((teacher, idx) => {
@@ -136,7 +129,7 @@ class CommissionInfoDialog extends React.Component {
                             direction={'column'}
                         >
                             <Typography>
-                                Exam date {this.state.commission.exam.date.date}
+                                Exam date {this.state.commission.exam.date}
                             </Typography>
                             <Typography>
                                 State {this.state.commission.state}
@@ -178,4 +171,4 @@ class CommissionInfoDialog extends React.Component {
     }
 }
 
-export default withStyles(useStyles)(CommissionInfoDialog);
+export default withStyles(useStyles)(CommissionInfoDialog)

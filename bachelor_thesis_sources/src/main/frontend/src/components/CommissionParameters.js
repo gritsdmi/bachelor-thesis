@@ -1,13 +1,11 @@
 import React from "react";
-import {Collapse, Divider, Grid, ListItem, ListItemIcon, ListItemText, MenuItem, Select,} from "@material-ui/core";
+import {Grid, MenuItem, Select,} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
 import {get, post} from "../utils/request"
-import List from "@material-ui/core/List";
 import {DatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import format from 'date-fns/format';
-
 
 const useStyles = theme => ({
     cardContainer: {
@@ -230,190 +228,9 @@ class CommissionParameters extends React.Component {
                         </Button>
                     </Grid>
                 </Grid>
-
-                {/*<Paper>*/}
-                {/*    <Typography*/}
-                {/*        onClick={this.handlePaper}*/}
-                {/*    >*/}
-                {/*        text*/}
-                {/*    </Typography>*/}
-                {/*    <Collapse*/}
-                {/*        in={this.state.paperOpen}*/}
-                {/*    >*/}
-                {/*        <List>*/}
-                {/*            <ListItem*/}
-                {/*                key={0}*/}
-                {/*                onClick={this.handlePaperItem(0)}*/}
-                {/*            >*/}
-                {/*                <Typography*/}
-                {/*                    // onClick={this.handlePaper}*/}
-                {/*                >*/}
-                {/*                    kn*/}
-                {/*                </Typography>*/}
-                {/*                <Collapse*/}
-                {/*                    in={this.state.collapsesOpen[0]}*/}
-                {/*                >*/}
-                {/*                    <List>*/}
-                {/*                        <ListItem*/}
-                {/*                            key={0}*/}
-                {/*                            onClick={this.handlePaperItem(0)}*/}
-                {/*                        >*/}
-                {/*                            <Typography*/}
-                {/*                                // onClick={this.handlePaper}*/}
-                {/*                            >*/}
-                {/*                                kn*/}
-                {/*                            </Typography>*/}
-                {/*                        </ListItem>*/}
-                {/*                        <ListItem*/}
-                {/*                            key={1}*/}
-                {/*                            onClick={this.handlePaperItem(1)}*/}
-                {/*                        >*/}
-                {/*                            <Typography*/}
-                {/*                                // onClick={this.handlePaper}*/}
-                {/*                            >*/}
-                {/*                                t2*/}
-                {/*                            </Typography>*/}
-                {/*                        </ListItem>*/}
-                {/*                    </List>*/}
-                {/*                </Collapse>*/}
-                {/*            </ListItem>*/}
-                {/*            <ListItem*/}
-                {/*                key={1}*/}
-                {/*                onClick={this.handlePaperItem(1)}*/}
-                {/*            >*/}
-                {/*                <Typography*/}
-                {/*                    // onClick={this.handlePaper}*/}
-                {/*                >*/}
-                {/*                    t2*/}
-                {/*                </Typography>*/}
-                {/*            </ListItem>*/}
-                {/*        </List>*/}
-                {/*    </Collapse>*/}
-                {/*</Paper>*/}
             </div>
         );
     }
-}
-
-class CategoriesResults extends React.Component {
-    render() {
-        const docs = data.documents;  //this coming from a json file, please see below for the sample json
-        return (
-            <div>
-                <List component='nav' aria-labelledby='nested-list-subheader'>
-                    {docs.map(doc => {
-                        return (
-                            <CustomizedListItem key={doc.id} doc={doc}/>
-                        );
-                    })}
-                </List>
-            </div>
-        );
-    }
-}
-
-class CustomizedListItem extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            open: false,
-            inOpen: false,
-        };
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        console.log("Handle Clicked....");
-        this.setState(prevState => ({
-            open: !prevState.open
-        }));
-    }
-
-    handleClick2(data) {
-        console.log("Handle Clicked.22222", data);
-    }
-
-    render() {
-        const {doc} = this.props;
-        return (
-            <div>
-                <ListItem button key={doc.Id} onClick={this.handleClick}>
-                    <ListItemText primary={doc.Name}/>
-                    {/* {this.state.open ? <ExpandLess /> : <ExpandMore />} */}
-                </ListItem>
-                <Collapse
-                    key={doc.Sheets.Id}
-                    in={this.state.open}
-                    timeout='auto'
-                    unmountOnExit
-                >
-                    <List component='li' disablePadding key={doc.Id}>
-                        {/* <Collapse
-          key={doc.Sheets.Id}
-          in={this.state.inOpen}
-          timeout='auto'
-          unmountOnExit
-          > */}
-                        {doc.Sheets.map(sheet => {
-                            return (
-                                <ListItem onClick={() => this.handleClick2(sheet)} button key={sheet.Id}>
-                                    <ListItemIcon/>
-                                    <ListItemText key={sheet.Id} primary={sheet.Title}/>
-                                </ListItem>
-                            );
-                        })}
-                        {/* </Collapse> */}
-                    </List>
-
-                </Collapse>
-                <Divider/>
-            </div>
-        )
-    }
-}
-
-const data = {
-    "documents": [
-        {
-            "Id": 1,
-            "Name": "Category 1",
-            "Sheets": [
-                {
-                    "Id": 1,
-                    "Title": "Title1 ",
-                    "data": [1, 2, 3]
-                },
-                {
-                    "Id": 2,
-                    "Title": "Title 2",
-                    "data": [1, 2, 3]
-                },
-                {
-                    "Id": 3,
-                    "Title": "Title 3",
-                    "data": [1, 2, 3]
-                }
-            ]
-        },
-        // {
-        //   "Id": 1,
-        //   "Name": "Category 2",
-        //   "Sheets": [
-        //     {
-        //       "Id": 1,
-        //       "Title": "Title1 "
-        //     },
-        //     {
-        //       "Id": 2,
-        //       "Title": "Title 2"
-        //     },
-        //     {
-        //       "Id": 3,
-        //       "Title": "Title 3"
-        //     }
-        //   ]
-        // }
-    ]
 }
 
 export default withStyles(useStyles)(CommissionParameters);

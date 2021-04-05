@@ -70,8 +70,11 @@ class ManualCreatingPage extends React.Component {
         get(`/location/free/${dateF}`)
             .then(response => {
                 this.setState({
-                    locations: response.data,
-                }, () => console.log(this.state.locations))
+                        locations: response.data,
+                        selectedLocation: response.data.length > 0 ? response.data[0] : '',
+                    }
+                    // , () => console.log(this.state.locations)
+                )
             })
             .catch(error => console.log(error))
     }
@@ -80,14 +83,17 @@ class ManualCreatingPage extends React.Component {
         get("/exam/degrees")
             .then(response => {
                 this.setState({
-                    degrees: response.data,
-                }, () => console.log(response.data))
+                        degrees: response.data,
+                        selectedDegree: response.data.length > 0 ? response.data[0] : '',
+                    }
+                    // , () => console.log(response.data)
+                )
             })
             .catch(error => console.log(error))
     }
 
     fetchTeachers() {
-        get(`/teacher/date/${this.state.selectedDate}`)
+        get(`/user/teacher/date/${this.state.selectedDate}`)
             .then((response) => {
                 this.setState({teachers: response.data})
             })
@@ -95,7 +101,6 @@ class ManualCreatingPage extends React.Component {
     }
 
     fetchAll() {
-        console.log("fetchAll")
         this.fetchTeachers()
         this.fetchDegrees()
         this.fetchLocations(this.state.selectedDate);
@@ -105,10 +110,8 @@ class ManualCreatingPage extends React.Component {
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
         if (value && value !== '') {
-            console.log("apply filter")
             this.setState({searchPattern: value})
         } else {
-            console.log("clear filter")
             this.setState({searchPattern: ''})
         }
     }
@@ -123,14 +126,12 @@ class ManualCreatingPage extends React.Component {
     }
 
     handleChangeLocation = (event) => {
-        console.log("handleChangeLocation")
         this.setState({
             selectedLocation: event.target.value,
         })
     }
 
     handleChangeDegree = (event) => {
-        console.log("handleChangeDegree")
         this.setState({
             selectedDegree: event.target.value,
         })
@@ -149,8 +150,8 @@ class ManualCreatingPage extends React.Component {
         return this.state.teachers
             && this.state.searchPattern
             && this.state.teachers.filter(teacher => {
-                return (
-                    (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+                    return (
+                        (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
                         || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
                         || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
                 }
@@ -229,12 +230,14 @@ class ManualCreatingPage extends React.Component {
         }
 
         console.log(payload)
-
-
     }
 
 
     render() {
+
+        if (!this.state.locations || !this.state.degrees) {
+            return <></>
+        }
         const teachersFilteredList = this.teachersFilteredList()
         const defaults = {
             date: this.state.selectedDate,
@@ -253,9 +256,6 @@ class ManualCreatingPage extends React.Component {
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
                     />
-                    {/*<CommissionParameters>*/}
-
-                    {/*</CommissionParameters>*/}
 
                     <CommissionProps
                         date={this.state.selectedDate}
@@ -266,7 +266,6 @@ class ManualCreatingPage extends React.Component {
                         onChangeLoc={this.handleChangeLocation}
                         defaults={defaults}
                     />
-
 
                     <Grid container>
                         <Grid item xs>
@@ -288,9 +287,11 @@ class ManualCreatingPage extends React.Component {
                                             <TableCell>
                                                 <List>
                                                     {this.state.commission &&
-                                                    this.state.commission.teachers.map((t, k) => {
+                                                    this.state.commission.teachers.map((t, idx) => {
                                                         return (
-                                                            <ListItem>
+                                                            <ListItem
+                                                                key={idx}
+                                                            >
                                                                 {t.name + " " + t.surname}
                                                                 <Button
                                                                     onClick={this.onClickRemoveTeacher(t)}
@@ -302,7 +303,6 @@ class ManualCreatingPage extends React.Component {
                                                     })}
                                                 </List>
                                             </TableCell>
-
                                         </TableRow>
                                         <TableRow>
                                             <TableCell>
@@ -332,12 +332,10 @@ class ManualCreatingPage extends React.Component {
                             </Paper>
                         </Grid>
                     </Grid>
-
                 </Container>
-
             </>
         )
     }
 }
 
-export default withStyles(useStyles)(ManualCreatingPage);
+export default withStyles(useStyles)(ManualCreatingPage)

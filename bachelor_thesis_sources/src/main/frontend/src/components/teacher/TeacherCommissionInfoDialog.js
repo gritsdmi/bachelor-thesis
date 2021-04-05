@@ -49,7 +49,6 @@ class TeacherCommissionInfoDialog extends React.Component {
     }
 
     componentDidMount() {
-        console.log("TeacherCommissionInfoDialog DID MOUNT")
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -89,7 +88,7 @@ class TeacherCommissionInfoDialog extends React.Component {
                 <TeacherRecommendDialog
                     open={this.state.recommendDialogOpen}
                     onClose={this.onCloseRecommendDialog}
-                    date={commission.exam.date.date}
+                    date={commission.exam.date}
                     commission={commission}
                     currentTeacherId={this.props.currentTeacherId}
                 />
@@ -104,11 +103,11 @@ class TeacherCommissionInfoDialog extends React.Component {
                             <TableBody>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Date</TableCell>
-                                    <TableCell className={classes.cell}>{commission.exam.date.date}</TableCell>
+                                    <TableCell className={classes.cell}>{commission.exam.date}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Time</TableCell>
-                                    <TableCell className={classes.cell}>{commission.exam.date.date}</TableCell>
+                                    <TableCell className={classes.cell}>{commission.exam.time}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Location</TableCell>

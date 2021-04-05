@@ -1,6 +1,6 @@
 package cz.cvut.fel.bachelor_thesis.to;
 
-import cz.cvut.fel.bachelor_thesis.model.Teacher;
+import cz.cvut.fel.bachelor_thesis.model.User;
 import cz.cvut.fel.bachelor_thesis.model.enums.Degree;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +19,5 @@ public class CreatorTO {
 
     private Long locationId;
 
-    private List<Teacher> teachers;
+    private List<User> teachers;
 }

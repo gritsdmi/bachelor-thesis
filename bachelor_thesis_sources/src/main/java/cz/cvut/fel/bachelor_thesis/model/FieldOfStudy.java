@@ -1,6 +1,5 @@
 package cz.cvut.fel.bachelor_thesis.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.cvut.fel.bachelor_thesis.model.enums.Degree;
 import cz.cvut.fel.bachelor_thesis.model.enums.FieldOfStudyEnum;
 import lombok.Getter;
@@ -8,13 +7,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @ToString
-@Table(name = "FieldOfStudy")
+@Table(name = "Field_Of_Study")
 public class FieldOfStudy extends AbstractEntity {
 
     @Enumerated(EnumType.STRING)
@@ -25,7 +23,7 @@ public class FieldOfStudy extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Degree degree;
 
-    @OneToMany(mappedBy = "fieldOfStudy")
-    @JsonIgnore
-    private List<Student> studentList;
+//    @OneToMany(mappedBy = "fieldOfStudy")
+//    @JsonIgnore
+//    private List<Student> studentList;
 }

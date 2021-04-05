@@ -31,7 +31,7 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
             )
         })
     }
-    const editButtonText = () => {
+    const buttonText = () => {
         if (commission.state === "DRAFT") {
             return "Create"
         } else {
@@ -42,13 +42,13 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
     return (
         <>
             <Card className={classes.card}>
-                <CardHeader title={`Exam date ${commission.exam.date.date}`}/>
+                <CardHeader title={`Exam date ${commission.exam.date}`}/>
 
                 <CardContent>
                     <List>
-                        <ListItem>
-                            <ListItemText>State: {commission.state}</ListItemText>
-                        </ListItem>
+                        {/*<ListItem>*/}
+                        {/*    <ListItemText>State: {commission.state}</ListItemText>*/}
+                        {/*</ListItem>*/}
                         <ListItem>
                             <ListItemText>Degree: {commission.exam.degree}</ListItemText>
                         </ListItem>
@@ -70,7 +70,7 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                     {commission.state !== 'APPROVED' &&
                     <Button
                         onClick={() => onEditClick(commission)}
-                    >{editButtonText()}</Button>}
+                    >{buttonText()}</Button>}
                 </CardActions>
             </Card>
         </>

@@ -15,7 +15,6 @@ public interface CommissionRepository extends JpaRepository<Commission, Long> {
     @Query("select c from Commission c where (c.state = :commissionState)")
     List<Commission> getAllByState(@Param("commissionState") CommissionState commissionState);
 
-    //    @Query("select c from Commission c where (c.state = :commissionState)")
     List<Commission> findByStateNot(CommissionState commissionState);
 
 //    @Query("select c from Commission c where(c)")

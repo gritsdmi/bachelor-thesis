@@ -4,21 +4,20 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.util.List;
 
-//TODO delete this
-//@Entity
+@Entity
 @Getter
 @Setter
 @ToString
-@Table(name = "Student")
-//@PrimaryKeyJoinColumn(name = "userId")
-public class Student extends AbstractEntity {
+public class StudentProperty extends AbstractEntity {
 
     @ManyToOne
     private FieldOfStudy fieldOfStudy;
 
-    @ManyToOne
-    private Exam exam;
+    @ManyToMany
+    private List<Exam> exams;
 }

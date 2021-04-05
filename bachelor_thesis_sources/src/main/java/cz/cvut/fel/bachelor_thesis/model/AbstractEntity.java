@@ -17,7 +17,7 @@ import java.io.Serializable;
 public abstract class AbstractEntity implements Serializable {
 
     @Id
-    @ToString.Exclude
+//    @ToString.Exclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 }

@@ -5,7 +5,6 @@ import {Paper} from "@material-ui/core";
 import {get, post} from "../../utils/request"
 import CommissionCard from "../../components/commission/CommissionCard";
 
-
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
@@ -24,38 +23,30 @@ class AutoGeneratingPage extends React.Component {
     }
 
     componentDidMount() {
-        console.log("AutoGeneratingPage DID MOUNT")
         get("/commission/draft")
             .then(res => {
                 this.setState({
                     commissions: res.data,
-                })
+                }, () => console.log(res.data))
             })
     }
 
     onGenerationComplete = (resp) => {
         console.log("on generationComplete", resp)
-        let t = resp.data;
-        // get("/commission/draft")
-        //     .then(res => t = res.data)
-
-        // console.log(t)
         this.setState({
-            commissions: t
+            commissions: resp.data
         }, () => console.log(this.state.commissions))
-        // console.log(this.state)
 
     }
 
     onClickCreate = (commission) => {
         //todo make disable, after click
 
-        const payload = {
-            commission: commission,
-        }
         console.log("onClickCreate", commission)
-        post(`/commission/${commission.id}/nextState`, commission)
-            .then(response => console.log(response.data))
+        post(`/commission/${commission.id}/toEditState`)
+            .then(res => this.setState({
+                commissions: res.data
+            }))
     }
 
 
@@ -67,7 +58,6 @@ class AutoGeneratingPage extends React.Component {
                     <CommissionCard
                         key={k}
                         commission={commission}
-                        // onInfoClick={this.onCommissionInfoButtonClick}
                         onEditClick={this.onClickCreate}
                         // onClose={this.onCommissionInfoClose}
                     />
@@ -81,6 +71,10 @@ class AutoGeneratingPage extends React.Component {
                 <CommissionParameters
                     onComplete={this.onGenerationComplete}
                 />
+
+                {/*<CommissionProps*/}
+                {/*    onComplete={this.onGenerationComplete}*/}
+                {/*/>*/}
                 <Paper className={classes.cardContainer}>
                     {comm}
                 </Paper>
@@ -90,4 +84,4 @@ class AutoGeneratingPage extends React.Component {
     }
 }
 
-export default withStyles(useStyles)(AutoGeneratingPage);
+export default withStyles(useStyles)(AutoGeneratingPage)

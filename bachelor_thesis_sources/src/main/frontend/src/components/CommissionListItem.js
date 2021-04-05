@@ -37,8 +37,8 @@ export default function CommissionListItem({commission, onClickInfoButton}) {
                         + ":" + commission.exam.location.classroom}
                     </Grid>
                     <Grid item>
-                        {"Date " + commission.exam.date.date
-                        + " Time "}
+                        {"Date " + commission.exam.date
+                        + " Time " + commission.exam.time}
                     </Grid>
                 </Grid>
                 <Grid direction={'column'} container item xs>

@@ -25,9 +25,9 @@ public class Exam extends AbstractEntity {
 //    @JsonIgnore
     private Location location;
 
-    @ManyToOne
-//            (cascade = CascadeType.REMOVE)
-    private Date date;
+    private String time;
+
+    private String date;
 
     private String semester;
 
@@ -36,8 +36,8 @@ public class Exam extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Degree degree;
 
-    @OneToMany(mappedBy = "exam")
-    private List<Student> students;
+    @OneToMany
+//            (mappedBy = "exam")
+    private List<User> students;
 
-//    private String time;
 }

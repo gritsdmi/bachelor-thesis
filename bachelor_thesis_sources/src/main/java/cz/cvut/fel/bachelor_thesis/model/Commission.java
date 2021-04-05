@@ -18,7 +18,7 @@ public class Commission extends AbstractEntity {
     //ownerSide
     @ManyToMany
 //    @JsonIgnore
-    private List<Teacher> teachers;
+    private List<User> teachers;
 
     //owner side
     @OneToOne

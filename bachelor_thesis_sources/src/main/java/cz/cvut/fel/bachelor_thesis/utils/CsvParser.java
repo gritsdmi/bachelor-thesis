@@ -32,7 +32,6 @@ public class CsvParser {
         Workbook workbook = null;
 
         try {
-            log.severe("tried");
             file = new FileInputStream(fileLocation);
             workbook = new XSSFWorkbook(file);
         } catch (IOException e) {
@@ -40,7 +39,6 @@ public class CsvParser {
         }
 
 
-        log.warning("tried ok");
         assert workbook != null;
 
         //Get sheet from the workbook

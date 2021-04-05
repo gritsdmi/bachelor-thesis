@@ -1,6 +1,6 @@
 package cz.cvut.fel.bachelor_thesis.utils;
 
-import cz.cvut.fel.bachelor_thesis.services.TeacherService;
+import cz.cvut.fel.bachelor_thesis.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ public class Generator {
 
 
     @Autowired
-    private TeacherService teacherService;
+    private UserService userService;
 
     public Generator() {
 

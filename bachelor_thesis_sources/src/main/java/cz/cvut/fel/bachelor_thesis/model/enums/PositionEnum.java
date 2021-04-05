@@ -6,7 +6,8 @@ public enum PositionEnum {
      * P = předseda
      * Č = člen
      */
-    //TODO rename this
-    M, P, C
+    M,
+    P,
+    C
 
 }

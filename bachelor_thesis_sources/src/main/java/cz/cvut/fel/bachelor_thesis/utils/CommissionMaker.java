@@ -2,7 +2,7 @@ package cz.cvut.fel.bachelor_thesis.utils;
 
 import cz.cvut.fel.bachelor_thesis.model.Commission;
 import cz.cvut.fel.bachelor_thesis.services.CommissionService;
-import cz.cvut.fel.bachelor_thesis.services.TeacherService;
+import cz.cvut.fel.bachelor_thesis.services.UserService;
 import cz.cvut.fel.bachelor_thesis.to.CommissionTO;
 import cz.cvut.fel.bachelor_thesis.to.CreatorTO;
 import lombok.extern.java.Log;
@@ -19,40 +19,25 @@ import java.util.List;
 public class CommissionMaker {
 
     private final CommissionService commissionService;
-    private final TeacherService teacherService;
+
+    private final UserService userService;
 
     @Autowired
-    public CommissionMaker(CommissionService commissionService, TeacherService teacherService) {
+    public CommissionMaker(CommissionService commissionService, UserService userService) {
         this.commissionService = commissionService;
-        this.teacherService = teacherService;
+        this.userService = userService;
     }
 
-//    @Transactional
-//    public List<Commission> test(Integer len) {
-//        log.warning("generator starting");
-//
-//        //todo add logic here
-//        var teachers = teacherService.getAll();
-//
-//        var commissionsList = new ArrayList<Commission>();
-//        Generator.combination(teachers)
-//                .simple(len)
-//                .stream()
-//                .forEach(pair -> {
-//                    var comTo = new CommissionTO();
-//                    comTo.setTeachers(pair);
-//                    commissionsList.add(commissionService.save(comTo));
-//                });
-//        log.warning("generator ends");
-//        return commissionService.getAll();
-//    }
-
+    /**
+     * used on autogenerate page
+     */
     @Transactional
-    public List<Commission> test2(Integer len, CreatorTO creatorTO) {
+    public List<Commission> generateCommissions(Integer len, CreatorTO creatorTO) {
         log.warning(creatorTO.toString());
 
-        var teachersFreeToday = teacherService.getAvailableTeachersByDate(creatorTO.getDate());
+        var teachersFreeToday = userService.getAvailableTeachersByDate(creatorTO.getDate());
         //todo add logic(titul, pozice)
+
         Generator.combination(teachersFreeToday)
                 .simple(len)
                 .stream()

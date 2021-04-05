@@ -5,19 +5,15 @@ import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 
 
 const useStyles = makeStyles((theme) => ({
-    card: {
-        margin: theme.spacing(2),
-        width: '250px',
-    },
-    cardActions: {
-        display: "flex",
-        justifyContent: "center"
-    },
     item: {
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-    }
+
+        width: "150px",
+    },
+
+
 }));
 
 export default function CommissionProps({
@@ -31,13 +27,17 @@ export default function CommissionProps({
                                         }) {
     const classes = useStyles();
 
+    if (!locations || locations.length < 1) {
+        return <></>
+    }
 
     return (
 
         <Paper>
             <Select
                 // fullWidth
-                defaultValue={defaults ? defaults.degree : " "}
+                // defaultValue={defaults.degree ? defaults.degree : "Bc"}
+                value={defaults.degree ? defaults.degree : "Bc"}
                 onChange={onChangeDegree}
                 className={classes.item}
             >
@@ -76,12 +76,11 @@ export default function CommissionProps({
                     // }}
                 />
             </MuiPickersUtilsProvider>
-
             <Select
-                // fullWidth
                 onChange={onChangeLoc}
                 className={classes.item}
-
+                // labelId="loc"
+                value={defaults.loc ? defaults.loc : locations[0]}
             >
                 {
                     locations.map((loc, idx) => {
@@ -95,9 +94,6 @@ export default function CommissionProps({
                     })
                 }
             </Select>
-
-
         </Paper>
     )
-
 }

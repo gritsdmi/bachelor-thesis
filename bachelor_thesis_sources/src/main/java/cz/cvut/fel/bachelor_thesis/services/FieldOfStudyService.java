@@ -31,7 +31,7 @@ public class FieldOfStudyService {
 
         field.setField(fieldOfStudyTO.getField());
 //        field.setDegree(fieldOfStudyTO.getDegree());
-        field.setStudentList(fieldOfStudyTO.getStudentList());
+//        field.setStudentList(fieldOfStudyTO.getStudentList());
 
         return fieldOfStudyRepository.save(field);
     }
@@ -41,7 +41,7 @@ public class FieldOfStudyService {
 
         field.setField(fieldOfStudyTO.getField());
 //        field.setDegree(fieldOfStudyTO.getDegree());
-        field.setStudentList(fieldOfStudyTO.getStudentList());
+//        field.setStudentList(fieldOfStudyTO.getStudentList());
 
         return fieldOfStudyRepository.save(field);
     }

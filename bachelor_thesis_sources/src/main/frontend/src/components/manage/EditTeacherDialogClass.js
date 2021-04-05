@@ -35,14 +35,6 @@ const useStyles = theme => ({
 });
 
 const InitialState = {
-    entries: [
-        "Full name",
-        "Email",
-        "Degree",
-        "Contract",
-        "Personal number",
-        "Position"
-    ],
     currentTeacherContract: '',
     contractInput: '',
     openInputField: false,
@@ -61,27 +53,17 @@ class EditTeacherDialogClass extends React.Component {
     }
 
     componentDidMount() {
-        console.log("EditTeacherDialogClass DID MOUNT")
         this.setState({
             ...this.props,
             ...InitialState,
-            // currentTeacherContract: this.props.teacher.contract
         }, () => console.log(this.state))
-        console.log("props", this.props)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
-            console.log("component did update", this.props)
-            if (this.props.teacher) { //todo clean code
-                get(`/teacher/${this.props.teacher.id}`).then((response) => {
-                    this.setState({teacher: response.data}
-                        , () => this.setState({currentTeacherContract: this.state.teacher.contract})
-                    )
-                })
-                // this.setState({currentTeacherContract: this.state.teacher.contract})
+            if (this.props.teacher) {
+                this.fetchTeacher()
             } else {
-                console.log("INITIAL STATE")
                 this.setState({
                     ...InitialState
                 })
@@ -89,14 +71,29 @@ class EditTeacherDialogClass extends React.Component {
         }
     }
 
+    fetchTeacher() {
+        get(`/user/teacher/${this.props.teacher.id}`)
+            .then((response) => {
+                this.setState({
+                        teacher: response.data
+                    }, () => this.setState({
+                        currentTeacherContract: this.state.teacher.teacher.contract
+                    }
+                    , () => console.log(response.data)
+                    )
+                )
+            })
+            .catch(err => console.log(err))
+    }
+
     onClickEditButton = () => {
         console.log("onClickEditButton", this.state.openInputField)
         if (!this.state.openInputField) {
-            console.log("edit", this.props)
+            console.log(this.props)
         } else {
             //todo validate input, control input type
             if (this.state.contractInput == null || this.state.contractInput === '') {
-                console.log('returmn', this.props.teacher.contract)
+                console.log(this.props.teacher.contract)
                 this.setState({
                     currentTeacherContract: this.state.teacher.contract,
                     openInputField: !this.state.openInputField,
@@ -105,11 +102,13 @@ class EditTeacherDialogClass extends React.Component {
             }
             let payload = {
                 ...this.props.teacher,
-                id: undefined
+                // id: undefined
             }
-            payload.contract = this.state.contractInput
-            console.log("save payload ", payload)
-            post(`/teacher/${this.props.teacher.id}`, payload).then(response => console.log(response.data)).catch()
+            payload.teacher.contract = parseFloat(this.state.contractInput)
+            console.log("update payload ", payload) //UserTO
+            post(`/user/teacher/${this.props.teacher.id}`, payload)
+                .then(response => console.log(response.data))
+                .catch(err => console.log(err))
         }
 
         this.setState({
@@ -122,15 +121,34 @@ class EditTeacherDialogClass extends React.Component {
         const value = evt.target.value;
         console.log("handleContractInput", value)
         this.setState({contractInput: value})
-
     }
 
+    positionsStr() {
+        let str = "";
+        this.state.teacher.teacher.positionInCommissions.map(pos => {
+            str += pos.description + ' '
+        })
+        return str
+    }
+
+    datesStr() {
+        let str = "";
+        this.state.teacher.teacher.unavailableDates.map(date => {
+            str += date.date + ' '
+        })
+        return str
+    }
+
+
     render() {
+        if (!this.state.teacher) {
+            return <></>
+        }
+
         const {open, onClose, teacher, classes} = this.props;
         const buttonText = this.state.openInputField ? "Save" : "Edit";
 
         return (
-
             <div>
                 {teacher &&
                 <Dialog
@@ -150,11 +168,11 @@ class EditTeacherDialogClass extends React.Component {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Email</TableCell>
-                                    <TableCell className={classes.cell}>{teacher.email}</TableCell>
+                                    <TableCell className={classes.cell}>{teacher.emailAddress}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Degree</TableCell>
-                                    <TableCell className={classes.cell}>{teacher.degree}</TableCell>
+                                    <TableCell className={classes.cell}>{teacher.teacher.degree}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Contract</TableCell>
@@ -178,8 +196,12 @@ class EditTeacherDialogClass extends React.Component {
                                     <TableCell className={classes.cell}>{teacher.personalNumber}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell className={classes.firstCol}>Position</TableCell>
-                                    <TableCell className={classes.cell}>{teacher.position}</TableCell>
+                                    <TableCell className={classes.firstCol}>Positions</TableCell>
+                                    <TableCell className={classes.cell}>{this.positionsStr()}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell className={classes.firstCol}>Unavailable dates</TableCell>
+                                    <TableCell className={classes.cell}>{this.datesStr()}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

@@ -16,7 +16,7 @@ class Header extends React.Component {
     onClickParseTeachers = () => {
         console.log("onClickParseTeachers")
         get("/util/4")
-            .then(() => console.log("parse ok"))
+            .then()
             .catch((error) => console.log(error))
     }
 
@@ -67,4 +67,4 @@ class Header extends React.Component {
     }
 }
 
-export default Header;
+export default Header

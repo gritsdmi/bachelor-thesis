@@ -30,7 +30,7 @@ const InitialState = {
     teacherId: null,
 }
 
-const teacherId = 4
+const teacherId = 1
 
 class TeacherOverview extends React.Component {
     constructor(props) {
@@ -49,7 +49,7 @@ class TeacherOverview extends React.Component {
     }
 
     fetchTeacher() {
-        get(`/teacher/${teacherId}`)
+        get(`/user/teacher/${teacherId}`)
             .then(response => {
                 this.setState({
                     teacher: response.data,

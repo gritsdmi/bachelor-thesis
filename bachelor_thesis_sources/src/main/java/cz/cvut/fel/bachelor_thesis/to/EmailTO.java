@@ -1,7 +1,6 @@
 package cz.cvut.fel.bachelor_thesis.to;
 
-import cz.cvut.fel.bachelor_thesis.model.Manager;
-import cz.cvut.fel.bachelor_thesis.model.Teacher;
+import cz.cvut.fel.bachelor_thesis.model.User;
 import cz.cvut.fel.bachelor_thesis.model.enums.EmailType;
 import lombok.Getter;
 import lombok.ToString;
@@ -12,9 +11,9 @@ import java.util.List;
 @ToString
 public class EmailTO {
 
-    private Manager author;
+    private User author;
 
-    private List<Teacher> to;
+    private List<User> to;
 
     private EmailType type;
 

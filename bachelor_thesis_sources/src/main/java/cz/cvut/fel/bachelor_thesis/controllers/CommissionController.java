@@ -1,9 +1,8 @@
 package cz.cvut.fel.bachelor_thesis.controllers;
 
 import cz.cvut.fel.bachelor_thesis.model.Commission;
-import cz.cvut.fel.bachelor_thesis.model.Teacher;
+import cz.cvut.fel.bachelor_thesis.model.User;
 import cz.cvut.fel.bachelor_thesis.services.CommissionService;
-import cz.cvut.fel.bachelor_thesis.services.TeacherService;
 import cz.cvut.fel.bachelor_thesis.to.CreatorTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +17,27 @@ import java.util.List;
 public class CommissionController implements Controller {
 
     private final CommissionService commissionService;
-    private final TeacherService teacherService;
 
     @Autowired
-    public CommissionController(CommissionService commissionService, TeacherService teacherService) {
+    public CommissionController(CommissionService commissionService) {
         this.commissionService = commissionService;
-        this.teacherService = teacherService;
     }
 
     @GetMapping
     public List<Commission> getAll() {
-        log.info("/commission/get request received");
         var temp = commissionService.getAll();
         Collections.shuffle(temp);
-        temp = temp.subList(0, temp.size() / 10);
-        log.warning(String.valueOf(temp.size()));
+//        temp = temp.subList(0, temp.size() / 10);
+//        log.warning(String.valueOf(temp.size()));
         return temp;
+    }
+
+    /**
+     * for test new mapping
+     */
+    @PostMapping("/{comId}/{teacherId}")
+    public Commission addTeacher(@PathVariable Long comId, @PathVariable Long teacherId) {
+        return commissionService.addTeacherById(comId, teacherId);
     }
 
     @GetMapping("/draft")
@@ -57,20 +61,22 @@ public class CommissionController implements Controller {
     }
 
     @PostMapping("/replace/{commId}/{teacherIdToRemove}")
-    public Commission replaceTeacher(@PathVariable Long commId, @RequestBody Teacher teacher, @PathVariable Long teacherIdToRemove) {
+    public Commission replaceTeacher(@PathVariable Long commId,
+                                     @PathVariable Long teacherIdToRemove,
+                                     @RequestBody User user) {
         log.warning("replacing teacher");
-        return commissionService.addTeacherToCommission(teacher, commId, teacherIdToRemove);
+        return commissionService.addTeacherToCommission(user, commId, teacherIdToRemove);
     }
 
     @PostMapping("/create")
     public Commission create(@RequestBody CreatorTO to) {
-        log.warning(to.toString());
         return commissionService.saveManual(to);
     }
 
-    @PostMapping("/{commId}/nextState")
-    public Commission nextState(@PathVariable Long commId, @RequestBody Commission commission) {
-        return commissionService.updateToEditedState(commId, commission);
+    @PostMapping("/{commId}/toEditState")
+    public List<Commission> nextState(@PathVariable Long commId) {
+        commissionService.updateToEditedState(commId);
+        return commissionService.getDrafts();
     }
 
     @PostMapping("/{id}")
@@ -78,13 +84,13 @@ public class CommissionController implements Controller {
         return commissionService.update(id, commission);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        commissionService.remove(id);
-    }
-
-    @DeleteMapping
-    public void deleteAll() {
-        commissionService.remove();
-    }
+//    @DeleteMapping("/{id}")
+//    public void delete(@PathVariable Long id) {
+//        commissionService.remove(id);
+//    }
+//
+//    @DeleteMapping
+//    public void deleteAll() {
+//        commissionService.remove();
+//    }
 }

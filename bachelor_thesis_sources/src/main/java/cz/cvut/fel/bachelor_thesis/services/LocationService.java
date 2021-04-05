@@ -3,7 +3,6 @@ package cz.cvut.fel.bachelor_thesis.services;
 import cz.cvut.fel.bachelor_thesis.model.Exam;
 import cz.cvut.fel.bachelor_thesis.model.Location;
 import cz.cvut.fel.bachelor_thesis.model.enums.CommissionState;
-import cz.cvut.fel.bachelor_thesis.repository.DateRepository;
 import cz.cvut.fel.bachelor_thesis.repository.LocationRepository;
 import cz.cvut.fel.bachelor_thesis.to.LocationTO;
 import lombok.extern.java.Log;
@@ -27,9 +26,6 @@ public class LocationService {
 
     @Autowired
     private ExamService examService;
-
-    @Autowired
-    private DateRepository dateRepository;
 
     public List<Location> getAll() {
         return locationRepository.findAll();
@@ -65,8 +61,6 @@ public class LocationService {
                     .filter(exam -> !exam.getCommission().getState().equals(CommissionState.DRAFT))
                     .map(Exam::getLocation)
                     .collect(Collectors.toList());
-            log.warning("full loc: " + fullLocations.toString());
-            log.warning("all loc: " + allLocations.toString());
             allLocations.removeAll(fullLocations);
         }
 
@@ -78,8 +72,6 @@ public class LocationService {
         newLoc.setBuilding(locationTO.getBuilding());
         newLoc.setClassroom(locationTO.getClassroom());
 
-        log.warning(locationTO.toString());
-        log.warning(newLoc.toString());
         return locationRepository.save(newLoc);
     }
 

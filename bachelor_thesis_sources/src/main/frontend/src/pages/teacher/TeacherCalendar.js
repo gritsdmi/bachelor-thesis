@@ -46,22 +46,21 @@ class TeacherCalendar extends React.Component {
     }
 
     fetchTeacher() {
-        get(`/teacher/${teacherId}`)
+        get(`/user/teacher/${teacherId}`)
             .then(res => this.setState({
                 teacher: res.data,
-                // unavailableDates: new Set(res.data.unavailableDates),
             }, () => {
-                // console.log(this.state.teacher)
-                this.makeUnavailableSetDates(res.data.unavailableDates)
+                this.makeUnavailableSetDates(res.data.teacher.unavailableDates)
             }))
             .catch(err => console.log(err))
 
-        get(`/teacher/${teacherId}/examDates`)
+        get(`/user/teacher/${teacherId}/examDates`)
             .then(res => this.makeExamSetDates(res.data))
             .catch(err => console.log(err))
     }
 
     makeUnavailableSetDates(dates) {
+        console.log(dates)
         this.setState({
             unavailableDates: new Set(dates.map(d => {
                 return d.date
@@ -70,9 +69,10 @@ class TeacherCalendar extends React.Component {
     }
 
     makeExamSetDates(dates) {
+        console.log(dates)
         this.setState({
             examDates: new Set(dates.map(d => {
-                return d.date
+                return d
             }))
         })
     }
@@ -103,7 +103,7 @@ class TeacherCalendar extends React.Component {
             semester: null,
         }
 
-        post(`/teacher/${teacherId}/addDate`, payload)
+        post(`/user/teacher/${teacherId}/addDate`, payload)
             .then(res => {
                 console.log(res)
                 this.fetchTeacher()
