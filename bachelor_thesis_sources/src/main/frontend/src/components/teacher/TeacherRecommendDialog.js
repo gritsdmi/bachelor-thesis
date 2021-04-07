@@ -60,18 +60,18 @@ class TeacherRecommendDialog extends React.Component {
             .catch(error => console.log(error))
     }
 
-    onClickRecommendTeacher = (teacher) => {
+    onClickRecommendTeacher = (teacherToRecommend) => {
         //remove current teacher from commission and chosen Teacher to the commission
         // /add/{commId}/{teacherId}
         console.log(this.props)
-        post(`/commission/replace/${this.props.commission.id}/${this.props.currentTeacherId}`, teacher)
+        post(`/commission/replace/${this.props.commission.id}/${this.props.currentTeacherId}`, teacherToRecommend)
             .then(res => {
                 console.log(res)
                 this.props.onClose()
             })
             .catch(err => console.log(err))
 
-        console.log("onClickRecommendTeacher", teacher)
+        console.log("onClickRecommendTeacher", teacherToRecommend)
 
     }
 

@@ -24,19 +24,21 @@ const useStyles = theme => ({
 const InitialState = {
     calendarDialogOpen: false,
     chosenDate: null,
+    teacherId: localStorage.getItem('userId'),
 
-    // unavailableDates: null,
+    unavailableDates: null,
     examDates: null,
+    teacher: null,
 
 }
 const dateFormat = "DD.MM.yyyy"
-const teacherId = 4
 
 class TeacherCalendar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             ...InitialState,
+            teacherId: localStorage.getItem('userId'),
         }
     }
 
@@ -46,7 +48,8 @@ class TeacherCalendar extends React.Component {
     }
 
     fetchTeacher() {
-        get(`/user/teacher/${teacherId}`)
+        console.log(this.state)
+        get(`/user/teacher/${this.state.teacherId}`)
             .then(res => this.setState({
                 teacher: res.data,
             }, () => {
@@ -54,7 +57,7 @@ class TeacherCalendar extends React.Component {
             }))
             .catch(err => console.log(err))
 
-        get(`/user/teacher/${teacherId}/examDates`)
+        get(`/user/teacher/${this.state.teacherId}/examDates`)
             .then(res => this.makeExamSetDates(res.data))
             .catch(err => console.log(err))
     }
@@ -103,7 +106,7 @@ class TeacherCalendar extends React.Component {
             semester: null,
         }
 
-        post(`/user/teacher/${teacherId}/addDate`, payload)
+        post(`/user/teacher/${this.state.teacherId}/addDate`, payload)
             .then(res => {
                 console.log(res)
                 this.fetchTeacher()
@@ -119,9 +122,9 @@ class TeacherCalendar extends React.Component {
             date: this.state.chosenDate,
             semester: null,
         }
-        let d = this.state.teacher.unavailableDates.find(date => date.date === this.state.chosenDate)
+        const d = this.state.teacher.teacher.unavailableDates.find(date => date.date === this.state.chosenDate)
         console.log(d)
-        post(`/teacher/${teacherId}/removeDate`, d)
+        post(`/user/teacher/${this.state.teacherId}/removeDate`, d)
             .then(res => {
                 console.log(res)
                 this.fetchTeacher()

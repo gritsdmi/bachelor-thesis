@@ -27,17 +27,16 @@ const InitialState = {
 
     commissionInfoDialogOpen: false,
     currentCommission: null,
-    teacherId: null,
-}
+    teacherId: localStorage.getItem('userId'),
 
-const teacherId = 1
+}
 
 class TeacherOverview extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             ...InitialState,
-            teacherId: teacherId,
+            teacherId: localStorage.getItem('userId'),
         }
     }
 
@@ -49,7 +48,7 @@ class TeacherOverview extends React.Component {
     }
 
     fetchTeacher() {
-        get(`/user/teacher/${teacherId}`)
+        get(`/user/teacher/${this.state.teacherId}`)
             .then(response => {
                 this.setState({
                     teacher: response.data,
@@ -69,7 +68,7 @@ class TeacherOverview extends React.Component {
     }
 
     fetchCommissions() {
-        get(`/commission/byTeacher/${teacherId}`)
+        get(`/commission/byTeacher/${this.state.teacherId}`)
             .then(response => {
                 this.setState({
                     commissions: response.data,
@@ -121,7 +120,7 @@ class TeacherOverview extends React.Component {
                     open={this.state.commissionInfoDialogOpen}
                     onClose={this.onCloseCommissionInfoDialog}
                     commission={this.state.currentCommission}
-                    currentTeacherId={teacherId}
+                    currentTeacherId={this.state.teacherId}
                 />
 
                 <h1>

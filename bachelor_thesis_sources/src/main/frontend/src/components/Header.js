@@ -5,12 +5,30 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import Paper from '@material-ui/core/Paper';
 import {NavLink} from "react-router-dom";
 import {get} from "../utils/request"
+import {Typography} from "@material-ui/core";
+
+const InitialState = {
+    userId: null,
+    username: null,
+    role: null,
+}
+const n = {}
 
 class Header extends React.Component {
     //TODO reset styles
 
     constructor(props) {
         super(props)
+        this.state = {
+            userId: JSON.parse(localStorage.getItem('userId')),
+            username: JSON.parse(localStorage.getItem('username')),
+            role: JSON.parse(localStorage.getItem('role')),
+
+        }
+        // localStorage.setItem('token', JSON.stringify(data.jwt));
+        // localStorage.setItem('userId', JSON.stringify(data.userId));
+        // localStorage.setItem('username', JSON.stringify(data.username));
+        // localStorage.setItem('role', JSON.stringify(data.role));
     }
 
     onClickParseTeachers = () => {
@@ -18,6 +36,11 @@ class Header extends React.Component {
         get("/util/4")
             .then()
             .catch((error) => console.log(error))
+    }
+
+    clearLS = () => {
+        localStorage.clear()
+        this.setState(InitialState, () => console.log(this.state))
     }
 
     render() {
@@ -28,6 +51,20 @@ class Header extends React.Component {
                         <h3>
                             GruSt - application for managing state exam topics.
                         </h3>
+                    </Box>
+                    <Box>
+                        <Typography>
+                            id:
+                            {this.state.userId}
+                        </Typography>
+                        <Typography>
+                            username:
+                            {this.state.username}
+                        </Typography>
+                        <Typography>
+                            role:
+                            {this.state.role}
+                        </Typography>
                     </Box>
                     <Box>
                         <Button>
@@ -57,6 +94,11 @@ class Header extends React.Component {
                         </Button>
                         <Button>
                             <NavLink to="/teacher/cal">Teacher cal</NavLink>
+                        </Button>
+                        <Button
+                            onClick={this.clearLS}
+                        >
+                            ClearLocalStorage
                         </Button>
                     </Box>
                 </Paper>

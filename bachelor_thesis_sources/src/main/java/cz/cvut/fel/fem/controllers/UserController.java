@@ -1,6 +1,8 @@
 package cz.cvut.fel.fem.controllers;
 
+import cz.cvut.fel.fem.model.Date;
 import cz.cvut.fel.fem.model.User;
+import cz.cvut.fel.fem.model.auth.NewPassTO;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.DateTO;
 import cz.cvut.fel.fem.to.UserTO;
@@ -51,6 +53,17 @@ public class UserController implements Controller {
     @PostMapping("/teacher/{teacherId}/addDate")
     public User addDateToUnavailable(@PathVariable Long teacherId, @RequestBody DateTO dateTO) {
         return userService.addDate(teacherId, dateTO);
+    }
+
+    @PostMapping("/teacher/pass")
+    public User setNewPassword(@RequestBody NewPassTO newPassTO) {
+        log.warning(newPassTO.toString());
+        return userService.setNewPassword(newPassTO);
+    }
+
+    @PostMapping("/teacher/{teacherId}/removeDate")
+    public User removeDate(@PathVariable Long teacherId, @RequestBody Date date) {
+        return userService.removeDate(teacherId, date);
     }
 
 }

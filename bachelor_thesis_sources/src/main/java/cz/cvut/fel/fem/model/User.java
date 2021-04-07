@@ -1,6 +1,7 @@
 package cz.cvut.fel.fem.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import cz.cvut.fel.fem.model.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -50,6 +51,9 @@ public class User extends AbstractEntity {
     @OneToMany(mappedBy = "author")
     @JsonIgnore
     private List<Email> sendEmails;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Override
     public boolean equals(Object o) {

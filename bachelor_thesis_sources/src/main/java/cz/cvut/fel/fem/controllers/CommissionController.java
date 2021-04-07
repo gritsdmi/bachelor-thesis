@@ -63,9 +63,9 @@ public class CommissionController implements Controller {
     @PostMapping("/replace/{commId}/{teacherIdToRemove}")
     public Commission replaceTeacher(@PathVariable Long commId,
                                      @PathVariable Long teacherIdToRemove,
-                                     @RequestBody User user) {
+                                     @RequestBody User teacherToRecommend) {
         log.warning("replacing teacher");
-        return commissionService.addTeacherToCommission(user, commId, teacherIdToRemove);
+        return commissionService.addTeacherToCommission(teacherToRecommend, commId, teacherIdToRemove);
     }
 
     @PostMapping("/create")

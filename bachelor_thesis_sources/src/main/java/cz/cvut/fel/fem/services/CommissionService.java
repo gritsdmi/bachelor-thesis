@@ -72,20 +72,22 @@ public class CommissionService {
      * Adds recommended teacher to commission, removes current teacher
      * and add unavailable date to the current teacher
      *
-     * @param newUser           teacher to add to the commission
-     * @param commId            commission's id
-     * @param teacherIdToRemove teacher's id to remove
+     * @param teacherToRecommend teacher to add to the commission
+     * @param commId             commission's id
+     * @param teacherIdToRemove  teacher's id to remove
      * @return updated Commission
      */
-    public Commission addTeacherToCommission(User newUser, Long commId, Long teacherIdToRemove) {
+    public Commission addTeacherToCommission(User teacherToRecommend, Long commId, Long teacherIdToRemove) {
         var comm = commissionRepository.getOne(commId);
         var date = comm.getExam().getDate();
         var teacherToRemove = userService.getTeacher(teacherIdToRemove);
 
         userService.addUnavailableDate(teacherToRemove.getId(), date);
 
-        comm.getTeachers().add(newUser);
+        comm.getTeachers().add(teacherToRecommend);
+        log.warning("before remove " + comm.getTeachers().toString());
         removeTeacherFromCommission(teacherToRemove, comm);
+        log.warning("after remove " + comm.getTeachers().toString());
         return comm;
     }
 
@@ -103,6 +105,8 @@ public class CommissionService {
     public Commission update(Long commissionId, Commission commission) {
 //        var comm = commissionRepository.getOne(commissionId);
         var newComm = modelMapper.map(commission, Commission.class);
+//        log.warning(commission.toString());
+//        log.warning(newComm.toString());
         return commissionRepository.save(newComm);
     }
 

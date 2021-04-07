@@ -4,6 +4,8 @@ import cz.cvut.fel.fem.model.Date;
 import cz.cvut.fel.fem.model.Position;
 import cz.cvut.fel.fem.model.TeacherProperty;
 import cz.cvut.fel.fem.model.User;
+import cz.cvut.fel.fem.model.auth.NewPassTO;
+import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.repository.UserRepository;
 import cz.cvut.fel.fem.to.DateTO;
 import cz.cvut.fel.fem.to.UserTO;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -46,21 +47,6 @@ public class UserService {
     public UserService(UserRepository userRepository, CsvParser csvParser) {
         this.userRepository = userRepository;
         this.csvParser = csvParser;
-    }
-
-    //playing with model mapper
-    private User convertToEntity(UserTO postDto) throws ParseException {
-//        Post post = modelMapper.map(postDto, Post.class);
-//        post.setSubmissionDate(postDto.getSubmissionDateConverted(
-//                userService.getCurrentUser().getPreference().getTimezone()));
-//
-//        if (postDto.getId() != null) {
-//            Post oldPost = postService.getPostById(postDto.getId());
-//            post.setRedditID(oldPost.getRedditID());
-//            post.setSent(oldPost.isSent());
-//        }
-//        return post;
-        return null;
     }
 
     public User create(UserTO userTO) {
@@ -161,7 +147,7 @@ public class UserService {
         if (!storedTeacher.getTeacher().getUnavailableDates().contains(date)) {
             storedTeacher.getTeacher().getUnavailableDates().add(date);
         } else {
-            log.warning("Teacher already has this date in UnavailableDates List " + date.getDate() + " IMPOSSIBLE SCENARIO");
+            log.warning("Teacher already has this date in UnavailableDates List " + date.getDate() + " IMPOSSIBLE SCENARIO 1");
         }
     }
 
@@ -177,7 +163,7 @@ public class UserService {
         AtomicBoolean alreadyHas = new AtomicBoolean(false);
         teacher.getTeacher().getUnavailableDates().forEach(date -> {
             if (date.getDate().equals(dateStr)) {
-                log.warning("Teacher already has this date in UnavailableDates List " + dateStr + " IMPOSSIBLE SCENARIO");
+                log.warning("Teacher already has this date in UnavailableDates List " + dateStr + " IMPOSSIBLE SCENARIO 2");
                 alreadyHas.set(true);
             }
         });
@@ -188,18 +174,33 @@ public class UserService {
         }
     }
 
-//    public void removeDate(Teacher teacher, Date date) {
-//        System.out.println(teacher.getUnavailableDates());
-//        teacher.getUnavailableDates().removeIf(d -> d.getDate().equals(date.getDate()));
-//        var t = userRepository.getOne(teacher.getId()).getUnavailableDates();
-//        System.out.println(t);
-//    }
-//
-//    public Teacher removeDate(Long teacherId, Date date) {
-//        removeDate(userRepository.getOne(teacherId), date);
-//        return userRepository.getOne(teacherId);
-//    }
-//
+    public User setNewPassword(NewPassTO newPassTO) {
+        var user = userRepository.getOne(newPassTO.getId());
+        user.setPassword(newPassTO.getPassword());
+        user.setFirstLogin(false);
+        return userRepository.save(user);
+    }
+
+    public User resetPassword(Long id) {
+        var user = userRepository.getOne(id);
+        user.setFirstLogin(true);
+        user.setPassword(user.getLogin());
+        return userRepository.save(user);
+    }
+
+    public void removeDate(User teacher, Date date) {
+        System.out.println(teacher.getTeacher().getUnavailableDates());
+        teacher.getTeacher().getUnavailableDates().removeIf(d -> d.getDate().equals(date.getDate()));
+        var t = userRepository.getOne(teacher.getId()).getTeacher().getUnavailableDates();
+        System.out.println(t);
+        dateService.delete(date);
+    }
+
+    public User removeDate(Long teacherId, Date date) {
+        removeDate(userRepository.getOne(teacherId), date);
+        return userRepository.getOne(teacherId);
+    }
+
 
 //
 //    @Transactional
@@ -266,6 +267,7 @@ public class UserService {
                     user.setLogin(v.get(0));
                     user.setPassword(v.get(0));
                     user.setFirstLogin(true);
+                    user.setRole(Role.ROLE_TEACHER);
 
                     var tProps = new TeacherProperty();
                     tProps.setContract(Double.parseDouble(v.get(2)));

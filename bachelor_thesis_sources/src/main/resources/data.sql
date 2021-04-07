@@ -8,8 +8,8 @@ VALUES (100, 'D3-256', 'T2'),
 -- INSERT INTO Field_Of_Study (id, field, deg)
 -- VALUES (2, 'SIT', 'Bc');
 
-INSERT INTO teacher (id, personal_number, name, surname, email_address, login, password, first_login)
-VALUES (999, 1111111, 'Jiri', 'Sebek', 'sebek@sebek', 'sebek', 'sebek', true);
+-- INSERT INTO teacher (id, personal_number, name, surname, email_address, login, password, first_login)
+-- VALUES (999, 1111111, 'Jiri', 'Sebek', 'sebek@sebek', 'sebek', 'sebek', true);
 
 INSERT INTO email_template (id, email_type, subject, text)
 VALUES (1, 'FINAL', 'testSubject', 'lorem ipsum');
@@ -24,8 +24,12 @@ VALUES (3, 'RECOMMENDED', 'testSubject', 'lorem ipsum');
 INSERT INTO users (id, name, surname)
 VALUES (100000, 'name_test_1', 'surname_test_1');
 
+INSERT INTO users (id, name, surname, email_address, login, password, first_login, role)
+VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', true, 'ROLE_TEST');
+
 INSERT INTO teacher_property (id, contract)
-VALUES (100000, 1);
+VALUES (100000, 1),
+       (999, 1);
 
 UPDATE users
 SET teacher = 100000
