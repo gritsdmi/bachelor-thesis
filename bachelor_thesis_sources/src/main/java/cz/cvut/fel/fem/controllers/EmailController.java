@@ -16,15 +16,11 @@ import java.util.List;
 @RestController
 public class EmailController implements Controller {
 
-    private final EmailService emailService;
-
-    private final EmailTemplateService emailTemplateService;
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
-    public EmailController(EmailService emailService, EmailTemplateService emailTemplateService) {
-        this.emailService = emailService;
-        this.emailTemplateService = emailTemplateService;
-    }
+    private EmailTemplateService emailTemplateService;
 
     @GetMapping
     public List<Email> getAll() {
@@ -54,5 +50,10 @@ public class EmailController implements Controller {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         emailService.delete(id);
+    }
+
+    @PostMapping("/send")
+    public void sendEmail(@RequestBody EmailTO emailTO) {
+        emailService.sendEmail(emailTO);
     }
 }

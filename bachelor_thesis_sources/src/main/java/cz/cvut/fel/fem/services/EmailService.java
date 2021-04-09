@@ -5,6 +5,9 @@ import cz.cvut.fel.fem.model.enums.EmailType;
 import cz.cvut.fel.fem.repository.EmailRepository;
 import cz.cvut.fel.fem.to.EmailTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,6 +19,10 @@ public class EmailService {
 
     @Autowired
     private EmailRepository emailRepository;
+
+    @Qualifier("getMailSender")
+    @Autowired
+    private JavaMailSender emailSender;
 
     public Email get(Long emailId) {
         return emailRepository.getOne(emailId);
@@ -58,5 +65,25 @@ public class EmailService {
 
     public void delete(Email email) {
         emailRepository.delete(email);
+    }
+
+    public void sendSimpleMessage(
+            String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("noreply@baeldung.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        emailSender.send(message);
+    }
+
+    public void sendEmail(EmailTO emailTO) {
+//        var from = emailTO.getAuthor().getEmailAddress();
+        var text = emailTO.getMessageText();
+        var subject = emailTO.getSubject();
+
+        sendSimpleMessage(emailTO.getEmailTO(), subject, text);
+
+//        emailTO.getTo().forEach(user -> sendSimpleMessage(user.getEmailAddress(), subject, text));
     }
 }

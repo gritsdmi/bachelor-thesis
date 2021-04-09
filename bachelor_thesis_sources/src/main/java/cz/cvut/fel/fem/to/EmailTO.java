@@ -18,4 +18,8 @@ public class EmailTO {
     private EmailType type;
 
     private String messageText;
+
+    private String subject;
+
+    private String emailTO;
 }

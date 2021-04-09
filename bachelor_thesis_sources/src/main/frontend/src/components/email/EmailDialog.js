@@ -2,8 +2,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import {Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, TextField} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {get} from "../../utils/request"
-
+import {get, post} from "../../utils/request"
 
 const useStyles = theme => ({
     firstCol: {
@@ -34,8 +33,6 @@ class EmailDialog extends React.Component {
     }
 
     componentDidMount() {
-        console.log("email dialog did mount", this.props)
-        //todo get email types
         get("/email/types").then(response => {
             this.setState({emailTypes: response.data})
         })
@@ -43,6 +40,19 @@ class EmailDialog extends React.Component {
 
     onClickSendButton = () => {
         console.log("onClickSendButton")
+        //todo control/verify inputs
+        const emailTo = {
+            author: null,
+            to: [],
+            type: this.state.currentType,
+            messageText: this.state.textInput,
+            subject: this.state.subjectInput,
+            emailTO: this.state.emailInput,
+        }
+
+        post('/email/send', emailTo)
+            .then(res => console.log(res))
+            .catch(err => console.log(err))
     }
 
     onChangeEmailInput = (event) => {
@@ -52,12 +62,16 @@ class EmailDialog extends React.Component {
         }, () => console.log(this.state.emailInput))
     }
 
-    onChangeSubjectInput = () => {
-
+    onChangeSubjectInput = (event) => {
+        this.setState({
+            subjectInput: event.target.value,
+        }, () => console.log(this.state.subjectInput))
     }
 
-    onChangeTextInput = () => {
-
+    onChangeTextInput = (event) => {
+        this.setState({
+            textInput: event.target.value,
+        }, () => console.log(this.state.textInput))
     }
 
 
@@ -145,7 +159,7 @@ class EmailDialog extends React.Component {
                                     defaultValue={''}
                                     // placeholder={"placeholder"}
                                     size={"small"}
-                                    onChange={this.onChangeSubjectInput}
+                                    onChange={this.onChangeTextInput}
                                 />
                             </Grid>
                         </Grid>
