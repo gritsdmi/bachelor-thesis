@@ -2,8 +2,9 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import CommissionParameters from "../../components/CommissionParameters";
 import {Paper} from "@material-ui/core";
-import {get, post} from "../../utils/request"
+import {post} from "../../utils/request"
 import CommissionCard from "../../components/commission/CommissionCard";
+import Pagination from "@material-ui/lab/Pagination";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -13,22 +14,57 @@ const useStyles = theme => ({
     }
 });
 
+const InitialState = {
+    commissions: [],
+
+    currentPage: 1,
+    size: 400, //count items in current page
+    totalItemsCount: null,
+    totalPagesCount: null,
+
+    pageSizes: [2, 10, 25, 50, 100],
+}
+
 class AutoGeneratingPage extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            commissions: [],
+            ...InitialState,
         }
     }
 
     componentDidMount() {
-        get("/commission/draft")
+        // get("/commission/draft")
+        //     .then(res => {
+        //         this.setState({
+        //             // commissions: res.data,
+        //         }, () => console.log(res.data))
+        //     })
+
+        this.fetchCommissions()
+    }
+
+    fetchCommissions() {
+
+        const pageTO = {
+            page: this.state.currentPage - 1,
+            size: this.state.size,
+            title: ' ',
+        }
+
+        post(`/commission/draft/page`, pageTO)
             .then(res => {
                 this.setState({
-                    commissions: res.data,
-                }, () => console.log(res.data))
+                        commissions: res.data.list,
+                        currentPage: res.data.currentPage,
+                        totalItemsCount: res.data.totalItemsCount,
+                        totalPagesCount: res.data.totalPagesCount,
+                    }
+                    // , () => console.log(res.data)
+                )
             })
+            .catch(err => console.log(err))
     }
 
     onGenerationComplete = (resp) => {
@@ -49,6 +85,11 @@ class AutoGeneratingPage extends React.Component {
             }))
     }
 
+    onChangePagination = (event, value) => {
+        this.setState({
+            currentPage: value,
+        }, () => this.fetchCommissions())
+    }
 
     render() {
         const {classes} = this.props
@@ -75,9 +116,25 @@ class AutoGeneratingPage extends React.Component {
                 {/*<CommissionProps*/}
                 {/*    onComplete={this.onGenerationComplete}*/}
                 {/*/>*/}
+                <Pagination
+                    count={this.state.totalPagesCount}
+                    page={this.state.currentPage + 1}
+                    siblingCount={1}
+                    boundaryCount={1}
+                    shape="rounded"
+                    onChange={this.onChangePagination}
+                />
                 <Paper className={classes.cardContainer}>
                     {comm}
                 </Paper>
+                <Pagination
+                    count={this.state.totalPagesCount}
+                    page={this.state.currentPage + 1}
+                    siblingCount={1}
+                    boundaryCount={1}
+                    shape="rounded"
+                    onChange={this.onChangePagination}
+                />
 
             </>
         )

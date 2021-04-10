@@ -4,12 +4,14 @@ import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.services.CommissionService;
 import cz.cvut.fel.fem.to.CreatorTO;
+import cz.cvut.fel.fem.to.page.PageRequestTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log
@@ -83,6 +85,22 @@ public class CommissionController implements Controller {
     public Commission update(@PathVariable Long id, @RequestBody Commission commission) {
         return commissionService.update(id, commission);
     }
+
+    @PostMapping("/page")
+    public Map<String, Object> getCommissionsPaged(@RequestBody PageRequestTO pageRequestTO) {
+        return commissionService.getAll(pageRequestTO);
+    }
+
+    @PostMapping("/byTeacher/{teacherId}/page")
+    public Map<String, Object> getByTeacher(@PathVariable Long teacherId, @RequestBody PageRequestTO pageRequestTO) {
+        return commissionService.getByTeacher(teacherId, pageRequestTO);
+    }
+
+    @PostMapping("/draft/page")
+    public Map<String, Object> getDraftPaged(@RequestBody PageRequestTO pageRequestTO) {
+        return commissionService.getAllDrafts(pageRequestTO);
+    }
+
 
 //    @DeleteMapping("/{id}")
 //    public void delete(@PathVariable Long id) {

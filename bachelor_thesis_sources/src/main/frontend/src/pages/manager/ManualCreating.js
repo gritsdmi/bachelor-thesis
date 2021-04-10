@@ -10,6 +10,7 @@ import List from "@material-ui/core/List";
 import SearchResultPanel from "../../components/SearchResultPanel";
 import Button from "@material-ui/core/Button";
 import ClearIcon from '@material-ui/icons/Clear';
+import Pagination from "@material-ui/lab/Pagination";
 
 const dateFormat = 'dd.MM.yyyy'
 
@@ -24,6 +25,13 @@ const InitialState = {
     selectedDate: format(new Date(), dateFormat),
 
     commission: null,
+
+    currentPage: 1,
+    size: 10, //count items in current page
+    totalItemsCount: null,
+    totalPagesCount: null,
+
+    pageSizes: [2, 10, 25, 50, 100],
 }
 
 const useStyles = theme => ({
@@ -63,7 +71,6 @@ class ManualCreatingPage extends React.Component {
         console.log("ManualCreatingPage DID MOUNT props new == false", this.props)
 
         this.fetchAll()
-
     }
 
     fetchLocations(dateF) {
@@ -92,12 +99,30 @@ class ManualCreatingPage extends React.Component {
             .catch(error => console.log(error))
     }
 
-    fetchTeachers() {
-        get(`/user/teacher/date/${this.state.selectedDate}`)
-            .then((response) => {
-                this.setState({teachers: response.data})
+    fetchTeachers(usePattern) {
+        // get(`/user/teacher/date/${this.state.selectedDate}`)
+        //     .then((response) => {
+        //         this.setState({teachers: response.data})
+        //     })
+        //     .catch(err => console.log(err))
+
+        const pageTO = {
+            page: usePattern ? this.state.currentPage : this.state.currentPage - 1,
+            size: this.state.size,
+            pattern: this.state.searchPattern,
+        }
+
+        post(`/user/teacher/date/${this.state.selectedDate}/page`, pageTO)
+            .then(res => {
+                this.setState({
+                    teachers: res.data.list,
+                    currentPage: res.data.currentPage,
+                    totalItemsCount: res.data.totalItemsCount,
+                    totalPagesCount: res.data.totalPagesCount,
+                }, () => console.log(res.data))
             })
             .catch(err => console.log(err))
+
     }
 
     fetchAll() {
@@ -110,7 +135,9 @@ class ManualCreatingPage extends React.Component {
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
         if (value && value !== '') {
-            this.setState({searchPattern: value})
+            this.setState({
+                searchPattern: value
+            }, () => this.fetchTeachers(true))
         } else {
             this.setState({searchPattern: ''})
         }
@@ -232,13 +259,19 @@ class ManualCreatingPage extends React.Component {
         console.log(payload)
     }
 
+    onChangePagination = (event, value) => {
+        this.setState({
+            currentPage: value,
+        }, () => this.fetchTeachers())
+    }
+
 
     render() {
 
         if (!this.state.locations || !this.state.degrees) {
             return <></>
         }
-        const teachersFilteredList = this.teachersFilteredList()
+        const teachersFilteredList = this.state.teachers
         const defaults = {
             date: this.state.selectedDate,
             loc: this.state.selectedLocation,
@@ -271,10 +304,26 @@ class ManualCreatingPage extends React.Component {
                         <Grid item xs>
                             <Paper>
                                 Search results
+                                <Pagination
+                                    count={this.state.totalPagesCount}
+                                    page={this.state.currentPage + 1}
+                                    siblingCount={1}
+                                    boundaryCount={1}
+                                    shape="rounded"
+                                    onChange={this.onChangePagination}
+                                />
                                 <SearchResultPanel
                                     data={teachersFilteredList}
                                     onClick={this.onClickAddTeacherButton}
                                     add={true}
+                                />
+                                <Pagination
+                                    count={this.state.totalPagesCount}
+                                    page={this.state.currentPage + 1}
+                                    siblingCount={1}
+                                    boundaryCount={1}
+                                    shape="rounded"
+                                    onChange={this.onChangePagination}
                                 />
                             </Paper>
                         </Grid>

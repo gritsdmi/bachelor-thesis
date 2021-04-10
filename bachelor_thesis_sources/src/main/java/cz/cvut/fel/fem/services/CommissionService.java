@@ -6,12 +6,16 @@ import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.repository.CommissionRepository;
 import cz.cvut.fel.fem.to.CommissionTO;
 import cz.cvut.fel.fem.to.CreatorTO;
+import cz.cvut.fel.fem.to.page.PageRequestTO;
+import cz.cvut.fel.fem.to.page.PageResponseTO;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -196,6 +200,41 @@ public class CommissionService {
         remove(draftsToRemove);
 
         return commissionRepository.save(comm);
+    }
+
+    /**
+     * Returns all non draft commissions by pages
+     *
+     * @param pageNumber represents current displayed page
+     * @param size       represents max count items on page
+     * @return
+     */
+    public Map<String, Object> getAllPaginated(Integer pageNumber, Integer size) {
+        var pageRequest = PageRequest.of(pageNumber, size);
+        var page = commissionRepository.findByStateNot(CommissionState.DRAFT, pageRequest);
+
+        return new PageResponseTO(page).getData();
+
+    }
+
+    public Map<String, Object> getAll(PageRequestTO pageRequestTO) {
+        return getAllPaginated(pageRequestTO.getPage(), pageRequestTO.getSize());
+    }
+
+    public Map<String, Object> getByTeacher(Long userId, PageRequestTO pageRequestTO) {
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        var page = commissionRepository.findByTeacherIdAndStateNot(userId, CommissionState.DRAFT.toString(), pageRequest);
+
+        return new PageResponseTO(page).getData();
+    }
+
+    public Map<String, Object> getAllDrafts(PageRequestTO pageRequestTO) {
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        log.info(pageRequest.toString());
+
+        var page = commissionRepository.findByState(CommissionState.DRAFT, pageRequest);
+
+        return new PageResponseTO(page).getData();
     }
 
     //    //do not work

@@ -28,6 +28,7 @@ export default function CommissionProps({
     const classes = useStyles();
 
     if (!locations || locations.length < 1) {
+        console.log("!locations")
         return <></>
     }
 

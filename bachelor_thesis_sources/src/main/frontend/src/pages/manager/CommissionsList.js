@@ -3,13 +3,15 @@ import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import {Paper} from "@material-ui/core";
 
-import {del, get} from "../../utils/request"
+import {del, post} from "../../utils/request"
 import Button from "@material-ui/core/Button";
 import CommissionCard from "../../components/commission/CommissionCard";
 import {withStyles} from "@material-ui/core/styles";
+import Pagination from '@material-ui/lab/Pagination';
 
 import CommissionSearchBox from "../../components/commission/CommissionSearchBox";
 import CommissionInfoDialog from "../../components/commission/CommissionInfoDialog";
+import CommissionListItem from "../../components/CommissionListItem";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -19,27 +21,65 @@ const useStyles = theme => ({
     }
 });
 
+const InitialState = {
+    commissions: [],
+    commissionInfoDialogOpen: false,
+    currentCommission: null,
+    cardView: true,
+
+    currentPage: 1,
+    size: 3, //count items in current page
+    totalItemsCount: null,
+    totalPagesCount: null,
+
+    pageSizes: [2, 10, 25, 50, 100],
+
+}
+
 class CommissionsListPage extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            commissions: [],
-            commissionInfoDialogOpen: false,
-            currentCommission: null,
-            cardView: true,
+            ...InitialState,
         }
     }
 
     componentDidMount() {
-        get("/commission/notDraft").then((response) => {
-            this.setState({commissions: response.data}
-                , () => console.log(this.state.commissions))
-        })
+        // get("/commission/notDraft").then((response) => {
+        //     this.setState({commissions: response.data}
+        //         , () => console.log(this.state.commissions))
+        // })
+        this.fetchCommissions()
     }
 
-    componentDidUpdate(prevProps) {
-        console.log("componentDidUpdate");
+    fetchCommissions() {
+
+        const pageTO = {
+            page: this.state.currentPage - 1,
+            size: this.state.size,
+            title: ' ',
+        }
+
+        post(`/commission/page`, pageTO)
+            .then(res => {
+                this.setState({
+                        commissions: res.data.list,
+                        currentPage: res.data.currentPage,
+                        totalItemsCount: res.data.totalItemsCount,
+                        totalPagesCount: res.data.totalPagesCount,
+                    }
+                    , () => console.log(res.data)
+                )
+            })
+            .catch(err => console.log(err))
+    }
+
+    onChangePagination = (event, value) => {
+        console.log("onChangePagination", value)
+        this.setState({
+            currentPage: value,
+        }, () => this.fetchCommissions())
     }
 
     onClearButtonClick = () => {
@@ -76,10 +116,9 @@ class CommissionsListPage extends React.Component {
     }
 
     onCommissionEditButtonClick = (commission) => {
-        //todo redirect to manual commission
+        // redirect to manual commission
         console.log("onCommissionEditButtonClick", commission)
-        // return <Redirect to="/manual/"/> //todo do not work
-        // this.props.history.push('/manual'); //todo but add props
+        // return <Redirect to="/manual/"/> // do not work
         this.props.history.push({
             pathname: "/manual",
             commission: commission,
@@ -89,17 +128,24 @@ class CommissionsListPage extends React.Component {
 
     render() {
         const {classes} = this.props
+        const cardView = this.state.cardView
 
         const cardsList = this.state.commissions
             && this.state.commissions.map((commission, idx) => {
                 return (
-                    <CommissionCard
-                        key={idx}
-                        commission={commission}
-                        onInfoClick={this.onCommissionInfoButtonClick}
-                        onEditClick={this.onCommissionEditButtonClick}
-                        onClose={this.onCommissionInfoClose}
-                    />
+                    this.state.cardView ?
+                        <CommissionCard
+                            key={idx}
+                            commission={commission}
+                            onInfoClick={this.onCommissionInfoButtonClick}
+                            onEditClick={this.onCommissionEditButtonClick}
+                            onClose={this.onCommissionInfoClose}
+                        /> :
+                        <CommissionListItem
+                            key={idx}
+                            commission={commission}
+                            onClickInfoButton={this.onCommissionInfoButtonClick}
+                        />
                 )
             })
 
@@ -125,9 +171,25 @@ class CommissionsListPage extends React.Component {
                     <CommissionSearchBox>
 
                     </CommissionSearchBox>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
+                    />
                     <Paper className={classes.cardContainer}>
                         {cardsList}
                     </Paper>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
+                    />
                 </Container>
             </>
         )

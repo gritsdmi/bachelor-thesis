@@ -50,7 +50,7 @@ export default function CommissionListItem({commission, onClickInfoButton}) {
                 <Grid direction={'column'} container item xs={1}>
                     <Grid item container justify={"center"}>
                         <Button
-                            onClick={onClickInfoButton(commission)}
+                            onClick={() => onClickInfoButton(commission)}
                         >
                             Info
                         </Button>

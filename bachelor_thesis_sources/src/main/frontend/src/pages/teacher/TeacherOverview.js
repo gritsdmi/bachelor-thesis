@@ -1,10 +1,11 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import TeacherEventsFilter from "../../components/teacher/TeacherEventsFilter";
-import {get} from "../../utils/request";
+import {get, post} from "../../utils/request";
 import {Paper} from "@material-ui/core";
 import CommissionListItem from "../../components/CommissionListItem";
 import TeacherCommissionInfoDialog from "../../components/teacher/TeacherCommissionInfoDialog";
+import Pagination from "@material-ui/lab/Pagination";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -27,7 +28,15 @@ const InitialState = {
 
     commissionInfoDialogOpen: false,
     currentCommission: null,
+
     teacherId: localStorage.getItem('userId'),
+
+    currentPage: 1,
+    size: 3, //count items in current page
+    totalItemsCount: null,
+    totalPagesCount: null,
+
+    pageSizes: [2, 10, 25, 50, 100],
 
 }
 
@@ -41,7 +50,6 @@ class TeacherOverview extends React.Component {
     }
 
     componentDidMount() {
-        console.log("TeacherOverview DID MOUNT")
         this.fetchDegrees()
         this.fetchTeacher()
         this.fetchCommissions()
@@ -68,13 +76,31 @@ class TeacherOverview extends React.Component {
     }
 
     fetchCommissions() {
-        get(`/commission/byTeacher/${this.state.teacherId}`)
-            .then(response => {
+        // get(`/commission/byTeacher/${this.state.teacherId}`)
+        //     .then(response => {
+        //         this.setState({
+        //             commissions: response.data,
+        //         }, () => console.log(response.data))
+        //     })
+        //     .catch(error => console.log(error))
+
+        const pageTO = {
+            page: this.state.currentPage - 1,
+            size: this.state.size,
+            pattern: ' ',
+        }
+
+        post(`/commission/byTeacher/${this.state.teacherId}/page`, pageTO)
+            .then(res => {
                 this.setState({
-                    commissions: response.data,
-                }, () => console.log(response.data))
+                        commissions: res.data.list,
+                        currentPage: res.data.currentPage,
+                        totalItemsCount: res.data.totalItemsCount,
+                        totalPagesCount: res.data.totalPagesCount,
+                    }, () => console.log(res)
+                )
             })
-            .catch(error => console.log(error))
+            .catch(err => console.log(err))
     }
 
     onChangeComState = (evt) => {
@@ -85,7 +111,7 @@ class TeacherOverview extends React.Component {
         console.log("onChangeDegree", evt.target.value)
     }
 
-    onClickInfoButton = comm => (evt) => {
+    onClickInfoButton = comm => {
         console.log("onClickInfoButton", comm)
         this.setState({
             currentCommission: comm,
@@ -102,6 +128,11 @@ class TeacherOverview extends React.Component {
         })
     }
 
+    onChangePagination = (event, value) => {
+        this.setState({
+            currentPage: value,
+        }, () => this.fetchCommissions())
+    }
 
     render() {
         const comList = this.state.commissions.map((comm, idx) => {
@@ -132,13 +163,28 @@ class TeacherOverview extends React.Component {
                     onChangeComState={this.onChangeComState}
                     onChangeDegree={this.onChangeDegree}
                 />
+                <Pagination
+                    count={this.state.totalPagesCount}
+                    page={this.state.currentPage + 1}
+                    siblingCount={1}
+                    boundaryCount={1}
+                    shape="rounded"
+                    onChange={this.onChangePagination}
+                />
                 <Paper>
                     {comList}
                 </Paper>
+                <Pagination
+                    count={this.state.totalPagesCount}
+                    page={this.state.currentPage + 1}
+                    siblingCount={1}
+                    boundaryCount={1}
+                    shape="rounded"
+                    onChange={this.onChangePagination}
+                />
             </div>
         );
     }
-
 }
 
 export default withStyles(useStyles)(TeacherOverview)

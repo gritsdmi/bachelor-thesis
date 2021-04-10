@@ -6,11 +6,13 @@ import cz.cvut.fel.fem.model.auth.NewPassTO;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.DateTO;
 import cz.cvut.fel.fem.to.UserTO;
+import cz.cvut.fel.fem.to.page.PageRequestTO;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log
@@ -65,5 +67,16 @@ public class UserController implements Controller {
     public User removeDate(@PathVariable Long teacherId, @RequestBody Date date) {
         return userService.removeDate(teacherId, date);
     }
+
+    @PostMapping("/teacher/page")
+    public Map<String, Object> getAllTeachersPaged(@RequestBody PageRequestTO pageRequestTO) {
+        return userService.getAll(pageRequestTO);
+    }
+
+    @PostMapping("/teacher/date/{date}/page")
+    public Map<String, Object> getByDate(@PathVariable String date, @RequestBody PageRequestTO pageRequestTO) {
+        return userService.getAvailableTeachersByDatePaged(date, pageRequestTO);
+    }
+
 
 }

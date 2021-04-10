@@ -1,24 +1,27 @@
 package cz.cvut.fel.fem.services;
 
-import cz.cvut.fel.fem.model.Date;
-import cz.cvut.fel.fem.model.Position;
-import cz.cvut.fel.fem.model.TeacherProperty;
-import cz.cvut.fel.fem.model.User;
+import cz.cvut.fel.fem.model.*;
 import cz.cvut.fel.fem.model.auth.NewPassTO;
+import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.repository.UserRepository;
 import cz.cvut.fel.fem.to.DateTO;
 import cz.cvut.fel.fem.to.UserTO;
+import cz.cvut.fel.fem.to.page.PageRequestTO;
+import cz.cvut.fel.fem.to.page.PageResponseTO;
 import cz.cvut.fel.fem.utils.CsvParser;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -91,8 +94,8 @@ public class UserService {
     }
 
     /**
-     * Returns List of Users who is free today.
-     * Free in meaning that teacher hasn't any exam today and teacher did not mark this day like unavailable.
+     * Returns List of Users who is free today and has contract more than 0.
+     * Free in meaning that teacher hasn't any exam today and teacher did not mark this day like unavailable day.
      *
      * @param dateStr String represents the date
      * @return List of User
@@ -115,11 +118,18 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns exam dates for teacher's calendar. Returns only date where commission's state isn't DRAFT
+     *
+     * @param teacherId user id
+     * @return List of string represents Date in format "01.01.1970"
+     */
     public List<String> getExamDates(Long teacherId) {
         var teacher = userRepository.getOne(teacherId);
 
         return teacher.getTeacher().getCommissionList()
                 .stream()
+                .filter(commission -> !commission.getState().equals(CommissionState.DRAFT))
                 .map(commission -> commission.getExam().getDate())
                 .collect(Collectors.toList());
     }
@@ -201,30 +211,38 @@ public class UserService {
         return userRepository.getOne(teacherId);
     }
 
+    public Map<String, Object> getAll(PageRequestTO pageRequestTO) {
 
-//
-//    @Transactional
-//    Teacher save(Teacher teacher, TeacherTO teacherTO) {
-//        //todo convertor DTO to model
-//        //existuji automaticke convertory
-//        teacher.setPersonalNumber(teacherTO.getPersonalNumber());
-//        teacher.setName(teacherTO.getName());
-//        teacher.setSurname(teacherTO.getSurname());
-//        teacher.setEmailAddress(teacherTO.getEmailAddress());
-//        teacher.setLogin(teacherTO.getLogin());
-//        teacher.setPassword(teacherTO.getPassword());
-//        teacher.setFirstLogin(teacherTO.getFirstLogin());
-//        teacher.setDegree(teacherTO.getDegree());
-//        teacher.setCommissionList(teacherTO.getCommissionList());
-//        teacher.setUnavailableDates(teacherTO.getUnavailableDates());
-//        teacher.setEmailAddress(teacherTO.getEmailAddress());
-//        teacher.setContract(teacherTO.getContract());
-//        teacher.setPosition(teacherTO.getPosition());
-//        teacher.setTitul(teacherTO.getTitul());
-//        teacher.setDepartment(teacherTO.getDepartment());
-//
-//        return userRepository.save(teacher);
-//    }
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        Page<User> page;
+
+        if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
+            page = userRepository.findByNameOrSurnameOrLoginContaining(pageRequestTO.getPattern().toLowerCase(), pageRequest);
+        } else {
+            page = userRepository.findAll(pageRequest);
+        }
+
+        return new PageResponseTO(page).getData();
+    }
+
+    public Map<String, Object> getAvailableTeachersByDatePaged(String date, PageRequestTO pageRequestTO) {
+
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        Page<User> page;
+
+        var allIdsByDate = getAvailableTeachersByDate(date)
+                .stream().map(AbstractEntity::getId)
+                .collect(Collectors.toList());
+
+        if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
+            page = userRepository.getUsersByIdByPatternPaged(allIdsByDate, pageRequestTO.getPattern(), pageRequest);
+        } else {
+            page = userRepository.getUsersByIdPaged(allIdsByDate, pageRequest);
+        }
+
+        return new PageResponseTO(page).getData();
+    }
+
 //
 //    public void delete(Long id) {
 //        userRepository.deleteById(id);
