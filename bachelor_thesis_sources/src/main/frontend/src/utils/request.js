@@ -19,7 +19,6 @@ export function get(url) {
     if (jwt) {
         console.log("sending get request with token to ", URL, config(jwt))
         return axios.get(URL, config(jwt)); // no 'Access-Control-Allow-Origin header //next error: no http ok status
-        // return axios.get(URL, {headers}); //no http ok status
     } else if (url.startsWith('/util')) {
         console.log("sending get auth request to ", URL)
         return axios.get(URL);
@@ -50,10 +49,13 @@ export function post(url, payload) {
 
 export function del(url) {
     const payload = base_URL + url;
-    // console.log("sending del request to ", payload)
     return axios.delete(payload);
 }
 
-// function myFunc(requiredArg, optionalArg = 'defaultValue') {
-//     // do stuff
-// }
+export function handleResponseError(err) {
+    console.log("Error code ", err.response.status)
+    if (err.response.status === 403) {
+        localStorage.clear()
+        window.location.href = '/login'
+    }
+}

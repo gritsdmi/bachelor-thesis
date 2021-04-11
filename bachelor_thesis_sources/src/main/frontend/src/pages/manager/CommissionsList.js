@@ -3,7 +3,7 @@ import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import {Paper} from "@material-ui/core";
 
-import {del, post} from "../../utils/request"
+import {del, handleResponseError, post} from "../../utils/request"
 import Button from "@material-ui/core/Button";
 import CommissionCard from "../../components/commission/CommissionCard";
 import {withStyles} from "@material-ui/core/styles";
@@ -72,7 +72,7 @@ class CommissionsListPage extends React.Component {
                     , () => console.log(res.data)
                 )
             })
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
     }
 
     onChangePagination = (event, value) => {
