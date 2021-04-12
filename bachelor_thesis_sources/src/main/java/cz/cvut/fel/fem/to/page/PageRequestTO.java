@@ -1,5 +1,6 @@
 package cz.cvut.fel.fem.to.page;
 
+import cz.cvut.fel.fem.to.CommissionFilterProps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +18,6 @@ public class PageRequestTO {
     private Integer size;
 
     private String pattern;
+
+    private CommissionFilterProps props;
 }

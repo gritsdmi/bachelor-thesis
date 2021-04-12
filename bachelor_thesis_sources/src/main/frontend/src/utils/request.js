@@ -54,8 +54,13 @@ export function del(url) {
 
 export function handleResponseError(err) {
     console.log("Error code ", err.response.status)
-    if (err.response.status === 403) {
-        localStorage.clear()
-        window.location.href = '/login'
+    if (err) {
+        if (err.response) {
+            if (err.response.status === 403) {
+                localStorage.clear()
+                window.location.href = '/login'
+            }
+        }
     }
+
 }

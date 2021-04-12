@@ -13,9 +13,9 @@ const useStyles = makeStyles((theme) => ({
         width: "150px",
     },
 
-
 }));
 
+//used in manual creating
 export default function CommissionProps({
                                             date,
                                             onChangeDate,

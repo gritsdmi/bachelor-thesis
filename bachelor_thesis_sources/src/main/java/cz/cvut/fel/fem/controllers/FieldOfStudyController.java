@@ -1,6 +1,7 @@
 package cz.cvut.fel.fem.controllers;
 
 import cz.cvut.fel.fem.model.FieldOfStudy;
+import cz.cvut.fel.fem.model.enums.Degree;
 import cz.cvut.fel.fem.services.FieldOfStudyService;
 import cz.cvut.fel.fem.to.FieldOfStudyTO;
 import lombok.extern.java.Log;
@@ -12,7 +13,7 @@ import java.util.List;
 @Log
 @RequestMapping(value = "/field", produces = {"application/json; charset=UTF-8"})
 @RestController
-public class FieldOfStudyController {
+public class FieldOfStudyController implements Controller {
 
     private final FieldOfStudyService fieldOfStudyService;
 
@@ -29,6 +30,11 @@ public class FieldOfStudyController {
     @GetMapping("/{id}")
     public FieldOfStudy get(@PathVariable Long id) {
         return fieldOfStudyService.get(id);
+    }
+
+    @GetMapping("/degree/{degree}")
+    public List<FieldOfStudy> getByDegree(@PathVariable Degree degree) {
+        return fieldOfStudyService.getByDegree(degree);
     }
 
     @PostMapping

@@ -1,8 +1,11 @@
 package cz.cvut.fel.fem.services;
 
+import cz.cvut.fel.fem.model.AbstractEntity;
 import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.enums.CommissionState;
+import cz.cvut.fel.fem.model.enums.Degree;
+import cz.cvut.fel.fem.model.enums.FieldOfStudyEnum;
 import cz.cvut.fel.fem.repository.CommissionRepository;
 import cz.cvut.fel.fem.to.CommissionTO;
 import cz.cvut.fel.fem.to.CreatorTO;
@@ -11,6 +14,7 @@ import cz.cvut.fel.fem.to.page.PageResponseTO;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -235,6 +239,59 @@ public class CommissionService {
         var page = commissionRepository.findByState(CommissionState.DRAFT, pageRequest);
 
         return new PageResponseTO(page).getData();
+    }
+
+    /**
+     * Get commissions for commissions list page.
+     * Used filter parameters such as dates, degrees, study fields.
+     *
+     * @param pageRequestTO page request.
+     * @return page contains requested data.
+     * @see cz.cvut.fel.fem.to.page.PageRequestTO
+     * @see cz.cvut.fel.fem.to.CommissionFilterProps
+     */
+    public Map<String, Object> getByPropsPaginated(PageRequestTO pageRequestTO) {
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        var props = pageRequestTO.getProps();
+
+        log.info(pageRequest.toString());
+        log.info(props.toString());
+        var notDraft = getNotDraft().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+        log.info("not draft " + notDraft.toString());
+
+        Page<Commission> page;
+        if (props.getSelectedField().getDegree().equals(Degree.ALL)) {
+            // request with all degrees and all fields
+            page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
+                    props.getSelectedDatesRange(),
+                    notDraft, pageRequest);
+            log.info("request with all degrees and all fields");
+            log.info(page.getContent().toString());
+
+        } else {
+            if (props.getSelectedField().getField().equals(FieldOfStudyEnum.ALL)) {
+                // request with selected degree and all fields according to this degree
+                page = commissionRepository.getByDegreeAndAllFieldsPaginated(props.getSelectedDatesRange(),
+                        notDraft,
+                        props.getSelectedField().getDegree(),
+                        pageRequest);
+                log.info("request with selected degree and all fields according to this degree");
+
+            } else {
+                //request specified degree and field of study
+                page = commissionRepository.getByDegreeAndFieldPaginated(props.getSelectedDatesRange(),
+                        notDraft,
+                        props.getSelectedField().getDegree(),
+                        props.getSelectedField().getField().toString(),
+                        pageRequest);
+                log.info("request specified degree and field of study");
+
+            }
+        }
+
+//        log.info(page.toString());
+        return new PageResponseTO(page).getData();
+
     }
 
     //    //do not work

@@ -4,6 +4,7 @@ import cz.cvut.fel.fem.model.Exam;
 import cz.cvut.fel.fem.model.enums.Degree;
 import cz.cvut.fel.fem.repository.ExamRepository;
 import cz.cvut.fel.fem.to.ExamTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,10 @@ public class ExamService {
     @Autowired
     private ExamRepository examRepository;
 
+    //TODO replace TO methods by model mapper
+    @Autowired
+    private ModelMapper modelMapper;
+
     public List<Exam> getAll() {
         return examRepository.findAll();
     }
@@ -26,7 +31,7 @@ public class ExamService {
     }
 
     public List<Degree> getDegrees() {
-        return new ArrayList<>(Arrays.asList(Degree.Bc, Degree.Ing, Degree.PhD));
+        return new ArrayList<>(Arrays.asList(Degree.ALL, Degree.Bc, Degree.Ing, Degree.PhD));
     }
 
     public List<Exam> getByDate(String date) {
@@ -40,7 +45,7 @@ public class ExamService {
     public Exam save(ExamTO examTO) {
         var exam = new Exam();
 
-//        exam.setDate(examTO.getDate());
+        exam.setDate(examTO.getDate());
         exam.setLocation(examTO.getLocation());
         exam.setFieldOfStudy(examTO.getFieldOfStudy());
         exam.setDegree(examTO.getDegree());
@@ -55,7 +60,7 @@ public class ExamService {
     public Exam update(Long id, ExamTO examTO) {
         var exam = examRepository.getOne(id);
 
-//        exam.setDate(examTO.getDate());
+        exam.setDate(examTO.getDate());
         exam.setLocation(examTO.getLocation());
         exam.setFieldOfStudy(examTO.getFieldOfStudy());
         exam.setDegree(examTO.getDegree());

@@ -34,6 +34,8 @@ const InitialState = {
 
     pageSizes: [2, 10, 25, 50, 100],
 
+    filterProps: null,
+
 }
 
 class CommissionsListPage extends React.Component {
@@ -46,22 +48,47 @@ class CommissionsListPage extends React.Component {
     }
 
     componentDidMount() {
-        // get("/commission/notDraft").then((response) => {
-        //     this.setState({commissions: response.data}
-        //         , () => console.log(this.state.commissions))
-        // })
-        this.fetchCommissions()
+        // this.fetchCommissions()
     }
 
-    fetchCommissions() {
+    fetchCommissions(changeProps) {
 
         const pageTO = {
-            page: this.state.currentPage - 1,
+            page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
             size: this.state.size,
             title: ' ',
         }
 
         post(`/commission/page`, pageTO)
+            .then(res => {
+                this.setState({
+                        // commissions: res.data.list,
+                        // currentPage: res.data.currentPage,
+                        // totalItemsCount: res.data.totalItemsCount,
+                        // totalPagesCount: res.data.totalPagesCount,
+                    }
+                    , () => console.log(res.data)
+                )
+            })
+            .catch(err => handleResponseError(err))
+
+    }
+
+    fetchByFilter(filterProps, changeProps) {
+        console.log(filterProps)
+
+        let props = filterProps
+        props.selectedState = null
+        const pageTO = {
+            page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
+            // page: this.state.currentPage - 1,
+            size: this.state.size,
+            title: ' ',
+            props: {...props},
+        }
+        console.log(pageTO)
+
+        post(`/commission/filter/page`, pageTO)
             .then(res => {
                 this.setState({
                         commissions: res.data.list,
@@ -76,16 +103,33 @@ class CommissionsListPage extends React.Component {
     }
 
     onChangePagination = (event, value) => {
-        console.log("onChangePagination", value)
+        console.log("onChangePagination")
         this.setState({
             currentPage: value,
-        }, () => this.fetchCommissions())
+        }, () => this.fetchByFilter(this.state.filterProps, false))
+    }
+
+    onChangeFilter = (filterProps, didMount) => {
+        if (didMount) {
+            console.log("onChangeFilter did mount", filterProps)
+            this.setState({
+                filterProps: filterProps,
+            }, () => this.onChangePagination(null, 1))
+
+        } else {
+            console.log("onChangeFilter", filterProps)
+            this.setState({
+                filterProps: filterProps,
+            }, () => this.fetchByFilter(filterProps, true))
+        }
+
     }
 
     onClearButtonClick = () => {
-        del("/commission").then((response) => {
-            this.setState({commissions: response.data})
-        })
+        del("/commission")
+            .then((response) => {
+                this.setState({commissions: response.data})
+            })
     }
 
     onCommissionInfoButtonClick = (commission) => {
@@ -123,12 +167,11 @@ class CommissionsListPage extends React.Component {
             pathname: "/manual",
             commission: commission,
         });
-
     }
+
 
     render() {
         const {classes} = this.props
-        const cardView = this.state.cardView
 
         const cardsList = this.state.commissions
             && this.state.commissions.map((commission, idx) => {
@@ -168,9 +211,10 @@ class CommissionsListPage extends React.Component {
                     <Box>
                         <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
                     </Box>
-                    <CommissionSearchBox>
+                    <CommissionSearchBox
+                        onChange={this.onChangeFilter}
+                    />
 
-                    </CommissionSearchBox>
                     <Pagination
                         count={this.state.totalPagesCount}
                         page={this.state.currentPage + 1}

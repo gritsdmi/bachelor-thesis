@@ -1,22 +1,25 @@
 package cz.cvut.fel.fem.services;
 
 import cz.cvut.fel.fem.model.FieldOfStudy;
+import cz.cvut.fel.fem.model.enums.Degree;
 import cz.cvut.fel.fem.repository.FieldOfStudyRepository;
 import cz.cvut.fel.fem.to.FieldOfStudyTO;
+import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Log
 public class FieldOfStudyService {
 
-    private final FieldOfStudyRepository fieldOfStudyRepository;
+    @Autowired
+    private FieldOfStudyRepository fieldOfStudyRepository;
 
     @Autowired
-    public FieldOfStudyService(FieldOfStudyRepository fieldOfStudyRepository) {
-        this.fieldOfStudyRepository = fieldOfStudyRepository;
-    }
+    private ModelMapper modelMapper;
 
     public List<FieldOfStudy> getAll() {
         return fieldOfStudyRepository.findAll();
@@ -26,12 +29,20 @@ public class FieldOfStudyService {
         return fieldOfStudyRepository.getOne(id);
     }
 
+    public List<FieldOfStudy> getByDegree(Degree degree) {
+        if (degree.toString().equals("ALL")) {
+            log.info("get by all degree");
+            return getAll();
+        } else {
+            return fieldOfStudyRepository.findByDegree(degree);
+        }
+    }
+
     public FieldOfStudy save(FieldOfStudyTO fieldOfStudyTO) {
         var field = new FieldOfStudy();
 
         field.setField(fieldOfStudyTO.getField());
 //        field.setDegree(fieldOfStudyTO.getDegree());
-//        field.setStudentList(fieldOfStudyTO.getStudentList());
 
         return fieldOfStudyRepository.save(field);
     }
@@ -41,7 +52,6 @@ public class FieldOfStudyService {
 
         field.setField(fieldOfStudyTO.getField());
 //        field.setDegree(fieldOfStudyTO.getDegree());
-//        field.setStudentList(fieldOfStudyTO.getStudentList());
 
         return fieldOfStudyRepository.save(field);
     }

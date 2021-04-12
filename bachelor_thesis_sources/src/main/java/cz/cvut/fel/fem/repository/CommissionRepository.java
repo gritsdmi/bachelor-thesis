@@ -2,6 +2,7 @@ package cz.cvut.fel.fem.repository;
 
 import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.model.enums.CommissionState;
+import cz.cvut.fel.fem.model.enums.Degree;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,5 +38,34 @@ public interface CommissionRepository extends JpaRepository<Commission, Long> {
                                                 @Param("state") String state,
                                                 Pageable pageable);
 
+    //request with all degrees and all fields
+//    @Query("select c from Commission c where ( c.id in :ids)")
+    @Query("select c from Commission c where (c.exam.date in :dates and c.id in :ids)")
+    Page<Commission> getByAllDegreesAndAllFieldsPaginated(
+            @Param("dates") List<String> dates,
+            @Param("ids") List<Long> ids,
+            Pageable pageable);
+
+    // request with selected degree and all fields according to this degree
+    @Query(
+            value = "select com from Commission com where (com.exam.date in :dates and com.id in :ids " +
+                    "and com.exam.degree = :degree)"
+    )
+    Page<Commission> getByDegreeAndAllFieldsPaginated(@Param("dates") List<String> dates,
+                                                      @Param("ids") List<Long> ids,
+                                                      @Param("degree") Degree degree,
+                                                      Pageable pageable);
+
+    // request specified degree and field of study
+    @Query(
+            value = "select com from Commission com where (com.exam.date in :dates and com.id in :ids " +
+                    "and com.exam.degree = :degree " +
+                    "and com.exam.fieldOfStudy = :fieldOfStudy)"
+    )
+    Page<Commission> getByDegreeAndFieldPaginated(@Param("dates") List<String> dates,
+                                                  @Param("ids") List<Long> ids,
+                                                  @Param("degree") Degree degree,
+                                                  @Param("fieldOfStudy") String fieldOfStudy,
+                                                  Pageable pageable);
 
 }

@@ -23,6 +23,7 @@ const useStyles = theme => ({
 
 const dateFormat = 'dd.MM.yyyy'
 
+//used in autogenerate page
 class CommissionParameters extends React.Component {
     constructor(props) {
         super(props);

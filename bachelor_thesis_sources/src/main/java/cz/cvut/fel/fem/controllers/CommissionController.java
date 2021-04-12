@@ -88,6 +88,7 @@ public class CommissionController implements Controller {
 
     @PostMapping("/page")
     public Map<String, Object> getCommissionsPaged(@RequestBody PageRequestTO pageRequestTO) {
+        log.info("commission/page");
         return commissionService.getAll(pageRequestTO);
     }
 
@@ -99,6 +100,12 @@ public class CommissionController implements Controller {
     @PostMapping("/draft/page")
     public Map<String, Object> getDraftPaged(@RequestBody PageRequestTO pageRequestTO) {
         return commissionService.getAllDrafts(pageRequestTO);
+    }
+
+    @PostMapping("/filter/page")
+    public Map<String, Object> getByFilterPaged(@RequestBody PageRequestTO pageRequestTO) {
+        log.info("filter page");
+        return commissionService.getByPropsPaginated(pageRequestTO);
     }
 
 

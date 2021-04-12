@@ -33,6 +33,7 @@ public class Exam extends AbstractEntity {
 
     private String fieldOfStudy;
 
+    //todo replace this by Field of study @ManyToOne
     @Enumerated(EnumType.STRING)
     private Degree degree;
 
