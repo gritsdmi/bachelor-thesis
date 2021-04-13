@@ -2,29 +2,38 @@ import React from "react";
 import Container from "@material-ui/core/Container";
 import {withStyles} from "@material-ui/core/styles";
 import SearchBox from "../../components/SearchBox";
-import {Grid, ListItem, Paper, Table, TableBody, TableCell, TableRow} from "@material-ui/core";
+import {Grid, ListItem, Paper, Snackbar, Table, TableBody, TableCell, TableRow} from "@material-ui/core";
 import CommissionProps from "../../components/CommissionProps";
-import {get, post} from "../../utils/request"
-import format from "date-fns/format";
+import {get, handleResponseError, post} from "../../utils/request"
 import List from "@material-ui/core/List";
 import SearchResultPanel from "../../components/SearchResultPanel";
 import Button from "@material-ui/core/Button";
 import ClearIcon from '@material-ui/icons/Clear';
 import Pagination from "@material-ui/lab/Pagination";
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
-const dateFormat = 'dd.MM.yyyy'
+import moment from 'moment'
+import "moment/locale/en-gb"
+
+const dateFormatMoment = "DD.MM.yyyy"
+const timeFormatMoment = "HH:mm"
 
 const InitialState = {
     searchPattern: '',
     teachers: [],
     locations: [],
     degrees: [],
+    fields: [],
 
     selectedDegree: '',
+    selectedField: '',
     selectedLocation: '',
-    selectedDate: format(new Date(), dateFormat),
+    selectedDate: new Date(),
 
     commission: null,
+    edit: false,
+    snackOpen: false,
 
     currentPage: 1,
     size: 10, //count items in current page
@@ -52,25 +61,47 @@ class ManualCreatingPage extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props)
         if (!this.props.location.commission) {
             //click on header's button
             //there are none any graft
-            console.log("ManualCreatingPage DID MOUNT props new == true")
+            console.log("ManualCreatingPage DID MOUNT creating new comm")
+            this.fetchAll()
         } else {
             //edit some commission
 
-            // console.log("ManualCreatingPage DID MOUNT props new == false", this.props)
+            console.log("ManualCreatingPage DID MOUNT => editing existed commission", this.props)
             this.setState({
                 commission: this.props.location.commission,
                 selectedDegree: this.props.location.commission.exam.degree,
+                selectedField: this.props.location.commission.exam.fieldOfStudy,
                 selectedLocation: this.props.location.commission.exam.location,
-                selectedDate: this.props.location.commission.exam.date.date,
-            }, () => console.log(this.state))
-
+                selectedDate: this.dateTimeStrToDate(this.props.location.commission.exam.date, this.props.location.commission.exam.time),
+                edit: true,
+            }, () => {
+                console.log(this.state)
+                this.fetchTeachers()
+                this.fetchDegrees(true)
+                this.fetchFields()
+                this.fetchLocations(moment(this.state.selectedDate).format(dateFormatMoment));
+            })
         }
-        console.log("ManualCreatingPage DID MOUNT props new == false", this.props)
 
-        this.fetchAll()
+    }
+
+    dateTimeStrToDate(date, time) {
+        const str = date.concat(' ').concat(time)
+        const format = dateFormatMoment.concat(' ').concat(timeFormatMoment)
+        console.log(str)
+        const obj = moment(str, format).toDate()
+        console.log(obj)
+        return obj
+    }
+
+    fetchAll(trigger) {
+        this.fetchTeachers(trigger)
+        this.fetchDegrees()
+        this.fetchLocations(moment(this.state.selectedDate).format(dateFormatMoment));
     }
 
     fetchLocations(dateF) {
@@ -83,28 +114,27 @@ class ManualCreatingPage extends React.Component {
                     // , () => console.log(this.state.locations)
                 )
             })
-            .catch(error => console.log(error))
+            .catch(err => handleResponseError(err))
     }
 
-    fetchDegrees() {
+    fetchDegrees(edit) {
         get("/exam/degrees")
-            .then(response => {
-                this.setState({
-                        degrees: response.data,
-                        selectedDegree: response.data.length > 0 ? response.data[0] : '',
-                    }
-                    // , () => console.log(response.data)
-                )
+            .then(res => {
+                if (edit) {
+                    this.setState({
+                        degrees: this.fixDegreesArr(res.data),
+                    })
+                } else {
+                    this.setState({
+                        degrees: this.fixDegreesArr(res.data),
+                        selectedDegree: res.data.length > 0 ? res.data[0] : '',
+                    }, () => this.fetchFields())
+                }
             })
-            .catch(error => console.log(error))
+            .catch(err => handleResponseError(err))
     }
 
     fetchTeachers(usePattern) {
-        // get(`/user/teacher/date/${this.state.selectedDate}`)
-        //     .then((response) => {
-        //         this.setState({teachers: response.data})
-        //     })
-        //     .catch(err => console.log(err))
 
         const pageTO = {
             page: usePattern ? this.state.currentPage : this.state.currentPage - 1,
@@ -112,7 +142,9 @@ class ManualCreatingPage extends React.Component {
             pattern: this.state.searchPattern,
         }
 
-        post(`/user/teacher/date/${this.state.selectedDate}/page`, pageTO)
+        const date = moment(this.state.selectedDate).format(dateFormatMoment)
+
+        post(`/user/teacher/date/${date}/page`, pageTO)
             .then(res => {
                 this.setState({
                     teachers: res.data.list,
@@ -121,16 +153,30 @@ class ManualCreatingPage extends React.Component {
                     totalPagesCount: res.data.totalPagesCount,
                 }, () => console.log(res.data))
             })
-            .catch(err => console.log(err))
-
+            .catch(err => handleResponseError(err))
     }
 
-    fetchAll() {
-        this.fetchTeachers()
-        this.fetchDegrees()
-        this.fetchLocations(this.state.selectedDate);
+    fetchFields(edit) {
+        get(`/field/degree/${this.state.selectedDegree}`)
+            .then(res => {
+                if (edit) {
+                    this.setState({
+                        fields: res.data,
+                    })
+                } else {
+                    this.setState({
+                        fields: res.data,
+                        selectedField: res.data.length > 0 ? res.data[0] : '',
+                    })
+                }
+            })
+            .catch(err => handleResponseError(err))
     }
 
+    fixDegreesArr(arr) {
+        arr.shift()
+        return arr
+    }
 
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
@@ -144,11 +190,9 @@ class ManualCreatingPage extends React.Component {
     }
 
     handleChangeDate = (event) => {
-        //dd.MM.yyyy
-        console.log("handleChangeDate", format(event, dateFormat))
         this.setState({
-            selectedDate: format(event, dateFormat),
-        }, () => this.fetchAll())
+            selectedDate: event,
+        }, () => this.fetchAll(true))
 
     }
 
@@ -160,29 +204,9 @@ class ManualCreatingPage extends React.Component {
 
     handleChangeDegree = (event) => {
         this.setState({
-            selectedDegree: event.target.value,
-        })
-    }
-
-    teachersFilteredList() {
-
-        // if (this.state.searchPattern.length < 2) {
-        //     return []
-        // }
-
-        if (this.state.searchPattern === '') {
-            return this.state.teachers
-        }
-
-        return this.state.teachers
-            && this.state.searchPattern
-            && this.state.teachers.filter(teacher => {
-                    return (
-                        (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-                        || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-                        || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
-                }
-            )
+                selectedDegree: event.target.value,
+            }, () => this.fetchFields()
+        )
     }
 
     onClickAddTeacherButton = (teacher) => {
@@ -194,8 +218,9 @@ class ManualCreatingPage extends React.Component {
                 exam: {
                     degree: this.state.selectedDegree,
                     location: this.state.selectedLocation,
-                    fieldOfStudy: null,
-                    date: this.state.selectedDate,
+                    fieldOfStudy: this.state.selectedField.field,
+                    date: moment(this.state.selectedDate).format(dateFormatMoment),
+                    time: moment(this.state.selectedDate).format(timeFormatMoment),
                 },
                 state: "EDITABLE",
             }
@@ -231,32 +256,58 @@ class ManualCreatingPage extends React.Component {
             return
         }
 
-        let payload
-        if (this.props.location.commission) {
-            payload = {
+        //if updating existed commission
+        // if (this.props.location.commission) {
+        if (this.state.edit) {
+            const payload = {
                 ...this.state.commission,
             }
+            console.log(payload)
+
             post(`/commission/${this.state.commission.id}`, payload)
-                .then(res => console.log(res))
+                .then(res => {
+                    console.log(res)
+                    if (res.status === 200) {
+                        this.setState({
+                            snackOpen: true,
+                        })
+                    }
+                })
+                .catch(err => handleResponseError(err))
+
             this.setState({
                 ...InitialState
             }, () => this.fetchAll())
         } else {
-            //creationTO object
-            payload = {
-                date: this.state.selectedDate,
+            //if creating new commission
+
+            //creatorTO object
+            const payload = {
+                date: moment(this.state.selectedDate).format(dateFormatMoment),
+                time: moment(this.state.selectedDate).format(timeFormatMoment),
                 degree: this.state.selectedDegree,
+                field: this.state.selectedField.field,
                 locationId: this.state.selectedLocation.id,
                 teachers: this.state.commission.teachers,
             }
+            console.log(payload)
+
             post(`/commission/create`, payload)
-                .then(res => console.log(res))
+                .then(res => {
+                    console.log(res)
+                    if (res.status === 200) {
+                        this.setState({
+                            snackOpen: true,
+                        })
+                    }
+                })
+                .catch(err => handleResponseError(err))
+
             this.setState({
                 ...InitialState
             }, () => this.fetchAll())
         }
 
-        console.log(payload)
     }
 
     onChangePagination = (event, value) => {
@@ -265,6 +316,33 @@ class ManualCreatingPage extends React.Component {
         }, () => this.fetchTeachers())
     }
 
+    handleChangeField = (e) => {
+        this.setState({
+            selectedField: e.target.value,
+        })
+    }
+
+    onClickClearCurrentCommission = () => {
+        this.setState({
+            commission: null,
+        })
+    }
+
+    disabledButtonCheck = (item) => {
+        if (!this.state.commission) {
+            return false
+        }
+        if (this.state.commission.teachers.includes(item)) {
+            return true
+        }
+        return false
+    }
+
+    onCloseSnackbar = () => {
+        this.setState({
+            snackOpen: false,
+        })
+    }
 
     render() {
 
@@ -276,26 +354,51 @@ class ManualCreatingPage extends React.Component {
             date: this.state.selectedDate,
             loc: this.state.selectedLocation,
             degree: this.state.selectedDegree,
+            field: this.state.selectedField,
         }
 
         return (
             <>
                 <Container>
-                    <h1>
-                        Manual Creating Page
-                    </h1>
+                    {this.state.edit ?
+                        <h1>Edit commission</h1> :
+                        <h1>Manual Creating Page</h1>
+                    }
                     <SearchBox
                         // onClickButton={}
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
                     />
-
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        open={this.state.snackOpen}
+                        autoHideDuration={4000}
+                        onClose={this.onCloseSnackbar}
+                        message="Commission saved"
+                        action={
+                            <React.Fragment>
+                                <IconButton
+                                    size="small"
+                                    aria-label="close"
+                                    color="inherit"
+                                    onClick={this.onCloseSnackbar}
+                                >
+                                    <CloseIcon fontSize="small"/>
+                                </IconButton>
+                            </React.Fragment>
+                        }
+                    />
                     <CommissionProps
                         date={this.state.selectedDate}
                         degrees={this.state.degrees}
+                        fields={this.state.fields}
                         locations={this.state.locations}
                         onChangeDate={this.handleChangeDate}
                         onChangeDegree={this.handleChangeDegree}
+                        onChangeField={this.handleChangeField}
                         onChangeLoc={this.handleChangeLocation}
                         defaults={defaults}
                     />
@@ -315,6 +418,7 @@ class ManualCreatingPage extends React.Component {
                                 <SearchResultPanel
                                     data={teachersFilteredList}
                                     onClick={this.onClickAddTeacherButton}
+                                    disabledCheck={this.disabledButtonCheck}
                                     add={true}
                                 />
                                 <Pagination
@@ -368,7 +472,31 @@ class ManualCreatingPage extends React.Component {
                                                 Date
                                             </TableCell>
                                             <TableCell>
-                                                {this.state.selectedDate}
+                                                {moment(this.state.selectedDate).format(dateFormatMoment)}
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>
+                                                Time
+                                            </TableCell>
+                                            <TableCell>
+                                                {moment(this.state.selectedDate).format(timeFormatMoment)}
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>
+                                                Degree
+                                            </TableCell>
+                                            <TableCell>
+                                                {this.state.selectedDegree}
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>
+                                                Study field
+                                            </TableCell>
+                                            <TableCell>
+                                                {this.state.selectedField.field}
                                             </TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -378,6 +506,11 @@ class ManualCreatingPage extends React.Component {
                                 >
                                     Save
                                 </Button>
+                                <Button
+                                    onClick={this.onClickClearCurrentCommission}
+                                >
+                                    Clear
+                                </Button>
                             </Paper>
                         </Grid>
                     </Grid>
@@ -385,6 +518,7 @@ class ManualCreatingPage extends React.Component {
             </>
         )
     }
+
 }
 
 export default withStyles(useStyles)(ManualCreatingPage)

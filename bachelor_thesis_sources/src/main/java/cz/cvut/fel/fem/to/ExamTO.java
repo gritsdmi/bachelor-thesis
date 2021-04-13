@@ -11,7 +11,6 @@ public class ExamTO {
 
     private Location location;
 
-    //    private Date date;
     private String date;
 
     private String fieldOfStudy;

@@ -19,6 +19,8 @@ public class CreatorTO {
 
     private Degree degree;
 
+    private String field;
+
     private Long locationId;
 
     private List<User> teachers;

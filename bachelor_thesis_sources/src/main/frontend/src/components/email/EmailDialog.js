@@ -13,6 +13,8 @@ import {
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {get, handleResponseError, post} from "../../utils/request"
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = theme => ({
     firstCol: {
@@ -203,16 +205,13 @@ class EmailDialog extends React.Component {
                     autoHideDuration={4000}
                     onClose={this.onCloseSnackbar}
                     message="Email was sent!"
-                    // action={
-                    //     <React.Fragment>
-                    //         <Button color="secondary" size="small" onClick={handleClose}>
-                    //             UNDO
-                    //         </Button>
-                    //         <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
-                    //             <CloseIcon fontSize="small"/>
-                    //         </IconButton>
-                    //     </React.Fragment>
-                    // }
+                    action={
+                        <React.Fragment>
+                            <IconButton size="small" aria-label="close" color="inherit" onClick={this.onCloseSnackbar}>
+                                <CloseIcon fontSize="small"/>
+                            </IconButton>
+                        </React.Fragment>
+                    }
                 />
                 <Dialog
                     fullWidth

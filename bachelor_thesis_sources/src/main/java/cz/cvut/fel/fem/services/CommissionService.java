@@ -127,12 +127,14 @@ public class CommissionService {
     public Commission saveManual(CreatorTO creatorTO) {
         var commission = new Commission();
         var exam = examService.create();
-        var loc = locationService.get(creatorTO.getLocationId());
 
         exam.setDate(creatorTO.getDate());
-        exam.setLocation(loc);
+        exam.setTime(creatorTO.getTime());
+        if (creatorTO.getLocationId() != null) {
+            exam.setLocation(locationService.get(creatorTO.getLocationId()));
+        }
         exam.setDegree(creatorTO.getDegree());
-//        examService.save(exam);
+        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.EDITABLE);
@@ -157,6 +159,7 @@ public class CommissionService {
         exam.setTime(creatorTO.getTime());
         exam.setLocation(locationService.get(creatorTO.getLocationId()));
         exam.setDegree(creatorTO.getDegree());
+        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.DRAFT);

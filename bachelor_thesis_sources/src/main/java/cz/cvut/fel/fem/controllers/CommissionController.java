@@ -109,13 +109,13 @@ public class CommissionController implements Controller {
     }
 
 
-//    @DeleteMapping("/{id}")
+    //    @DeleteMapping("/{id}")
 //    public void delete(@PathVariable Long id) {
 //        commissionService.remove(id);
 //    }
 //
-@DeleteMapping
-public void deleteAll() {
-    commissionService.removeDrafts();
-}
+    @DeleteMapping
+    public void deleteAll() {
+        commissionService.removeDrafts();
+    }
 }

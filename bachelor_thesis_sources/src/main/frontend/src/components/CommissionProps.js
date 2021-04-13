@@ -1,8 +1,11 @@
 import React from "react";
-import {makeStyles, MenuItem, Paper, Select} from "@material-ui/core";
-import DateFnsUtils from "@date-io/date-fns";
-import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import {InputAdornment, makeStyles, MenuItem, Paper, TextField} from "@material-ui/core";
+import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
+import TodayIcon from "@material-ui/icons/Today";
 
+const dateTimeFormatMoment = "DD.MM.yyyy HH:mm"
 
 const useStyles = makeStyles((theme) => ({
     item: {
@@ -12,6 +15,9 @@ const useStyles = makeStyles((theme) => ({
 
         width: "150px",
     },
+    datePicker: {
+        cursor: `pointer !important`,
+    }
 
 }));
 
@@ -20,25 +26,28 @@ export default function CommissionProps({
                                             date,
                                             onChangeDate,
                                             onChangeDegree,
+                                            onChangeField,
                                             onChangeLoc,
+                                            fields,
                                             degrees,
                                             locations,
-                                            defaults
+                                            defaults,
                                         }) {
     const classes = useStyles();
 
-    if (!locations || locations.length < 1) {
-        console.log("!locations")
-        return <></>
-    }
+    // if (!locations || locations.length < 1) {
+    //     return <></>
+    // }
 
     return (
 
         <Paper>
-            <Select
+            <TextField
                 // fullWidth
+                select
                 // defaultValue={defaults.degree ? defaults.degree : "Bc"}
                 value={defaults.degree ? defaults.degree : "Bc"}
+                helperText="Degree"
                 onChange={onChangeDegree}
                 className={classes.item}
             >
@@ -53,35 +62,54 @@ export default function CommissionProps({
                         )
                     })
                 }
-            </Select>
-
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <DatePicker
-                    //todo css
-                    disableToolbar
-                    // variant="inline"
-                    // format="MM.dd.yyyy"//poebat мб это изза разных версий пикера и форматера
-                    // dateFormat="dd.MM.yyyy"
-                    autoOk={true}
-                    // placeholderText={"Enter date"}
-                    // margin="normal"
-                    id="date-picker-inline"
-                    // label="Date picker inline"
-
+            </TextField>
+            <TextField
+                id="field-select"
+                select
+                fullWidth
+                value={defaults.field ? defaults.field : "BP_SIT"}
+                onChange={onChangeField}
+                helperText="Field of study"
+                className={classes.item}
+            >
+                {fields.map((field, idx) => (
+                    <MenuItem
+                        key={idx}
+                        value={field}
+                    >
+                        {field.field}
+                    </MenuItem>
+                ))}
+            </TextField>
+            <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
+                <DateTimePicker
                     value={date}
+                    disablePast
+                    ampm={false}
+                    minutesStep={15}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment
+                                // position="end"
+                            >
+                                <TodayIcon/>
+                            </InputAdornment>
+                        )
+                    }}
+                    format={dateTimeFormatMoment}
                     onChange={onChangeDate}
-                    className={classes.item}
-
-                    // KeyboardButtonProps={{
-                    //     'aria-label': 'change date',
-                    // }}
+                    helperText="Date and time"
+                    className={`${classes.item} ${classes.datePicker}`}
+                    showTodayButton
                 />
             </MuiPickersUtilsProvider>
-            <Select
+
+            <TextField
+                select
                 onChange={onChangeLoc}
                 className={classes.item}
-                // labelId="loc"
-                value={defaults.loc ? defaults.loc : locations[0]}
+                helperText="Location"
+                value={defaults.loc ? defaults.loc : locations.length > 0 ? locations[0] : ''}
             >
                 {
                     locations.map((loc, idx) => {
@@ -94,7 +122,7 @@ export default function CommissionProps({
                         )
                     })
                 }
-            </Select>
+            </TextField>
         </Paper>
     )
 }

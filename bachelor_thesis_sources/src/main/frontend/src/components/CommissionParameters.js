@@ -259,15 +259,6 @@ class CommissionGenerateParameters extends React.Component {
                         item
                     >
                         <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
-                            {/*<DatePicker*/}
-                            {/*    id="date-picker-inline"*/}
-                            {/*    format={dateFormatMoment}*/}
-                            {/*    autoOk={true}*/}
-                            {/*    value={this.state.selectedDate}*/}
-                            {/*    onChange={this.handleChangeDate}*/}
-                            {/*    className={classes.item}*/}
-                            {/*    helperText="Date"*/}
-                            {/*/>*/}
                             <DateTimePicker
                                 value={this.state.selectedDateTime}
                                 disablePast
@@ -288,7 +279,8 @@ class CommissionGenerateParameters extends React.Component {
                                 onChange={this.handleChangeDateTime}
                                 // label="With Today Button"
                                 helperText="Date and time"
-                                className={[classes.item, classes.datePicker]}
+                                className={`${classes.item} ${classes.datePicker}`}
+                                // className={classes.item}
                                 showTodayButton
                             />
                         </MuiPickersUtilsProvider>
