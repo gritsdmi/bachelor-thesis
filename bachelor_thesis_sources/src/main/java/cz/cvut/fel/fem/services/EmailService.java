@@ -1,9 +1,11 @@
 package cz.cvut.fel.fem.services;
 
 import cz.cvut.fel.fem.model.Email;
+import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.enums.EmailType;
 import cz.cvut.fel.fem.repository.EmailRepository;
 import cz.cvut.fel.fem.to.EmailTO;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,8 +15,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Log
 public class EmailService {
 
     @Autowired
@@ -41,7 +45,7 @@ public class EmailService {
 
         email.setAuthor(emailTO.getAuthor());
         email.setMessageText(email.getMessageText());
-        email.setTo(emailTO.getTo());
+        email.setTo(emailTO.getToUsers());
         email.setType(email.getType());
 
         return emailRepository.save(email);
@@ -53,7 +57,7 @@ public class EmailService {
 
         email.setAuthor(emailTO.getAuthor());
         email.setMessageText(email.getMessageText());
-        email.setTo(emailTO.getTo());
+        email.setTo(emailTO.getToUsers());
         email.setType(email.getType());
 
         return emailRepository.save(email);
@@ -67,23 +71,34 @@ public class EmailService {
         emailRepository.delete(email);
     }
 
-    public void sendSimpleMessage(
-            String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
+    public void sendSimpleMessage(String[] emails, String subject, String text) {
+
+        var message = new SimpleMailMessage();
+
         message.setFrom("noreply@baeldung.com");
-        message.setTo(to);
+        message.setTo(emails);
         message.setSubject(subject);
         message.setText(text);
+
+        log.severe(message.toString());
         emailSender.send(message);
     }
 
+    //todo create email object
     public void sendEmail(EmailTO emailTO) {
 //        var from = emailTO.getAuthor().getEmailAddress();
         var text = emailTO.getMessageText();
         var subject = emailTO.getSubject();
+        String[] emailsArray = emailTO.getToStr();
 
-        sendSimpleMessage(emailTO.getEmailTO(), subject, text);
+        if (emailTO.getToUsers() != null && !emailTO.getToUsers().isEmpty() && emailsArray == null) {
+            emailsArray = emailTO.getToUsers().stream()
+                    .map(User::getEmailAddress)
+                    .collect(Collectors.toList())
+                    .toArray(String[]::new);
+        }
 
-//        emailTO.getTo().forEach(user -> sendSimpleMessage(user.getEmailAddress(), subject, text));
+        sendSimpleMessage(emailsArray, subject, text);
+
     }
 }

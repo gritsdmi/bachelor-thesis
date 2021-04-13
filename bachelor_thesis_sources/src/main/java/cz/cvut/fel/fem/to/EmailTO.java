@@ -13,7 +13,7 @@ public class EmailTO {
 
     private User author;
 
-    private List<User> to;
+    private List<User> toUsers;
 
     private EmailType type;
 
@@ -21,5 +21,5 @@ public class EmailTO {
 
     private String subject;
 
-    private String emailTO;
+    private String[] toStr;
 }

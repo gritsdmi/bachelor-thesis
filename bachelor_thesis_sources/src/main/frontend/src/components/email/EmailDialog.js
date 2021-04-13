@@ -1,8 +1,18 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import {Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Select, TextField} from "@material-ui/core";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    MenuItem,
+    Select,
+    Snackbar,
+    TextField
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {get, post} from "../../utils/request"
+import {get, handleResponseError, post} from "../../utils/request"
 
 const useStyles = theme => ({
     firstCol: {
@@ -15,63 +25,163 @@ const useStyles = theme => ({
     },
     select: {
         paddingTop: theme.spacing(0),
-        paddingBottom: theme.spacing(0)
-    }
+        paddingBottom: theme.spacing(0),
+        width: "150px",
+    },
+    invalid: {
+        borderColor: "red",
+    },
 });
+
+const InitialState = {
+
+    teachers: [],
+    emailTypes: [],
+
+    currentEmailType: 'FINAL',
+    emailInput: null,
+    subjectInput: null,
+    textInput: null,
+
+    snackOpen: false,
+    validEmails: true,
+    emailsWasTouched: false,
+
+}
+const emailsStr = (teachers) => {
+    let str = ""
+
+    teachers.forEach(teacher => {
+        str += teacher.emailAddress + " "
+    })
+    return str
+}
 
 class EmailDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            teachers: [],
-            emailTypes: [],
-            currentType: null,
-            emailInput: null,
-            subjectInput: null,
-            textInput: null,
+            ...InitialState,
         }
     }
 
     componentDidMount() {
-        get("/email/types").then(response => {
-            this.setState({emailTypes: response.data})
+        this.setState({
+            emailInput: emailsStr(this.props.teachers),
         })
+
+        get("/email/types").then(response => {
+            this.setState({
+                emailTypes: response.data,
+                currentEmailType: response.data ? response.data[0] : 'FINAL',
+            }, () => {
+                this.fetchEmailTemplateByType(this.state.currentEmailType)
+            })
+        })
+
+        this.validateEmail()
+    }
+
+    fetchEmailTemplateByType(emailType) {
+        get(`/template/type/${emailType}`)
+            .then(res => {
+                this.setState({
+                        currentEmailType: res.data.emailType,
+                        subjectInput: res.data.subject,
+                        textInput: res.data.text,
+                    }, () => console.log(this.state)
+                )
+            })
+            .catch(err => handleResponseError(err))
+
     }
 
     onClickSendButton = () => {
-        console.log("onClickSendButton")
-        //todo control/verify inputs
+
+        if (!this.state.validEmails) {
+            return
+        }
         const emailTo = {
             author: null,
-            to: [],
-            type: this.state.currentType,
+            toUsers: this.state.emailsWasTouched ? [] : this.props.teachers,
+            type: this.state.currentEmailType,
             messageText: this.state.textInput,
             subject: this.state.subjectInput,
-            emailTO: this.state.emailInput,
+            toStr: this.state.emailsWasTouched ? this.state.emailInput.split(' ') : null,
         }
 
         post('/email/send', emailTo)
-            .then(res => console.log(res))
-            .catch(err => console.log(err))
+            .then(res => {
+                console.log(res)
+                this.props.onClose()
+            })
+            .catch(err => handleResponseError(err))
+
+        this.setState({
+            snackOpen: true,
+        })
+    }
+
+    onChangeEmailType = (event) => {
+        this.setState({
+                currentEmailType: event.target.value,
+            }
+            , () => {
+                this.fetchEmailTemplateByType(this.state.currentEmailType)
+            }
+        )
     }
 
     onChangeEmailInput = (event) => {
-        console.log(event.target.value)
         this.setState({
             emailInput: event.target.value,
-        }, () => console.log(this.state.emailInput))
+        }, () => {
+            this.validateEmail(this.state.emailInput)
+        })
     }
 
     onChangeSubjectInput = (event) => {
         this.setState({
             subjectInput: event.target.value,
-        }, () => console.log(this.state.subjectInput))
+        })
     }
 
     onChangeTextInput = (event) => {
         this.setState({
             textInput: event.target.value,
-        }, () => console.log(this.state.textInput))
+        })
+    }
+
+    onCloseSnackbar = () => {
+        this.setState({
+            snackOpen: false,
+        })
+    }
+
+    validateEmail = (input) => {
+        let valid = true
+
+        const mailFormat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+        if (this.state.emailsWasTouched) {
+            let emails = input.split(' ')
+            emails.forEach(email => {
+                if (email.match(mailFormat)) {
+                } else {
+                    valid = false;
+                }
+            })
+        } else {
+            this.props.teachers.forEach(t => {
+                if (t.emailAddress.match(mailFormat)) {
+                } else {
+                    valid = false;
+                }
+            })
+        }
+
+        this.setState({
+            validEmails: valid,
+        })
     }
 
 
@@ -80,14 +190,30 @@ class EmailDialog extends React.Component {
             return <></>
         }
 
-        let emailsDefaultValue = ""
-        this.state.teachers.forEach(teacher => {
-            emailsDefaultValue += teacher.email + " "
-        })
         const {classes} = this.props;
 
         return (
             <div>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.snackOpen}
+                    autoHideDuration={4000}
+                    onClose={this.onCloseSnackbar}
+                    message="Email was sent!"
+                    // action={
+                    //     <React.Fragment>
+                    //         <Button color="secondary" size="small" onClick={handleClose}>
+                    //             UNDO
+                    //         </Button>
+                    //         <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
+                    //             <CloseIcon fontSize="small"/>
+                    //         </IconButton>
+                    //     </React.Fragment>
+                    // }
+                />
                 <Dialog
                     fullWidth
                     open={this.props.open}
@@ -99,12 +225,13 @@ class EmailDialog extends React.Component {
                     <DialogContent
                         dividers
                     >
-                        {/*email dialog content*/}
                         <Grid container>
-                            <Grid className={classes.firstCol} item xs={2}>Type </Grid>
+                            <Grid className={classes.firstCol} item xs={2}>Type</Grid>
                             <Grid className={classes.item} item xs>
                                 <Select
                                     className={classes.select}
+                                    value={this.state.currentEmailType}
+                                    onChange={this.onChangeEmailType}
                                     // variant={'outlined'}
                                 >
                                     {!this.state.emailTypes ? '' :
@@ -122,12 +249,19 @@ class EmailDialog extends React.Component {
                             <Grid className={classes.firstCol} item xs={2}>To</Grid>
                             <Grid className={classes.item} item xs>
                                 <TextField
+                                    fullWidth
+                                    error={!this.state.validEmails}
+                                    disabled={!this.state.emailsWasTouched}
                                     id={"emailInput"}
                                     variant={'outlined'}
                                     autoFocus={false}
-                                    defaultValue={emailsDefaultValue}
-                                    // placeholder={"placeholder"}
+                                    value={this.state.emailInput}
                                     size={"small"}
+                                    onClick={() => {
+                                        this.setState({
+                                            emailsWasTouched: true,
+                                        })
+                                    }}
                                     onChange={this.onChangeEmailInput}
                                 />
                             </Grid>
@@ -136,11 +270,11 @@ class EmailDialog extends React.Component {
                             <Grid className={classes.firstCol} item xs={2}>Subject</Grid>
                             <Grid className={classes.item} item xs>
                                 <TextField
+                                    fullWidth
                                     id={"subjectInput"}
                                     variant={'outlined'}
                                     autoFocus={false}
-                                    defaultValue={''}
-                                    // placeholder={"placeholder"}
+                                    value={this.state.subjectInput}
                                     size={"small"}
                                     onChange={this.onChangeSubjectInput}
                                 />
@@ -156,14 +290,12 @@ class EmailDialog extends React.Component {
                                     multiline={true}
                                     rows={6}
                                     autoFocus={true}
-                                    defaultValue={''}
-                                    // placeholder={"placeholder"}
+                                    value={this.state.textInput}
                                     size={"small"}
                                     onChange={this.onChangeTextInput}
                                 />
                             </Grid>
                         </Grid>
-
                     </DialogContent>
                     <DialogActions>
                         <Button
@@ -175,7 +307,7 @@ class EmailDialog extends React.Component {
                     </DialogActions>
                 </Dialog>
             </div>
-        );
+        )
     }
 }
 

@@ -30,4 +30,9 @@ public class EmailTemplateController implements Controller {
     public EmailTemplate update(@RequestBody EmailTemplate emailTemplate) {
         return emailTemplateService.update(emailTemplate);
     }
+
+    @GetMapping("/type/{type}")
+    public EmailTemplate getByType(@PathVariable String type) {
+        return emailTemplateService.getByType(type);
+    }
 }

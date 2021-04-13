@@ -1,6 +1,7 @@
 package cz.cvut.fel.fem.services;
 
 import cz.cvut.fel.fem.model.EmailTemplate;
+import cz.cvut.fel.fem.model.enums.EmailType;
 import cz.cvut.fel.fem.repository.EmailTemplateRepository;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,28 @@ public class EmailTemplateService {
 
     public EmailTemplate get(Long id) {
         return emailTemplateRepository.getOne(id);
+    }
+
+    public EmailTemplate getByType(String emailType) {
+        return emailTemplateRepository.findEmailTemplateByEmailType(getType(emailType)).get(0);
+    }
+
+    private EmailType getType(String type) {
+        EmailType ret = EmailType.FINAL;
+
+        switch (type) {
+            case "FINAL" -> ret = EmailType.FINAL;
+            case "NOMINATED" -> ret = EmailType.NOMINATED;
+            case "RECOMMENDED" -> ret = EmailType.RECOMMENDED;
+            default -> {
+                try {
+                    throw new Exception(type);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
     }
 
     public EmailTemplate update(EmailTemplate emailTemplate) {

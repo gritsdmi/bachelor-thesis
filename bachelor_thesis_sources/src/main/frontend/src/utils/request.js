@@ -60,6 +60,9 @@ export function handleResponseError(err) {
                 localStorage.clear()
                 window.location.href = '/login'
             }
+            if (err.response.status === 415) {
+                console.log("Http 415 Unsupported Media type error with JSON")
+            }
         }
     }
 
