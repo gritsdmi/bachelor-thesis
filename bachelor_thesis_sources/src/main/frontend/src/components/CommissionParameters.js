@@ -1,11 +1,16 @@
 import React from "react";
-import {Grid, MenuItem, Select,} from "@material-ui/core";
+import {Grid, InputAdornment, MenuItem, TextField,} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
-import {get, post} from "../utils/request"
-import {DatePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import format from 'date-fns/format';
+import {del, get, handleResponseError, post} from "../utils/request"
+import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
+
+import moment from "moment";
+import MomentUtils from "@date-io/moment";
+import "moment/locale/en-gb"
+
+import TodayIcon from '@material-ui/icons/Today';
+
 
 const useStyles = theme => ({
     cardContainer: {
@@ -17,107 +22,151 @@ const useStyles = theme => ({
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
+
+        // width: "150px",
+
+    },
+    datePicker: {
+        cursor: `pointer !important`,
     }
 
 });
 
 const dateFormat = 'dd.MM.yyyy'
+const dateFormatMoment = "DD.MM.yyyy"
+const timeFormatMoment = "HH:mm"
+const dateTimeFormatMoment = "DD.MM.yyyy HH:mm"
+
+
+const InitialState = {
+    degrees: [],
+    fields: [],
+    locations: [],
+    commissions: [],
+
+    selectedDegree: '',
+    selectedField: '',
+    selectedLocation: '',
+    selectedDate: new Date(),
+    selectedTime: new Date(),
+    selectedDateTime: new Date(),
+
+
+}
+
 
 //used in autogenerate page
-class CommissionParameters extends React.Component {
+class CommissionGenerateParameters extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            degrees: [],
-            locations: [],
-            commissions: [],
-
-            selectedDegree: '',
-            selectedLocation: '',
-            selectedDate: format(new Date(), dateFormat),
-
-            paperOpen: false,
-            collapsesOpen: [],
+            ...InitialState
         }
 
     }
 
     componentDidMount() {
         console.log("CommissionParameters DID MOUNT")
-        get("/exam/degrees")
-            .then(response => {
-                this.setState({
-                    degrees: response.data,
-                }, () => console.log(response.data))
-            })
-            .catch(error => console.log(error))
+        this.fetchDegrees()
+        // this.fetchFields()
 
         this.fetchLocations(this.state.selectedDate);
 
     }
 
-    test(loc) {
-        let test = []
-        for (let [key, value] of Object.entries(loc)) {
-            let obj = {}
-            obj[key] = value;
-            test.push(obj)
-        }
-        console.log(test)
-        return test
+    fetchDegrees() {
+        get("/exam/degrees")
+            .then(response => {
+                this.setState({
+                    degrees: this.fixDegreesArr(response.data),
+                    selectedDegree: response.data[0],
+                }, () => {
+                    console.log(this.state.degrees)
+                    this.fetchFields()
+                })
+            })
+            .catch(error => console.log(error))
     }
 
-    handlePaper = () => {
-        console.log("handle paper")
-        this.setState({
-            paperOpen: !this.state.paperOpen,
-        }, () => console.log(this.state.paperOpen))
+    fetchFields(didMount) {
+
+        console.log("fetchFields", this.state.selectedDegree)
+
+        get(`/field/degree/${this.state.selectedDegree}`)
+            .then(res => {
+                this.setState({
+                        fields: res.data,
+                        // fields: res.data,
+                        selectedField: res.data.length > 0 ? res.data[0] : ''
+                    }
+                    // , () => console.log(res.data)
+                    , () => {
+                        console.log(this.state)
+                        // this.props.onChange(filterProps(this.state), didMount)
+                    }
+                )
+            })
+            .catch(err => handleResponseError(err))
     }
 
-    handlePaperItem = item => () => {
-        console.log("handle item", item)
-        let obj = {
-            item: true,
-        }
-    }
+    fetchLocations(date) {
 
-    handleChangeDate = (event) => {
-        //dd.MM.yyyy
-        console.log("handleChangeDate", format(event, dateFormat))
-        this.setState({
-            selectedDate: format(event, dateFormat),
-        }, () => this.fetchLocations(this.state.selectedDate))
-
-    }
-
-    fetchLocations(dateF) {
-        const payload = {
-            date: '',
-            semester: ''
-        }
-        console.log("fetchLocations payload", payload)
+        const dateF = moment(date).format(dateFormatMoment)
+        console.log("fetchLocations payload", dateF)
 
         get(`/location/free/${dateF}`)
             .then(response => {
                 this.setState({
-                    // locations: this.test(response.data),
                     locations: response.data,
+                    selectedLocation: response.data ? response.data[0] : '',
                 }, () => console.log(this.state.locations))
             })
             .catch(error => console.log(error))
     }
 
+    fixDegreesArr(arr) {
+        arr.shift()
+        return arr
+    }
+
+    handleChangeDate = (event) => {
+        console.log("handleChangeDate", moment(event).format(dateFormatMoment))
+        this.setState({
+            selectedDate: event,
+        }, () => this.fetchLocations(this.state.selectedDate))
+
+    }
+
+    handleChangeDateTime = (event) => {
+        console.log("handleChangeDate", moment(event).format(dateFormatMoment))
+        const date = moment(event).format(dateFormatMoment)
+        const time = moment(event).format(timeFormatMoment)
+        console.log(date, time)
+        this.setState({
+            selectedDate: event,
+            selectedTime: event,
+            selectedDateTime: event,
+        }, () => this.fetchLocations(this.state.selectedDate))
+
+    }
+
     handleChangeDegree = (event) => {
-        console.log("handleChangeDegree")
         this.setState({
             selectedDegree: event.target.value,
+        }, () => {
+            this.fetchFields()
         })
     }
 
     handleChangeLocation = (event) => {
-        console.log("handleChangeLocation")
         this.setState({
             selectedLocation: event.target.value,
+        })
+    }
+
+    handleChangeField = (e) => {
+        this.setState({
+            selectedField: e.target.value,
         })
     }
 
@@ -126,7 +175,8 @@ class CommissionParameters extends React.Component {
 
         //creationTO object
         const payload = {
-            date: this.state.selectedDate,
+            date: moment(this.state.selectedDate).format(dateFormatMoment),
+            time: moment(this.state.selectedTime).format(timeFormatMoment),
             degree: this.state.selectedDegree,
             locationId: this.state.selectedLocation.id,
             teachers: [],
@@ -136,6 +186,7 @@ class CommissionParameters extends React.Component {
         post("/util/gen/2", payload)
             // .then(response => console.log(response))
             .then(response => this.props.onComplete(response))
+            .catch(err => handleResponseError(err))
 
     }
 
@@ -155,9 +206,14 @@ class CommissionParameters extends React.Component {
                         xs={1}
                         className={classes.item}
                     >
-                        <Select
+                        <TextField
+                            id="degree-select"
+                            select
                             fullWidth
+                            value={this.state.selectedDegree}
                             onChange={this.handleChangeDegree}
+                            helperText="Degree"
+                            className={classes.item}
                         >
                             {
                                 this.state.degrees.map((degree, idx) => {
@@ -170,29 +226,70 @@ class CommissionParameters extends React.Component {
                                     )
                                 })
                             }
-                        </Select>
+                        </TextField>
+
+                    </Grid>
+                    <Grid
+                        className={classes.item}
+                        item
+                        xs={1}
+
+                    >
+                        <TextField
+                            id="field-select"
+                            select
+                            fullWidth
+                            value={this.state.selectedField}
+                            onChange={this.handleChangeField}
+                            helperText="Field of study"
+                            className={classes.item}
+                        >
+                            {this.state.fields.map((field, idx) => (
+                                <MenuItem
+                                    key={idx}
+                                    value={field}
+                                >
+                                    {field.field}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid
                         className={classes.item}
                         item
                     >
-                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            <DatePicker
-                                //todo css
-                                disableToolbar
-                                // variant="inline"
-                                // format="MM.dd.yyyy"//poebat мб это изза разных версий пикера и форматера
-                                // dateFormat="dd.MM.yyyy"
-                                autoOk={true}
-                                // placeholderText={"Enter date"}
-                                // margin="normal"
-                                id="date-picker-inline"
-                                // label="Date picker inline"
-                                value={this.state.selectedDate}
-                                onChange={this.handleChangeDate}
-                                // KeyboardButtonProps={{
-                                //     'aria-label': 'change date',
-                                // }}
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
+                            {/*<DatePicker*/}
+                            {/*    id="date-picker-inline"*/}
+                            {/*    format={dateFormatMoment}*/}
+                            {/*    autoOk={true}*/}
+                            {/*    value={this.state.selectedDate}*/}
+                            {/*    onChange={this.handleChangeDate}*/}
+                            {/*    className={classes.item}*/}
+                            {/*    helperText="Date"*/}
+                            {/*/>*/}
+                            <DateTimePicker
+                                value={this.state.selectedDateTime}
+                                disablePast
+                                ampm={false}
+                                minutesStep={15}
+                                // rightArrowIcon={<TodayIcon/>}
+
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment
+                                            // position="end"
+                                        >
+                                            <TodayIcon/>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                format={dateTimeFormatMoment}
+                                onChange={this.handleChangeDateTime}
+                                // label="With Today Button"
+                                helperText="Date and time"
+                                className={[classes.item, classes.datePicker]}
+                                showTodayButton
                             />
                         </MuiPickersUtilsProvider>
                     </Grid>
@@ -201,9 +298,14 @@ class CommissionParameters extends React.Component {
                         xs={2}
                         className={classes.item}
                     >
-                        <Select
+                        <TextField
+                            id="location-select"
+                            select
                             fullWidth
+                            value={this.state.selectedLocation}
                             onChange={this.handleChangeLocation}
+                            helperText="Location"
+                            className={classes.item}
                         >
                             {
                                 this.state.locations.map((location, idx) => {
@@ -216,7 +318,7 @@ class CommissionParameters extends React.Component {
                                     )
                                 })
                             }
-                        </Select>
+                        </TextField>
                     </Grid>
                     <Grid
                         item
@@ -227,6 +329,16 @@ class CommissionParameters extends React.Component {
                         >
                             Generate 2
                         </Button>
+
+                        <Button
+                            onClick={() => {
+                                del(`/commission`)
+                                    .then(res => console.log(res))
+                                    .catch(err => handleResponseError(err))
+                            }}
+                        >
+                            delete drafts
+                        </Button>
                     </Grid>
                 </Grid>
             </div>
@@ -234,4 +346,4 @@ class CommissionParameters extends React.Component {
     }
 }
 
-export default withStyles(useStyles)(CommissionParameters);
+export default withStyles(useStyles)(CommissionGenerateParameters);

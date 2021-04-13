@@ -114,8 +114,8 @@ public class CommissionController implements Controller {
 //        commissionService.remove(id);
 //    }
 //
-//    @DeleteMapping
-//    public void deleteAll() {
-//        commissionService.remove();
-//    }
+@DeleteMapping
+public void deleteAll() {
+    commissionService.removeDrafts();
+}
 }

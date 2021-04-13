@@ -34,7 +34,6 @@ public class UtilController implements Controller {
     @PostMapping("/gen/{len}")
     public List<Commission> generate(@PathVariable Integer len,
                                      @RequestBody CreatorTO creatorTO) {
-//        return commissionMaker.test(len);
         return commissionMaker.generateCommissions(len, creatorTO);
     }
 }

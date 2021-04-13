@@ -15,6 +15,8 @@ public class CreatorTO {
 
     private String date;
 
+    private String time;
+
     private Degree degree;
 
     private Long locationId;

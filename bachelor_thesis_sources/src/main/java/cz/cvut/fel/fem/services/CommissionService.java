@@ -154,6 +154,7 @@ public class CommissionService {
         var exam = examService.create();
 
         exam.setDate(creatorTO.getDate());
+        exam.setTime(creatorTO.getTime());
         exam.setLocation(locationService.get(creatorTO.getLocationId()));
         exam.setDegree(creatorTO.getDegree());
 
@@ -341,6 +342,12 @@ public class CommissionService {
 
     public void remove(Long id) {
         commissionRepository.deleteById(id);
+    }
+
+    public void removeDrafts() {
+        var drafts = getDrafts();
+
+        remove(drafts);
     }
 
 }

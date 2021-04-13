@@ -48,8 +48,22 @@ export function post(url, payload) {
 }
 
 export function del(url) {
-    const payload = base_URL + url;
-    return axios.delete(payload);
+    const URL = base_URL + url;
+    const jwt = JSON.parse(localStorage.getItem('token'));
+
+    if (jwt) {
+        console.log("sending post request with token to ", URL, config(jwt))
+        return axios.delete(URL, config(jwt));
+    } else if (url === '/auth') {
+        console.log("sending post auth request to ", URL)
+        return axios.delete(URL);
+
+    } else if (url.startsWith('/util')) {
+        console.log("sending post auth request to ", URL)
+    } else {
+        console.log("there are not jwt token for post request. Login first!")
+        window.location.href = '/login'
+    }
 }
 
 export function handleResponseError(err) {

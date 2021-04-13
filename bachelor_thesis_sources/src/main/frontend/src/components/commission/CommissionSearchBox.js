@@ -24,7 +24,6 @@ const dateFormatMoment = "DD.MM.yyyy"
 const InitialState = {
     degrees: [],
     fields: [],
-    // date: new Date,
     states: ['ALL', 'EDITABLE', 'APPROVED', 'DRAFT'],
 
     selectedDegree: 'ALL',
@@ -234,7 +233,6 @@ class CommissionSearchBox extends React.Component {
 
                     <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
                         <DatePicker
-                            disableToolbar
                             id="date-picker-inline"
                             format={dateFormatMoment}
                             autoOk={true}
@@ -245,9 +243,7 @@ class CommissionSearchBox extends React.Component {
                             helperText="Date from"
 
                         />
-
                         <DatePicker
-                            disableToolbar
                             id="date-picker-inline"
                             format={dateFormatMoment}
                             autoOk={true}

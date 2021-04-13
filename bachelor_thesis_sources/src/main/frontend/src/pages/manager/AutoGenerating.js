@@ -2,7 +2,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import CommissionParameters from "../../components/CommissionParameters";
 import {Paper} from "@material-ui/core";
-import {post} from "../../utils/request"
+import {handleResponseError, post} from "../../utils/request"
 import CommissionCard from "../../components/commission/CommissionCard";
 import Pagination from "@material-ui/lab/Pagination";
 
@@ -18,7 +18,7 @@ const InitialState = {
     commissions: [],
 
     currentPage: 1,
-    size: 400, //count items in current page
+    size: 100, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
 
@@ -35,13 +35,6 @@ class AutoGeneratingPage extends React.Component {
     }
 
     componentDidMount() {
-        // get("/commission/draft")
-        //     .then(res => {
-        //         this.setState({
-        //             // commissions: res.data,
-        //         }, () => console.log(res.data))
-        //     })
-
         this.fetchCommissions()
     }
 
@@ -64,7 +57,7 @@ class AutoGeneratingPage extends React.Component {
                     // , () => console.log(res.data)
                 )
             })
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
     }
 
     onGenerationComplete = (resp) => {
@@ -83,6 +76,7 @@ class AutoGeneratingPage extends React.Component {
             .then(res => this.setState({
                 commissions: res.data
             }))
+            .catch(err => handleResponseError(err))
     }
 
     onChangePagination = (event, value) => {

@@ -50,6 +50,9 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                         {/*    <ListItemText>State: {commission.state}</ListItemText>*/}
                         {/*</ListItem>*/}
                         <ListItem>
+                            <ListItemText>Time: {commission.exam.time}</ListItemText>
+                        </ListItem>
+                        <ListItem>
                             <ListItemText>Degree: {commission.exam.degree}</ListItemText>
                         </ListItem>
                         <ListItem>
