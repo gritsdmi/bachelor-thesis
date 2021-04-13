@@ -1,6 +1,6 @@
 package cz.cvut.fel.fem.to;
 
-import cz.cvut.fel.fem.model.Student;
+import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.enums.Degree;
 import cz.cvut.fel.fem.model.enums.FieldOfStudyEnum;
 import lombok.Getter;
@@ -16,5 +16,5 @@ public class FieldOfStudyTO {
 
     private Degree degree;
 
-    private List<Student> studentList;
+    private List<User> studentList;
 }

@@ -164,8 +164,8 @@ public class UserService {
     /**
      * add date to teacher's unavailable dates list.
      *
-     * @param teacherId
-     * @param dateStr
+     * @param teacherId user's id
+     * @param dateStr   date
      */
     public void addUnavailableDate(Long teacherId, String dateStr) {
         var teacher = getTeacher(teacherId);
@@ -278,7 +278,7 @@ public class UserService {
 //                    to.setContract(Double.parseDouble(v.get(2)));
 //                    to.setEmailAddress(v.get(4));
 //                    save(teacher, to);
-
+//get(4) = positions
                     var user = new User();
                     user.setSurname(v.get(0));
                     user.setEmailAddress(v.get(4));
