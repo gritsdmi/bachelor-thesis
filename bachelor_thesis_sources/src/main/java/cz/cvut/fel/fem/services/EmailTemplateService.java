@@ -38,16 +38,21 @@ public class EmailTemplateService {
         EmailType ret = EmailType.FINAL;
 
         switch (type) {
-            case "FINAL" -> ret = EmailType.FINAL;
-            case "NOMINATED" -> ret = EmailType.NOMINATED;
-            case "RECOMMENDED" -> ret = EmailType.RECOMMENDED;
-            default -> {
+            case "FINAL":
+                ret = EmailType.FINAL;
+                break;
+            case "NOMINATED":
+                ret = EmailType.NOMINATED;
+                break;
+            case "RECOMMENDED":
+                ret = EmailType.RECOMMENDED;
+                break;
+            default:
                 try {
                     throw new Exception(type);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
         }
         return ret;
     }

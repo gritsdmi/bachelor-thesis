@@ -25,16 +25,27 @@ public class PositionService {
 
         var letter = PositionEnum.C;
         switch (s) {
-            case "C", "Č", "č", "c" -> letter = PositionEnum.C;
-            case "M", "m" -> letter = PositionEnum.M;
-            case "P", "p" -> letter = PositionEnum.P;
-            default -> {
+            case "C":
+            case "Č":
+            case "č":
+            case "c":
+                letter = PositionEnum.C;
+                break;
+            case "M":
+            case "m":
+                letter = PositionEnum.M;
+                break;
+            case "P":
+            case "p":
+                letter = PositionEnum.P;
+                break;
+            default:
                 try {
                     throw new Exception(s);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
+
         }
 
         var all = getAll();
