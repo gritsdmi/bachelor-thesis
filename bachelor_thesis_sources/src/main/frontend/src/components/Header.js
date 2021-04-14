@@ -93,7 +93,7 @@ class Header extends React.Component {
                             <NavLink to="/teacher">Teacher</NavLink>
                         </Button>
                         <Button>
-                            <NavLink to="/teacher/cal">Teacher cal</NavLink>
+                            <NavLink to="/teacher/settings">Teacher settings</NavLink>
                         </Button>
                         <Button
                             onClick={this.clearLS}

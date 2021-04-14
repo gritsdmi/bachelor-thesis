@@ -31,7 +31,6 @@ public class FieldOfStudyService {
 
     public List<FieldOfStudy> getByDegree(Degree degree) {
         if (degree.toString().equals("ALL")) {
-            log.info("get by all degree");
             return getAll();
         } else {
             return fieldOfStudyRepository.findByDegree(degree);
@@ -42,7 +41,7 @@ public class FieldOfStudyService {
         var field = new FieldOfStudy();
 
         field.setField(fieldOfStudyTO.getField());
-//        field.setDegree(fieldOfStudyTO.getDegree());
+        field.setDegree(fieldOfStudyTO.getDegree());
 
         return fieldOfStudyRepository.save(field);
     }
@@ -51,7 +50,7 @@ public class FieldOfStudyService {
         var field = fieldOfStudyRepository.getOne(id);
 
         field.setField(fieldOfStudyTO.getField());
-//        field.setDegree(fieldOfStudyTO.getDegree());
+        field.setDegree(fieldOfStudyTO.getDegree());
 
         return fieldOfStudyRepository.save(field);
     }

@@ -7,7 +7,7 @@ import AutoGeneratingPage from "./pages/manager/AutoGenerating";
 import ManualCreatingPage from "./pages/manager/ManualCreating";
 import ManageTeachersPage from "./pages/manager/ManageTeachers";
 import TeacherOverview from "./pages/teacher/TeacherOverview";
-import TeacherCalendar from "./pages/teacher/TeacherCalendar";
+import TeacherSettings from "./pages/teacher/TeacherSettings";
 import EmailTemplates from "./pages/manager/EmailTemplates";
 import Login from "./pages/login/Login";
 
@@ -25,7 +25,7 @@ function App() {
                     <Route exact path="/manual" component={ManualCreatingPage}/>
                     <Route exact path="/manage" component={ManageTeachersPage}/>
                     <Route exact path="/teacher" component={TeacherOverview}/>
-                    <Route exact path="/teacher/cal" component={TeacherCalendar}/>
+                    <Route exact path="/teacher/settings" component={TeacherSettings}/>
                     <Route exact path="/emails" component={EmailTemplates}/>
                 </Switch>
             </Container>

@@ -5,7 +5,8 @@ import Calendar from "react-calendar";
 import '../../calendar.css';
 import moment from 'moment'
 import TeacherDateDialog from "../../components/teacher/TeacherDateDialog";
-import {get, post} from "../../utils/request";
+import {get, handleResponseError, post} from "../../utils/request";
+import TeacherFieldPreferences from "../../components/teacher/TeacherFieldPreferences";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -30,10 +31,14 @@ const InitialState = {
     examDates: null,
     teacher: null,
 
-}
-const dateFormat = "DD.MM.yyyy"
+    degrees: [],
+    fieldsClass: [],
+    fieldsChecked: new Set(),
 
-class TeacherCalendar extends React.Component {
+}
+const dateFormatMoment = "DD.MM.yyyy"
+
+class TeacherSettings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -43,27 +48,55 @@ class TeacherCalendar extends React.Component {
     }
 
     componentDidMount() {
-        console.log("TeacherCalendar DID MOUNT")
         this.fetchTeacher()
+        this.fetchFields()
     }
 
     fetchTeacher() {
-        console.log(this.state)
         get(`/user/teacher/${this.state.teacherId}`)
             .then(res => this.setState({
                 teacher: res.data,
             }, () => {
                 this.makeUnavailableSetDates(res.data.teacher.unavailableDates)
             }))
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
 
         get(`/user/teacher/${this.state.teacherId}/examDates`)
             .then(res => this.makeExamSetDates(res.data))
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
+    }
+
+    fetchDegrees(didMount) {
+        // console.log("did mount", didMount)
+        get("/exam/degrees")
+            .then(res => {
+                this.setState({
+                        degrees: res.data,
+                        // selectedDegree: res.data.length > 0 ? res.data[0] : 'Bc',
+                    }
+                    // , () => console.log(res.data)
+                    // , () => this.props.onChange(filterProps(this.state), didMount)
+                )
+            })
+            .catch(err => handleResponseError(err))
+    }
+
+    fetchFields(didMount) {
+        // console.log("did mount", didMount)
+
+        get(`/field`)
+            .then(res => {
+                this.setState({
+                        // fieldsClass: this.addItemALL(res.data, true),
+                        fieldsClass: res.data,
+                        // selectedField: res.data.length > 0 ? res.data[0] : 'ALL'
+                    }, () => console.log(this.state.fieldsClass)
+                )
+            })
+            .catch(err => handleResponseError(err))
     }
 
     makeUnavailableSetDates(dates) {
-        console.log(dates)
         this.setState({
             unavailableDates: new Set(dates.map(d => {
                 return d.date
@@ -72,7 +105,6 @@ class TeacherCalendar extends React.Component {
     }
 
     makeExamSetDates(dates) {
-        console.log(dates)
         this.setState({
             examDates: new Set(dates.map(d => {
                 return d
@@ -81,7 +113,7 @@ class TeacherCalendar extends React.Component {
     }
 
     onClickHandle = (value) => {
-        const date = moment(value).format(dateFormat)
+        const date = moment(value).format(dateFormatMoment)
         this.setState({
             chosenDate: date,
             calendarDialogOpen: true,
@@ -111,7 +143,7 @@ class TeacherCalendar extends React.Component {
                 console.log(res)
                 this.fetchTeacher()
             })
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
 
         this.closeDialog()
     }
@@ -129,7 +161,7 @@ class TeacherCalendar extends React.Component {
                 console.log(res)
                 this.fetchTeacher()
             })
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
 
         this.closeDialog()
         this.fetchTeacher()
@@ -145,9 +177,7 @@ class TeacherCalendar extends React.Component {
         if (data.view !== "month") {
             return
         }
-        const date = moment(data.date).format(dateFormat)
-        // moment(date.date).format(dateFormat)
-        // console.log(this.state.unavailableDates)
+        const date = moment(data.date).format(dateFormatMoment)
         if (this.state.unavailableDates.has(date)) {
             return "unavailable"
         }
@@ -171,8 +201,36 @@ class TeacherCalendar extends React.Component {
 
     }
 
+    handleCheckCheckbox = (item) => {
+        console.log("handleCheckCheckbox", item)
+        return this.state.fieldsChecked.has(item);
+    }
+
+    handleClickCheckbox(item) {
+        // console.log("handleClickCheckbox", item)
+        // return false
+    }
+
+    handleClickField = field => {
+        let set = this.state.fieldsChecked
+
+        if (!this.state.fieldsChecked.has(field)) {
+            console.log("added")
+            set.add(field)
+        } else {
+            console.log("removed")
+            set.delete(field)
+        }
+
+        this.setState({
+            fieldsChecked: set,
+        })
+    }
+
 
     render() {
+        const {classes} = this.props
+
         return (
             <>
                 <TeacherDateDialog
@@ -183,15 +241,25 @@ class TeacherCalendar extends React.Component {
                     onClickCan={this.onClickCan}
                     color={this.color(this.state.chosenDate)}
                 />
-                <h1>Calendar</h1>
-                <Paper>
+                <h1>Settings</h1>
+                <Paper
+                    className={classes.cardContainer}
+                >
                     <Calendar
                         // locale={"cs-CZ"}
                         locale={"en-UK"}
                         onChange={this.onClickHandle}
                         tileClassName={this.markDate()}
                     />
-
+                    <TeacherFieldPreferences
+                        teacher={this.state.teacher}
+                        allDegrees={this.state.degrees}
+                        fieldsClass={this.state.fieldsClass}
+                        handleCheck={this.handleCheckCheckbox}
+                        handleClick={this.handleClickCheckbox}
+                        handleClickField={this.handleClickField}
+                        fieldsChecked={this.state.fieldsChecked}
+                    />
                 </Paper>
             </>
         );
@@ -199,4 +267,4 @@ class TeacherCalendar extends React.Component {
 
 }
 
-export default withStyles(useStyles)(TeacherCalendar)
+export default withStyles(useStyles)(TeacherSettings)
