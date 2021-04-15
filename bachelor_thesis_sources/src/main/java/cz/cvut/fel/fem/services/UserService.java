@@ -200,10 +200,8 @@ public class UserService {
     }
 
     public void removeDate(User teacher, Date date) {
-        System.out.println(teacher.getTeacher().getUnavailableDates());
         teacher.getTeacher().getUnavailableDates().removeIf(d -> d.getDate().equals(date.getDate()));
         var t = userRepository.getOne(teacher.getId()).getTeacher().getUnavailableDates();
-        System.out.println(t);
         dateService.delete(date);
     }
 
@@ -246,12 +244,6 @@ public class UserService {
 
     public User updateTeacherProperty(Long id, TeacherPropertyTO teacherPropertyTO) {
         var user = userRepository.getOne(id);
-        log.info(teacherPropertyTO.toString());
-        var oldTeacherProps = user.getTeacher();
-
-        modelMapper.map(teacherPropertyTO, oldTeacherProps);
-        log.info(oldTeacherProps.toString());
-
         var teacherProps = user.getTeacher();
 
         teacherProps.setContract(teacherPropertyTO.getContract());
@@ -259,9 +251,6 @@ public class UserService {
         teacherProps.setUnavailableDates(teacherPropertyTO.getUnavailableDates());
         teacherProps.setPreferredFieldOfStudies(teacherPropertyTO.getPreferredFieldOfStudies());
         teacherProps.setPositionInCommissions(teacherPropertyTO.getPositionInCommissions());
-
-
-        log.info(teacherProps.toString());
 
         user.setTeacher(teacherProps);
 

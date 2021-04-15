@@ -1,12 +1,16 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import {Paper} from "@material-ui/core";
+import {Paper, Snackbar} from "@material-ui/core";
 import Calendar from "react-calendar";
 import '../../calendar.css';
 import moment from 'moment'
 import TeacherDateDialog from "../../components/teacher/TeacherDateDialog";
 import {get, handleResponseError, post} from "../../utils/request";
 import TeacherFieldPreferences from "../../components/teacher/TeacherFieldPreferences";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -18,7 +22,12 @@ const useStyles = theme => ({
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-    }
+    },
+    box: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+    },
 
 });
 
@@ -33,7 +42,9 @@ const InitialState = {
 
     degrees: [],
     fieldsClass: [],
-    fieldsChecked: new Set(),
+    fieldsChecked: [],
+    fieldCheckMap: new Map(),
+    snackOpen: false,
 
 }
 const dateFormatMoment = "DD.MM.yyyy"
@@ -50,18 +61,17 @@ class TeacherSettings extends React.Component {
     componentDidMount() {
         this.fetchTeacher()
         this.fetchDegrees()
-        this.fetchFields()
     }
 
     fetchTeacher() {
         get(`/user/teacher/${this.state.teacherId}`)
             .then(res => this.setState({
                 teacher: res.data,
-                fieldsChecked: new Set(res.data.teacher.preferredFieldOfStudies),
+                fieldsChecked: res.data.teacher.preferredFieldOfStudies
             }, () => {
                 console.log(res.data)
-                console.log(this.state.fieldsChecked)
                 this.makeUnavailableSetDates(res.data.teacher.unavailableDates)
+                this.fetchFields()
             }))
             .catch(err => handleResponseError(err))
 
@@ -70,16 +80,12 @@ class TeacherSettings extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    fetchDegrees(didMount) {
-        // console.log("did mount", didMount)
+    fetchDegrees() {
         get("/exam/degrees")
             .then(res => {
                 this.setState({
                         degrees: this.fixDegreesArr(res.data),
-                        // selectedDegree: res.data.length > 0 ? res.data[0] : 'Bc',
                     }
-                    // , () => console.log(res.data)
-                    // , () => this.props.onChange(filterProps(this.state), didMount)
                 )
             })
             .catch(err => handleResponseError(err))
@@ -90,19 +96,29 @@ class TeacherSettings extends React.Component {
         return arr
     }
 
-    fetchFields(didMount) {
-        // console.log("did mount", didMount)
-
+    fetchFields() {
         get(`/field`)
             .then(res => {
                 this.setState({
-                    // fieldsClass: this.addItemALL(res.data, true),
-                    fieldsClass: res.data,
-                    // selectedField: res.data.length > 0 ? res.data[0] : 'ALL'
-                    }, () => console.log(this.state.fieldsClass)
+                        fieldsClass: res.data,
+                    }, () => {
+                        this.makeCheckFieldsMap(this.state.fieldsClass)
+                    }
                 )
             })
             .catch(err => handleResponseError(err))
+    }
+
+    makeCheckFieldsMap(allFields) {
+        let map = new Map(allFields.map(f => [f.field, false]))
+
+        this.state.fieldsChecked.forEach(checked => {
+            map.set(checked.field, true)
+        })
+
+        this.setState({
+            fieldCheckMap: map,
+        })
     }
 
     makeUnavailableSetDates(dates) {
@@ -209,62 +225,38 @@ class TeacherSettings extends React.Component {
         return "blank"
     }
 
-    handleCheckCheckbox = (item) => {
-        console.log("handleCheckCheckbox", item)
-        return this.state.fieldsChecked.has(item);
-    }
-
-    handleClickCheckbox(item) {
-        // console.log("handleClickCheckbox", item)
-        // return false
-    }
-
     handleClickField = field => {
-        let set = this.state.fieldsChecked
-
-        if (!this.state.fieldsChecked.has(field)) {
-            set.add(field)
+        let map = this.state.fieldCheckMap
+        if (!map.get(field.field)) {
+            map.set(field.field, true)
         } else {
-            set.delete(field)
+            map.set(field.field, false)
         }
-
         this.setState({
-                fieldsChecked: set,
-            }
-            // , () => console.log(this.state.fieldsChecked)
-        )
+            fieldCheckMap: map,
+        })
     }
 
     onClickSavePreference = () => {
-        //TODO save teacher
-        console.log(Array.from(this.state.fieldsChecked))
-        console.log(this.state.teacher)
+        const prefs = this.state.fieldsClass.filter(field => this.state.fieldCheckMap.get(field.field))
 
         //teacherPropsTO
         const payload = {
             ...this.state.teacher.teacher,
-            preferredFieldOfStudies: Array.from(this.state.fieldsChecked),
+            preferredFieldOfStudies: prefs,
         }
-        console.log(payload)
 
         post(`/user/teacher/prop/${this.state.teacher.id}`, payload)
-            .then(res => console.log(res.data))
+            .then(res => {
+                console.log(res.data)
+                this.setState({snackOpen: true})
+            })
             .catch(err => handleResponseError(err))
     }
 
-    //TODO this do not work: set has do not work properly
-    // make list instead???
     handleChecked = (field) => {
-        if (this.state.fieldsChecked.has(field)) {
-            console.log("has", field)
-            return true
-        } else {
-            console.log("not")
-            return false
-
-        }
-
-        // console.log("not",field, this.state.fieldsChecked.)
+        const get = this.state.fieldCheckMap.get(field.field)
+        return get || false
     }
 
     render() {
@@ -272,6 +264,25 @@ class TeacherSettings extends React.Component {
 
         return (
             <>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.snackOpen}
+                    autoHideDuration={4000}
+                    onClose={() => this.setState({snackOpen: false})}
+                    message="Saved"
+                    action={
+                        <React.Fragment>
+                            <IconButton size="small" aria-label="close" color="inherit"
+                                        onClick={() => this.setState({snackOpen: false})}
+                            >
+                                <CloseIcon fontSize="small"/>
+                            </IconButton>
+                        </React.Fragment>
+                    }
+                />
                 <TeacherDateDialog
                     open={this.state.calendarDialogOpen}
                     onClose={this.onCloseDialog}
@@ -284,20 +295,25 @@ class TeacherSettings extends React.Component {
                 <Paper
                     className={classes.cardContainer}
                 >
-                    <Calendar
-                        // locale={"cs-CZ"}
-                        locale={"en-UK"}
-                        onChange={this.onClickHandle}
-                        tileClassName={this.markDate()}
-                    />
+                    <Box
+                        className={classes.box}
+                    >
+                        <Typography>Calendar</Typography>
+
+                        <Calendar
+                            // locale={"cs-CZ"}
+
+                            locale={"en-UK"}
+                            onChange={this.onClickHandle}
+                            tileClassName={this.markDate()}
+                        />
+                    </Box>
+
                     <TeacherFieldPreferences
-                        teacher={this.state.teacher}
                         allDegrees={this.state.degrees}
                         fieldsClass={this.state.fieldsClass}
                         handleChecked={this.handleChecked}
-                        handleClick={this.handleClickCheckbox}
                         handleClickField={this.handleClickField}
-                        fieldsChecked={this.state.fieldsChecked}
                         onClickSave={this.onClickSavePreference}
                     />
                 </Paper>

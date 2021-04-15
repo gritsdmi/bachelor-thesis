@@ -1,11 +1,9 @@
 import React from "react";
-import {Checkbox, ListItem, ListItemIcon, ListItemText, makeStyles, Paper, Snackbar} from "@material-ui/core";
+import {Checkbox, ListItem, ListItemIcon, ListItemText, makeStyles, Paper} from "@material-ui/core";
 import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -15,30 +13,28 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "column",
     },
+    paper: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+    },
 }));
 
 export default function TeacherFieldPreferences({
-                                                    teacher,
                                                     allDegrees,
                                                     fieldsClass,
-                                                    fieldsChecked,
                                                     handleClickField,
                                                     handleChecked,
-                                                    handleClick,
                                                     onClickSave,
                                                 }) {
     const classes = useStyles();
-    const [snackOpen, setSnackOpen] = React.useState(false);
-
-
-    function onButtonClick() {
-        setSnackOpen(true)
-        onClickSave()
-    }
 
     return (
         <>
-            <Paper>
+            <Paper
+                className={classes.paper}
+            >
+                <Typography>Preference</Typography>
                 <List
                     className={classes.container}
                 >
@@ -64,11 +60,8 @@ export default function TeacherFieldPreferences({
                                                 <ListItemIcon>
                                                     <Checkbox
                                                         checked={handleChecked(field)}
-                                                        // onChange={test(field)}
                                                         color={"primary"}
-                                                        // tabIndex={-1}
                                                         disableRipple
-                                                        // inputProps={{ 'aria-labelledby': labelId }}
                                                     />
                                                 </ListItemIcon>
                                                 <ListItemText
@@ -85,27 +78,8 @@ export default function TeacherFieldPreferences({
 
                 </List>
                 <Box>
-                    <Snackbar
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                        open={snackOpen}
-                        autoHideDuration={4000}
-                        onClose={() => setSnackOpen(false)}
-                        message="Saved"
-                        action={
-                            <React.Fragment>
-                                <IconButton size="small" aria-label="close" color="inherit"
-                                            onClick={() => setSnackOpen(false)}
-                                >
-                                    <CloseIcon fontSize="small"/>
-                                </IconButton>
-                            </React.Fragment>
-                        }
-                    />
                     <Button
-                        onClick={() => onButtonClick()}
+                        onClick={() => onClickSave()}
                     >Save</Button>
                 </Box>
             </Paper>
