@@ -56,7 +56,7 @@ class TeacherDateDialog extends React.Component {
             return "red"
         }
 
-        console.log("click blank Color")
+        // console.log("click blank Color")
         return "blank"
     }
 

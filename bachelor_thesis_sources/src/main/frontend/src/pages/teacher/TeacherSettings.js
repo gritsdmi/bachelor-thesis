@@ -49,6 +49,7 @@ class TeacherSettings extends React.Component {
 
     componentDidMount() {
         this.fetchTeacher()
+        this.fetchDegrees()
         this.fetchFields()
     }
 
@@ -56,7 +57,10 @@ class TeacherSettings extends React.Component {
         get(`/user/teacher/${this.state.teacherId}`)
             .then(res => this.setState({
                 teacher: res.data,
+                fieldsChecked: new Set(res.data.teacher.preferredFieldOfStudies),
             }, () => {
+                console.log(res.data)
+                console.log(this.state.fieldsChecked)
                 this.makeUnavailableSetDates(res.data.teacher.unavailableDates)
             }))
             .catch(err => handleResponseError(err))
@@ -71,7 +75,7 @@ class TeacherSettings extends React.Component {
         get("/exam/degrees")
             .then(res => {
                 this.setState({
-                        degrees: res.data,
+                        degrees: this.fixDegreesArr(res.data),
                         // selectedDegree: res.data.length > 0 ? res.data[0] : 'Bc',
                     }
                     // , () => console.log(res.data)
@@ -81,15 +85,20 @@ class TeacherSettings extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
+    fixDegreesArr(arr) {
+        arr.shift()
+        return arr
+    }
+
     fetchFields(didMount) {
         // console.log("did mount", didMount)
 
         get(`/field`)
             .then(res => {
                 this.setState({
-                        // fieldsClass: this.addItemALL(res.data, true),
-                        fieldsClass: res.data,
-                        // selectedField: res.data.length > 0 ? res.data[0] : 'ALL'
+                    // fieldsClass: this.addItemALL(res.data, true),
+                    fieldsClass: res.data,
+                    // selectedField: res.data.length > 0 ? res.data[0] : 'ALL'
                     }, () => console.log(this.state.fieldsClass)
                 )
             })
@@ -198,7 +207,6 @@ class TeacherSettings extends React.Component {
         }
 
         return "blank"
-
     }
 
     handleCheckCheckbox = (item) => {
@@ -215,18 +223,49 @@ class TeacherSettings extends React.Component {
         let set = this.state.fieldsChecked
 
         if (!this.state.fieldsChecked.has(field)) {
-            console.log("added")
             set.add(field)
         } else {
-            console.log("removed")
             set.delete(field)
         }
 
         this.setState({
-            fieldsChecked: set,
-        })
+                fieldsChecked: set,
+            }
+            // , () => console.log(this.state.fieldsChecked)
+        )
     }
 
+    onClickSavePreference = () => {
+        //TODO save teacher
+        console.log(Array.from(this.state.fieldsChecked))
+        console.log(this.state.teacher)
+
+        //teacherPropsTO
+        const payload = {
+            ...this.state.teacher.teacher,
+            preferredFieldOfStudies: Array.from(this.state.fieldsChecked),
+        }
+        console.log(payload)
+
+        post(`/user/teacher/prop/${this.state.teacher.id}`, payload)
+            .then(res => console.log(res.data))
+            .catch(err => handleResponseError(err))
+    }
+
+    //TODO this do not work: set has do not work properly
+    // make list instead???
+    handleChecked = (field) => {
+        if (this.state.fieldsChecked.has(field)) {
+            console.log("has", field)
+            return true
+        } else {
+            console.log("not")
+            return false
+
+        }
+
+        // console.log("not",field, this.state.fieldsChecked.)
+    }
 
     render() {
         const {classes} = this.props
@@ -255,10 +294,11 @@ class TeacherSettings extends React.Component {
                         teacher={this.state.teacher}
                         allDegrees={this.state.degrees}
                         fieldsClass={this.state.fieldsClass}
-                        handleCheck={this.handleCheckCheckbox}
+                        handleChecked={this.handleChecked}
                         handleClick={this.handleClickCheckbox}
                         handleClickField={this.handleClickField}
                         fieldsChecked={this.state.fieldsChecked}
+                        onClickSave={this.onClickSavePreference}
                     />
                 </Paper>
             </>

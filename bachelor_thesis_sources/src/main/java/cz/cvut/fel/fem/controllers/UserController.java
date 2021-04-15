@@ -5,6 +5,7 @@ import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.auth.NewPassTO;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.DateTO;
+import cz.cvut.fel.fem.to.TeacherPropertyTO;
 import cz.cvut.fel.fem.to.UserTO;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
 import lombok.extern.java.Log;
@@ -45,6 +46,11 @@ public class UserController implements Controller {
     @GetMapping("/teacher/{teacherId}/examDates")
     public List<String> getExamDates(@PathVariable Long teacherId) {
         return userService.getExamDates(teacherId);
+    }
+
+    @PostMapping("/teacher/prop/{id}")
+    public User updateTeacherProperty(@PathVariable Long id, @RequestBody TeacherPropertyTO teacherPropertyTO) {
+        return userService.updateTeacherProperty(id, teacherPropertyTO);
     }
 
     @PostMapping("/teacher/{id}")

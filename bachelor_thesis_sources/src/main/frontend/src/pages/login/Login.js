@@ -54,7 +54,7 @@ class Login extends React.Component {
             }, () => {
                 this.renameThis()
             }))
-            .catch(err => console.log(err))
+            // .catch(err => handleResponseError(err))
 
     }
 

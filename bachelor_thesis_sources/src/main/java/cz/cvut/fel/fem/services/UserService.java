@@ -6,6 +6,7 @@ import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.repository.UserRepository;
 import cz.cvut.fel.fem.to.DateTO;
+import cz.cvut.fel.fem.to.TeacherPropertyTO;
 import cz.cvut.fel.fem.to.UserTO;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
 import cz.cvut.fel.fem.to.page.PageResponseTO;
@@ -243,6 +244,30 @@ public class UserService {
         return new PageResponseTO(page).getData();
     }
 
+    public User updateTeacherProperty(Long id, TeacherPropertyTO teacherPropertyTO) {
+        var user = userRepository.getOne(id);
+        log.info(teacherPropertyTO.toString());
+        var oldTeacherProps = user.getTeacher();
+
+        modelMapper.map(teacherPropertyTO, oldTeacherProps);
+        log.info(oldTeacherProps.toString());
+
+        var teacherProps = user.getTeacher();
+
+        teacherProps.setContract(teacherPropertyTO.getContract());
+        teacherProps.setDepartment(teacherPropertyTO.getDepartment());
+        teacherProps.setUnavailableDates(teacherPropertyTO.getUnavailableDates());
+        teacherProps.setPreferredFieldOfStudies(teacherPropertyTO.getPreferredFieldOfStudies());
+        teacherProps.setPositionInCommissions(teacherPropertyTO.getPositionInCommissions());
+
+
+        log.info(teacherProps.toString());
+
+        user.setTeacher(teacherProps);
+
+        return userRepository.save(user);
+    }
+
 //
 //    public void delete(Long id) {
 //        userRepository.deleteById(id);
@@ -287,6 +312,7 @@ public class UserService {
                     user.setFirstLogin(true);
                     user.setRole(Role.ROLE_TEACHER);
 
+//                    log.severe(v.get(2));
                     var tProps = new TeacherProperty();
                     tProps.setContract(Double.parseDouble(v.get(2)));
                     tProps.setPositionInCommissions(parsePosition(v.get(4)));
