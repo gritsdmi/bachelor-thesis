@@ -15,6 +15,7 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import moment from 'moment'
 import "moment/locale/en-gb"
+import EditTeacherDialogClass from "../../components/manage/EditTeacherDialogClass";
 
 const dateFormatMoment = "DD.MM.yyyy"
 const timeFormatMoment = "HH:mm"
@@ -41,6 +42,9 @@ const InitialState = {
     totalPagesCount: null,
 
     pageSizes: [2, 10, 25, 50, 100],
+
+    editTeacherDialogOpen: false,
+    currentTeacher: null,
 }
 
 const useStyles = theme => ({
@@ -344,6 +348,21 @@ class ManualCreatingPage extends React.Component {
         })
     }
 
+    onClickEditTeacher = teacher => {
+        console.log("onClickEditTeacher", teacher)
+        this.setState({
+            currentTeacher: teacher,
+            editTeacherDialogOpen: true,
+        })
+    }
+
+    onCloseEditTeacherDialog = () => {
+        this.setState({
+            currentTeacher: null,
+            editTeacherDialogOpen: false,
+        })
+    }
+
     render() {
 
         if (!this.state.locations || !this.state.degrees) {
@@ -368,6 +387,11 @@ class ManualCreatingPage extends React.Component {
                         // onClickButton={}
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
+                    />
+                    <EditTeacherDialogClass
+                        open={this.state.editTeacherDialogOpen}
+                        onClose={this.onCloseEditTeacherDialog}
+                        teacher={this.state.currentTeacher}
                     />
                     <Snackbar
                         anchorOrigin={{
@@ -420,6 +444,7 @@ class ManualCreatingPage extends React.Component {
                                     onClick={this.onClickAddTeacherButton}
                                     disabledCheck={this.disabledButtonCheck}
                                     add={true}
+                                    editButton={this.onClickEditTeacher}
                                 />
                                 <Pagination
                                     count={this.state.totalPagesCount}

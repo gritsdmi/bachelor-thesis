@@ -24,4 +24,6 @@ public class TeacherPropertyTO {
 
     private List<Position> positionInCommissions;
 
+    private String approvedByScientificCouncilFrom;
+
 }

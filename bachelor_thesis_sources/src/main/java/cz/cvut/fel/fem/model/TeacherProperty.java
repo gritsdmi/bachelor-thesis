@@ -41,6 +41,9 @@ public class TeacherProperty extends AbstractEntity {
     @ManyToMany
     private List<Position> positionInCommissions;
 
+    //new item
+    private String approvedByScientificCouncilFrom;
+
 //    //new item
 //    @ElementCollection
 //    @CollectionTable(name = "teacher_commission_reaction",

@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
     datePicker: {
         cursor: `pointer !important`,
+        width: "200px",
     }
 
 }));
@@ -35,17 +36,12 @@ export default function CommissionProps({
                                         }) {
     const classes = useStyles();
 
-    // if (!locations || locations.length < 1) {
-    //     return <></>
-    // }
-
     return (
 
         <Paper>
             <TextField
                 // fullWidth
                 select
-                // defaultValue={defaults.degree ? defaults.degree : "Bc"}
                 value={defaults.degree ? defaults.degree : "Bc"}
                 helperText="Degree"
                 onChange={onChangeDegree}
@@ -90,7 +86,7 @@ export default function CommissionProps({
                     InputProps={{
                         endAdornment: (
                             <InputAdornment
-                                // position="end"
+                                position="end"
                             >
                                 <TodayIcon/>
                             </InputAdornment>

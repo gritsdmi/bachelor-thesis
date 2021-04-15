@@ -1,11 +1,13 @@
 import React from "react";
 import Container from "@material-ui/core/Container";
-import {post} from "../../utils/request";
+import {handleResponseError, post} from "../../utils/request";
 import SearchBox from "../../components/SearchBox";
 import SearchResultPanel from "../../components/SearchResultPanel";
 import EditTeacherDialogClass from "../../components/manage/EditTeacherDialogClass";
 import Pagination from "@material-ui/lab/Pagination";
+import {withStyles} from "@material-ui/core/styles";
 
+const useStyles = theme => ({});
 const InitialState = {
     teachers: [],
     currentTeacher: null,
@@ -13,7 +15,7 @@ const InitialState = {
     searchPattern: '',
 
     currentPage: 1,
-    size: 5, //count items in current page
+    size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
 
@@ -31,9 +33,6 @@ class ManageTeachersPage extends React.Component {
 
 
     componentDidMount() {
-        // get("/user/teacher").then((response) => {
-        //     this.setState({teachers: response.data})
-        // })
         this.fetchTeachers()
     }
 
@@ -54,7 +53,7 @@ class ManageTeachersPage extends React.Component {
                     totalPagesCount: res.data.totalPagesCount,
                 }, () => console.log(res.data))
             })
-            .catch(err => console.log(err))
+            .catch(err => handleResponseError(err))
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -65,12 +64,10 @@ class ManageTeachersPage extends React.Component {
     }
 
     onClickEditTeacherButton = (teacher) => {
-        // console.log("on click edit teacher button ", teacherId)
         this.setState({
             currentTeacher: teacher,
             editTeacherDialogOpen: true
         })
-
     }
 
     onCloseEditTeacherDialog = () => {
@@ -82,29 +79,24 @@ class ManageTeachersPage extends React.Component {
 
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
-        if (value && value !== '') {
-            console.log("apply filter")
-            this.setState({searchPattern: value}, () => this.fetchTeachers(true))
-        } else {
-            console.log("clear filter")
-            this.setState({searchPattern: ''})
-        }
+        this.setState({searchPattern: value ? value : ''}
+            , () => this.fetchTeachers(true))
     }
 
-    teachersFilteredList() {
-        if (this.state.searchPattern === '') {
-            return this.state.teachers
-        }
-        return this.state.teachers
-            && this.state.searchPattern
-            && this.state.teachers.filter(teacher => {
-                    return (
-                        (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-                        || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-                        || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
-                }
-            )
-    }
+    // teachersFilteredList() {
+    //     if (this.state.searchPattern === '') {
+    //         return this.state.teachers
+    //     }
+    //     return this.state.teachers
+    //         && this.state.searchPattern
+    //         && this.state.teachers.filter(teacher => {
+    //                 return (
+    //                     (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+    //                     || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+    //                     || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
+    //             }
+    //         )
+    // }
 
     onChangePagination = (event, value) => {
         this.setState({
@@ -113,10 +105,10 @@ class ManageTeachersPage extends React.Component {
     }
 
     render() {
-        // const teachersFilteredList = this.teachersFilteredList()
         if (!this.state.teachers) {
             return <></>
         }
+        const {classes} = this.props
         return (
             <>
                 <Container>
@@ -131,7 +123,7 @@ class ManageTeachersPage extends React.Component {
                     />
 
                     <SearchBox
-                        onClickButton={this.onClickSearchButton}
+                        // onClickButton={this.onClickSearchButton}
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
                     />
@@ -162,4 +154,4 @@ class ManageTeachersPage extends React.Component {
     }
 }
 
-export default ManageTeachersPage;
+export default withStyles(useStyles)(ManageTeachersPage);

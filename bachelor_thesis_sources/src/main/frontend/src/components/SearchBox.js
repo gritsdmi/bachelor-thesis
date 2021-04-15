@@ -9,6 +9,7 @@ export default function SearchBox({onClickButton, searchPattern, onChange}) {
         <>
             <Paper> {/*todo css*/}
                 <TextField
+                    autoFocus
                     fullWidth
                     variant={"outlined"}
                     size={"small"}
