@@ -56,3 +56,6 @@ build/
 **/*.xlsx
 **/*.xlsx*
 **/*.code-workspace
+**/*.jpg
+**/*.jpeg
+**/*.csv

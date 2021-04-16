@@ -28,6 +28,32 @@ export function get(url) {
     }
 }
 
+export function download(url, payload) {
+    const URL = base_URL + url;
+    const jwt = JSON.parse(localStorage.getItem('token'));
+    const config = {
+        responseType: 'blob', // important
+        headers: {
+            'Authorization': token.concat(jwt),
+        },
+    }
+
+    if (jwt) {
+        console.log("sending download request with token to ", URL, config)
+        axios.post(URL, payload, config).then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'table.csv');
+            document.body.appendChild(link);
+            link.click();
+        });
+    } else {
+        console.log("there are not jwt token for download request. Login first!")
+        window.location.href = '/login'
+    }
+}
+
 export function post(url, payload) {
     const URL = base_URL + url;
     const jwt = JSON.parse(localStorage.getItem('token'));

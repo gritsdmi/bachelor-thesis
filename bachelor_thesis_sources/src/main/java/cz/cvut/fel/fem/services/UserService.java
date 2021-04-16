@@ -286,13 +286,7 @@ public class UserService {
             var data = csvParser.getData(sheetNumber);
             data.forEach((k, v) -> {
                 if (k != 0) {
-//                    var teacher = new Teacher();
-//                    var to = new TeacherTO();
-//                    to.setSurname(v.get(0));
-//                    to.setContract(Double.parseDouble(v.get(2)));
-//                    to.setEmailAddress(v.get(4));
-//                    save(teacher, to);
-//get(4) = positions
+
                     var user = new User();
                     user.setSurname(v.get(0));
                     user.setEmailAddress(v.get(4));

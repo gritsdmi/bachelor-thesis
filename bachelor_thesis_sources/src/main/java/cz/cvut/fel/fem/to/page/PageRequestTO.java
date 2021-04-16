@@ -1,6 +1,5 @@
 package cz.cvut.fel.fem.to.page;
 
-import cz.cvut.fel.fem.to.CommissionFilterProps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

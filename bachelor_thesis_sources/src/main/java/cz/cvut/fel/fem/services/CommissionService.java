@@ -9,6 +9,7 @@ import cz.cvut.fel.fem.model.enums.FieldOfStudyEnum;
 import cz.cvut.fel.fem.repository.CommissionRepository;
 import cz.cvut.fel.fem.to.CommissionTO;
 import cz.cvut.fel.fem.to.CreatorTO;
+import cz.cvut.fel.fem.to.page.CommissionFilterProps;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
 import cz.cvut.fel.fem.to.page.PageResponseTO;
 import lombok.extern.java.Log;
@@ -252,7 +253,7 @@ public class CommissionService {
      * @param pageRequestTO page request.
      * @return page contains requested data.
      * @see cz.cvut.fel.fem.to.page.PageRequestTO
-     * @see cz.cvut.fel.fem.to.CommissionFilterProps
+     * @see CommissionFilterProps
      */
     public Map<String, Object> getByPropsPaginated(PageRequestTO pageRequestTO) {
         var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());

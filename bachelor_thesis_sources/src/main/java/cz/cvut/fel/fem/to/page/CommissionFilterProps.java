@@ -1,4 +1,4 @@
-package cz.cvut.fel.fem.to;
+package cz.cvut.fel.fem.to.page;
 
 import cz.cvut.fel.fem.model.FieldOfStudy;
 import cz.cvut.fel.fem.model.enums.CommissionState;

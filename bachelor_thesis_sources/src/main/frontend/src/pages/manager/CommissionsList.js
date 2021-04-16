@@ -12,6 +12,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import CommissionSearchBox from "../../components/commission/CommissionSearchBox";
 import CommissionInfoDialog from "../../components/commission/CommissionInfoDialog";
 import CommissionListItem from "../../components/CommissionListItem";
+import GenerateCSVDialog from "../../components/GenerateCSVDialog";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -35,6 +36,7 @@ const InitialState = {
     pageSizes: [2, 10, 25, 50, 100],
 
     filterProps: null,
+    csvDialogOpen: false,
 
 }
 
@@ -51,28 +53,28 @@ class CommissionsListPage extends React.Component {
         // this.fetchCommissions()
     }
 
-    fetchCommissions(changeProps) {
-
-        const pageTO = {
-            page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
-            size: this.state.size,
-            title: ' ',
-        }
-
-        post(`/commission/page`, pageTO)
-            .then(res => {
-                this.setState({
-                        // commissions: res.data.list,
-                        // currentPage: res.data.currentPage,
-                        // totalItemsCount: res.data.totalItemsCount,
-                        // totalPagesCount: res.data.totalPagesCount,
-                    }
-                    , () => console.log(res.data)
-                )
-            })
-            .catch(err => handleResponseError(err))
-
-    }
+    // fetchCommissions(changeProps) {
+    //
+    //     const pageTO = {
+    //         page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
+    //         size: this.state.size,
+    //         title: ' ',
+    //     }
+    //
+    //     post(`/commission/page`, pageTO)
+    //         .then(res => {
+    //             this.setState({
+    //                     // commissions: res.data.list,
+    //                     // currentPage: res.data.currentPage,
+    //                     // totalItemsCount: res.data.totalItemsCount,
+    //                     // totalPagesCount: res.data.totalPagesCount,
+    //                 }
+    //                 , () => console.log(res.data)
+    //             )
+    //         })
+    //         .catch(err => handleResponseError(err))
+    //
+    // }
 
     fetchByFilter(filterProps, changeProps) {
         console.log(filterProps)
@@ -169,6 +171,19 @@ class CommissionsListPage extends React.Component {
         });
     }
 
+    onClickGenerateCSV = () => {
+        console.log("onClickGenerateCSV")
+        this.setState({
+            csvDialogOpen: true,
+        })
+    }
+
+    onCloseCSVDialog = () => {
+        this.setState({
+            csvDialogOpen: false,
+        })
+    }
+
 
     render() {
         const {classes} = this.props
@@ -202,6 +217,11 @@ class CommissionsListPage extends React.Component {
                     updComm={this.updateCommission}
                 />
 
+                <GenerateCSVDialog
+                    open={this.state.csvDialogOpen}
+                    onClose={this.onCloseCSVDialog}
+                />
+
                 <Container>
                     <Box>
                         <h1>
@@ -213,6 +233,7 @@ class CommissionsListPage extends React.Component {
                     </Box>
                     <CommissionSearchBox
                         onChange={this.onChangeFilter}
+                        onClickGenButton={this.onClickGenerateCSV}
                     />
 
                     <Pagination

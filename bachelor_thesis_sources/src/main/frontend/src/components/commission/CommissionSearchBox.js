@@ -6,6 +6,7 @@ import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import moment from 'moment'
 import MomentUtils from '@date-io/moment';
 import "moment/locale/en-gb"
+import Button from "@material-ui/core/Button";
 
 moment.locale("en-gb")
 
@@ -273,6 +274,11 @@ class CommissionSearchBox extends React.Component {
                             </MenuItem>
                         ))}
                     </TextField>
+                    <Button
+                        onClick={this.props.onClickGenButton}
+                    >
+                        Generate CSV
+                    </Button>
                 </Paper>
             </div>
         );

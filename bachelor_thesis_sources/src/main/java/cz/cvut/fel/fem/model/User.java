@@ -55,6 +55,19 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    public String getFullName() {
+
+        var sb = new StringBuilder();
+        if (this.titlesPre != null && !this.titlesPre.equals(""))
+            sb.append(this.titlesPre).append(" ");
+        sb.append(this.name).append(" ");
+        sb.append(this.surname);
+        if (this.titlesPost != null && !this.titlesPost.equals(""))
+            sb.append(" ").append(this.titlesPre);
+
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
