@@ -2,9 +2,10 @@ package cz.cvut.fel.fem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class BachelorThesisApplication {
+public class BachelorThesisApplication extends SpringBootServletInitializer {
 
     private static final Integer pageVedeckaRada = 1;
     private static final Integer pageUvazky = 4;

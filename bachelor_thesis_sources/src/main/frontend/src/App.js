@@ -1,7 +1,7 @@
 import './App.css';
 import CommissionsListPage from "./pages/manager/CommissionsList"
 import Header from "./components/Header";
-import {Redirect, Route, Switch} from 'react-router-dom';
+import {Route, Switch} from 'react-router-dom';
 import Container from "@material-ui/core/Container";
 import AutoGeneratingPage from "./pages/manager/AutoGenerating";
 import ManualCreatingPage from "./pages/manager/ManualCreating";
@@ -18,7 +18,8 @@ function App() {
             <Container>
                 <Header/>
                 <Switch> {/* The Switch decides which component to show based on the current URL.*/}
-                    <Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>
+                    {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
+                    <Route exact path="/" component={CommissionsListPage}/>
                     <Route exact path="/login" component={Login}/>
                     <Route exact path="/commissions" component={CommissionsListPage}/>
                     <Route exact path="/auto" component={AutoGeneratingPage}/>
