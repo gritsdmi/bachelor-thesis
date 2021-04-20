@@ -10,11 +10,13 @@ import TeacherOverview from "./pages/teacher/TeacherOverview";
 import TeacherSettings from "./pages/teacher/TeacherSettings";
 import EmailTemplates from "./pages/manager/EmailTemplates";
 import Login from "./pages/login/Login";
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import femTheme from './styles/theme'
 
 
 function App() {
     return (
-        <>
+        <MuiThemeProvider theme={femTheme}>
             <Container>
                 <Header/>
                 <Switch> {/* The Switch decides which component to show based on the current URL.*/}
@@ -30,7 +32,7 @@ function App() {
                     <Route exact path="/emails" component={EmailTemplates}/>
                 </Switch>
             </Container>
-        </>
+        </MuiThemeProvider>
 
     );
 }

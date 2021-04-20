@@ -7,6 +7,8 @@ import moment from 'moment'
 import MomentUtils from '@date-io/moment';
 import "moment/locale/en-gb"
 import Button from "@material-ui/core/Button";
+import dateFormatMoment from "../../utils/constants";
+import Box from "@material-ui/core/Box";
 
 moment.locale("en-gb")
 
@@ -18,9 +20,18 @@ const useStyles = theme => ({
 
         width: "150px",
     },
-});
+    flex: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    buttonBox: {
+        display: 'flex',
 
-const dateFormatMoment = "DD.MM.yyyy"
+    },
+    button: {
+        marginLeft: theme.spacing(0.5),
+    },
+});
 
 const InitialState = {
     degrees: [],
@@ -29,7 +40,6 @@ const InitialState = {
 
     selectedDegree: 'ALL',
     selectedField: {field: 'ALL', degree: 'ALL'},
-    // selectedDatesRange: [],
     selectedDateFrom: new Date(),
     selectedDateTo: new Date(),
     selectedState: 'ALL',
@@ -79,7 +89,6 @@ class CommissionSearchBox extends React.Component {
     }
 
     fetchDegrees(didMount) {
-        console.log("did mount", didMount)
         get("/exam/degrees")
             .then(res => {
                 this.setState({
@@ -94,28 +103,14 @@ class CommissionSearchBox extends React.Component {
     }
 
     fetchFields(didMount) {
-        // get("/field")
-        //     .then(res => {
-        //         this.setState({
-        //                 fields: res.data,
-        //             }
-        //             , () => console.log(res.data)
-        //         )
-        //     })
-        //     .catch(err => handleResponseError(err))
-        console.log("did mount", didMount)
 
         get(`/field/degree/${this.state.selectedDegree}`)
             .then(res => {
                 this.setState({
                         fields: this.addItemALL(res.data, true),
-                        // fields: res.data,
                         selectedField: res.data.length > 0 ? res.data[0] : 'ALL'
                     }
-                    // , () => console.log(res.data)
-                    // , () =>
                     , () => {
-                        console.log(this.state)
                         this.props.onChange(filterProps(this.state), didMount)
                     }
                 )
@@ -133,14 +128,6 @@ class CommissionSearchBox extends React.Component {
     }
 
     fixDegree(field) {
-        // let degree
-        // if (field.degree.startsWith('BP')) {
-        //     degree = 'Bc'
-        // } else if (field.startsWith('MP')) {
-        //     degree = 'Ing'
-        // } else {
-        //     degree = 'PhD'
-        // }
         this.setState({
                 selectedDegree: field.degree,
             }, this.props.onChange(filterProps(this.state))
@@ -175,14 +162,12 @@ class CommissionSearchBox extends React.Component {
     }
 
     handleChangeDateFrom = (e) => {
-        console.log("handleChangeDate", moment(e).format(dateFormatMoment))
         this.setState({
             selectedDateFrom: e,
         }, () => this.props.onChange(filterProps(this.state)))
     }
 
     handleChangeDateTo = (e) => {
-        console.log("handleChangeDate", moment(e).format(dateFormatMoment))
         this.setState({
             selectedDateTo: e,
         }, () => this.props.onChange(filterProps(this.state)))
@@ -195,7 +180,7 @@ class CommissionSearchBox extends React.Component {
 
         return (
             <div>
-                <Paper>
+                <Paper className={classes.flex}>
                     <TextField
                         id="degree-select"
                         select
@@ -242,7 +227,6 @@ class CommissionSearchBox extends React.Component {
                             className={classes.item}
                             maxDate={this.state.selectedDateTo}
                             helperText="Date from"
-
                         />
                         <DatePicker
                             id="date-picker-inline"
@@ -253,7 +237,6 @@ class CommissionSearchBox extends React.Component {
                             className={classes.item}
                             minDate={this.state.selectedDateFrom}
                             helperText="Date to"
-
                         />
                     </MuiPickersUtilsProvider>
 
@@ -274,11 +257,24 @@ class CommissionSearchBox extends React.Component {
                             </MenuItem>
                         ))}
                     </TextField>
-                    <Button
-                        onClick={this.props.onClickGenButton}
-                    >
-                        Generate CSV
-                    </Button>
+                    <Box className={classes.buttonBox}>
+                        <Button
+                            onClick={this.props.onClickGenButton}
+                            color={'primary'}
+                            variant={"contained"}
+                            className={classes.button}
+                        >
+                            Generate CSV
+                        </Button>
+                        <Button
+                            color={'primary'}
+                            onClick={this.props.onClickChangeView}
+                            variant={'contained'}
+                            className={classes.button}
+                        >
+                            Change view
+                        </Button>
+                    </Box>
                 </Paper>
             </div>
         );

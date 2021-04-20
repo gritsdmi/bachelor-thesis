@@ -22,23 +22,6 @@ const dateFormatMoment = "DD.MM.yyyy"
 
 
 const useStyles = theme => ({
-    // item: {
-    //     paddingLeft: theme.spacing(2),
-    //     paddingTop: theme.spacing(1.5),
-    //     paddingBottom: theme.spacing(1.5),
-    //     paddingRight: theme.spacing(2),
-    // },
-    // cell: {
-    //     border: 'none',
-    // },
-    // firstCol: {
-    //     width: '150px',
-    //     border: 'none',
-    // },
-    // inputCell: {
-    //     maxWidth: '50px',
-    //     border: 'none',
-    // },
     title: {
         textAlign: 'center',
     },
@@ -116,13 +99,9 @@ class GenerateCSVDialog extends React.Component {
             dateTo: moment(this.state.selectedDateTo).format(dateFormatMoment),
             semester: null,
         }
-        console.log("onClickDownload", payload)
 
         download(`/util/download`, payload)
 
-        // post(`/util/csv/byDate`, payload)
-        //     .then()
-        //     .catch()
     }
 
     render() {
@@ -191,16 +170,18 @@ class GenerateCSVDialog extends React.Component {
                                 </MuiPickersUtilsProvider>
                             </Grid>
                         </Grid>
-
                     </Grid>
                 </DialogContent>
                 <DialogActions>
                     <Button
                         onClick={this.props.onClose}
+                        color={'secondary'}
+                        variant={'contained'}
                     >Cancel</Button>
 
                     <Button
-                        // disabled={true}
+                        color={'primary'}
+                        variant={'contained'}
                         onClick={this.onClickDownload}
                     >
                         Download

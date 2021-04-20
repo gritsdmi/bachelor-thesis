@@ -1,7 +1,7 @@
 import React from "react";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
-import {Paper} from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
 
 import {del, handleResponseError, post} from "../../utils/request"
 import Button from "@material-ui/core/Button";
@@ -13,27 +13,48 @@ import CommissionSearchBox from "../../components/commission/CommissionSearchBox
 import CommissionInfoDialog from "../../components/commission/CommissionInfoDialog";
 import CommissionListItem from "../../components/CommissionListItem";
 import GenerateCSVDialog from "../../components/GenerateCSVDialog";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
+import {Typography} from "@material-ui/core";
 
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-around',
-    }
+    },
+    paginationBox: {
+        margin: theme.spacing(1),
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    pageSelect: {
+        width: '70px',
+        marginLeft: '10px',
+    },
+    menuSelect: {
+        paddingLeft: '10px',
+    },
+    typography: {
+        alignSelf: 'center',
+    },
+    flex: {
+        display: 'flex',
+    },
 });
 
 const InitialState = {
     commissions: [],
     commissionInfoDialogOpen: false,
     currentCommission: null,
-    cardView: true,
+    cardView: false,
 
     currentPage: 1,
-    size: 3, //count items in current page
+    size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
 
-    pageSizes: [2, 10, 25, 50, 100],
+    pageSizes: [2, 6, 10, 25, 50, 100],
 
     filterProps: null,
     csvDialogOpen: false,
@@ -47,43 +68,19 @@ class CommissionsListPage extends React.Component {
         this.state = {
             ...InitialState,
         }
+        this.state.size = this.state.cardView ? 6 : 10
     }
 
     componentDidMount() {
-        // this.fetchCommissions()
     }
 
-    // fetchCommissions(changeProps) {
-    //
-    //     const pageTO = {
-    //         page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
-    //         size: this.state.size,
-    //         title: ' ',
-    //     }
-    //
-    //     post(`/commission/page`, pageTO)
-    //         .then(res => {
-    //             this.setState({
-    //                     // commissions: res.data.list,
-    //                     // currentPage: res.data.currentPage,
-    //                     // totalItemsCount: res.data.totalItemsCount,
-    //                     // totalPagesCount: res.data.totalPagesCount,
-    //                 }
-    //                 , () => console.log(res.data)
-    //             )
-    //         })
-    //         .catch(err => handleResponseError(err))
-    //
-    // }
 
-    fetchByFilter(filterProps, changeProps) {
-        console.log(filterProps)
+    fetchByFilter(filterProps, paginationChanged) {
 
         let props = filterProps
         props.selectedState = null
         const pageTO = {
-            page: changeProps ? this.state.currentPage : this.state.currentPage - 1,
-            // page: this.state.currentPage - 1,
+            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
             size: this.state.size,
             title: ' ',
             props: {...props},
@@ -105,10 +102,9 @@ class CommissionsListPage extends React.Component {
     }
 
     onChangePagination = (event, value) => {
-        console.log("onChangePagination")
         this.setState({
             currentPage: value,
-        }, () => this.fetchByFilter(this.state.filterProps, false))
+        }, () => this.fetchByFilter(this.state.filterProps, true))
     }
 
     onChangeFilter = (filterProps, didMount) => {
@@ -122,7 +118,7 @@ class CommissionsListPage extends React.Component {
             console.log("onChangeFilter", filterProps)
             this.setState({
                 filterProps: filterProps,
-            }, () => this.fetchByFilter(filterProps, true))
+            }, () => this.fetchByFilter(filterProps, false))
         }
 
     }
@@ -165,6 +161,7 @@ class CommissionsListPage extends React.Component {
         // redirect to manual commission
         console.log("onCommissionEditButtonClick", commission)
         // return <Redirect to="/manual/"/> // do not work
+        //TODO test on deploy
         this.props.history.push({
             pathname: "/manual",
             commission: commission,
@@ -182,6 +179,22 @@ class CommissionsListPage extends React.Component {
         this.setState({
             csvDialogOpen: false,
         })
+    }
+
+    onChangePageSize = (e) => {
+        this.setState({
+                size: e.target.value,
+            }
+            , () => this.fetchByFilter(this.state.filterProps, false)
+        )
+    }
+
+    onClickChangeView = () => {
+        this.setState({
+                cardView: !this.state.cardView,
+            }
+            , () => this.fetchByFilter(this.state.filterProps, false)
+        )
     }
 
 
@@ -234,27 +247,65 @@ class CommissionsListPage extends React.Component {
                     <CommissionSearchBox
                         onChange={this.onChangeFilter}
                         onClickGenButton={this.onClickGenerateCSV}
+                        onClickChangeView={this.onClickChangeView}
                     />
-
-                    <Pagination
-                        count={this.state.totalPagesCount}
-                        page={this.state.currentPage + 1}
-                        siblingCount={1}
-                        boundaryCount={1}
-                        shape="rounded"
-                        onChange={this.onChangePagination}
-                    />
-                    <Paper className={classes.cardContainer}>
-                        {cardsList}
-                    </Paper>
-                    <Pagination
-                        count={this.state.totalPagesCount}
-                        page={this.state.currentPage + 1}
-                        siblingCount={1}
-                        boundaryCount={1}
-                        shape="rounded"
-                        onChange={this.onChangePagination}
-                    />
+                    <Box className={classes.paginationBox}>
+                        <Pagination
+                            count={this.state.totalPagesCount}
+                            page={this.state.currentPage + 1}
+                            siblingCount={1}
+                            boundaryCount={1}
+                            shape="rounded"
+                            onChange={this.onChangePagination}
+                        />
+                        <Box className={classes.flex}>
+                            <Typography className={classes.typography}>Items per page: </Typography>
+                            <TextField
+                                select
+                                value={this.state.size}
+                                onChange={this.onChangePageSize}
+                                className={classes.pageSelect}
+                            >
+                                {this.state.pageSizes.map((size, idx) => (
+                                    <MenuItem
+                                        key={idx}
+                                        value={size}
+                                    >
+                                        {size}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                    </Box>
+                    <Paper className={classes.cardContainer}>{cardsList}</Paper>
+                    <Box className={classes.paginationBox}>
+                        <Pagination
+                            count={this.state.totalPagesCount}
+                            page={this.state.currentPage + 1}
+                            siblingCount={1}
+                            boundaryCount={1}
+                            shape="rounded"
+                            onChange={this.onChangePagination}
+                        />
+                        <Box className={classes.flex}>
+                            <Typography className={classes.typography}>Items per page: </Typography>
+                            <TextField
+                                select
+                                value={this.state.size}
+                                onChange={this.onChangePageSize}
+                                className={classes.pageSelect}
+                            >
+                                {this.state.pageSizes.map((size, idx) => (
+                                    <MenuItem
+                                        key={idx}
+                                        value={size}
+                                    >
+                                        {size}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                    </Box>
                 </Container>
             </>
         )
