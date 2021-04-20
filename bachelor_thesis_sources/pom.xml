@@ -144,7 +144,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>${project.artifactId}-react-clean</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
