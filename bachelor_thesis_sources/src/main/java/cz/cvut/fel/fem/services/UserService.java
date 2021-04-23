@@ -1,11 +1,13 @@
 package cz.cvut.fel.fem.services;
 
+import cz.cvut.fel.fem.model.Date;
 import cz.cvut.fel.fem.model.*;
 import cz.cvut.fel.fem.model.auth.NewPassTO;
 import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.repository.UserRepository;
 import cz.cvut.fel.fem.to.DateTO;
+import cz.cvut.fel.fem.to.NewUserTo;
 import cz.cvut.fel.fem.to.TeacherPropertyTO;
 import cz.cvut.fel.fem.to.UserTO;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
@@ -19,10 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -216,7 +215,7 @@ public class UserService {
         Page<User> page;
 
         if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
-            page = userRepository.findByNameOrSurnameOrLoginContaining(pageRequestTO.getPattern().toLowerCase(), pageRequest);
+            page = userRepository.findTeacherByNameOrSurnameOrLoginContaining(pageRequestTO.getPattern().toLowerCase(), pageRequest);
         } else {
             page = userRepository.findAll(pageRequest);
         }
@@ -255,6 +254,55 @@ public class UserService {
         user.setTeacher(teacherProps);
 
         return userRepository.save(user);
+    }
+
+    public Map<String, Object> getAllUsersPaged(PageRequestTO request) {
+        var pageRequest = PageRequest.of(request.getPage(), request.getSize());
+
+        var allUsers = getAll().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+        Page<User> page;
+
+        if (request.getPattern() != null && !request.getPattern().equals("")) {
+            page = userRepository.getUsersByIdByPatternPaged(allUsers, request.getPattern(), pageRequest);
+        } else {
+            page = userRepository.getUsersByIdPaged(allUsers, pageRequest);
+        }
+        log.info(page.toString());
+        return new PageResponseTO(page).getData();
+
+    }
+
+    public List<Role> getAllRoles() {
+        return new ArrayList<>(Arrays.asList(Role.ROLE_MANAGER, Role.ROLE_TEACHER));
+    }
+
+    public User createNewUser(NewUserTo newUserTo) {
+        log.info(newUserTo.toString());
+
+//        var user = new User();
+        var user = modelMapper.map(newUserTo, User.class);
+        user.setLogin(newUserTo.getEmailAddress().split("@")[0]);
+        user.setPassword(newUserTo.getEmailAddress().split("@")[0]);
+        user.setFirstLogin(true);
+        //TODO figure out with requirement: data.xl -> 2.sheet -> columns F and G
+
+        log.info(user.toString());
+        if (newUserTo.getTeacher() != null) {
+            var teacherProp = modelMapper.map(newUserTo.getTeacher(), TeacherProperty.class);
+            log.info(teacherProp.toString());
+            user.setTeacher(teacherProp);
+        }
+        if (newUserTo.getManager() != null) {
+            var managerProp = modelMapper.map(newUserTo.getManager(), ManagerProperty.class);
+            log.info(managerProp.toString());
+            user.setManager(managerProp);
+        }
+
+        log.info(user.toString());
+
+        return userRepository.save(user);
+
+//        return null;
     }
 
 //

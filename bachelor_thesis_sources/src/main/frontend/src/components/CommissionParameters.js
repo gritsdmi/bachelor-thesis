@@ -4,13 +4,12 @@ import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
 import {del, get, handleResponseError, post} from "../utils/request"
 import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
-
+import {dateFormatMoment, dateTimeFormatMoment, timeFormatMoment} from "../utils/constants";
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import "moment/locale/en-gb"
 
 import TodayIcon from '@material-ui/icons/Today';
-
 
 const useStyles = theme => ({
     cardContainer: {
@@ -23,20 +22,12 @@ const useStyles = theme => ({
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
 
-        // width: "150px",
-
     },
     datePicker: {
         cursor: `pointer !important`,
-    }
+    },
 
 });
-
-const dateFormat = 'dd.MM.yyyy'
-const dateFormatMoment = "DD.MM.yyyy"
-const timeFormatMoment = "HH:mm"
-const dateTimeFormatMoment = "DD.MM.yyyy HH:mm"
-
 
 const InitialState = {
     degrees: [],
@@ -51,7 +42,6 @@ const InitialState = {
     selectedTime: new Date(),
     selectedDateTime: new Date(),
 
-
 }
 
 
@@ -62,16 +52,11 @@ class CommissionGenerateParameters extends React.Component {
         this.state = {
             ...InitialState
         }
-
     }
 
     componentDidMount() {
-        console.log("CommissionParameters DID MOUNT")
         this.fetchDegrees()
-        // this.fetchFields()
-
         this.fetchLocations(this.state.selectedDate);
-
     }
 
     fetchDegrees() {
@@ -81,7 +66,6 @@ class CommissionGenerateParameters extends React.Component {
                     degrees: this.fixDegreesArr(response.data),
                     selectedDegree: response.data[0],
                 }, () => {
-                    console.log(this.state.degrees)
                     this.fetchFields()
                 })
             })
@@ -96,13 +80,7 @@ class CommissionGenerateParameters extends React.Component {
             .then(res => {
                 this.setState({
                         fields: res.data,
-                        // fields: res.data,
                         selectedField: res.data.length > 0 ? res.data[0] : ''
-                    }
-                    // , () => console.log(res.data)
-                    , () => {
-                        console.log(this.state)
-                        // this.props.onChange(filterProps(this.state), didMount)
                     }
                 )
             })
@@ -121,7 +99,7 @@ class CommissionGenerateParameters extends React.Component {
                     selectedLocation: response.data ? response.data[0] : '',
                 }, () => console.log(this.state.locations))
             })
-            .catch(error => console.log(error))
+            .catch(err => handleResponseError(err))
     }
 
     fixDegreesArr(arr) {
@@ -233,7 +211,6 @@ class CommissionGenerateParameters extends React.Component {
                         className={classes.item}
                         item
                         xs={1}
-
                     >
                         <TextField
                             id="field-select"

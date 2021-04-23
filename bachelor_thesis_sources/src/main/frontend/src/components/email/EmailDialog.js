@@ -15,6 +15,7 @@ import Button from "@material-ui/core/Button";
 import {get, handleResponseError, post} from "../../utils/request"
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import {emailPattern} from '../../utils/constants'
 
 const useStyles = theme => ({
     firstCol: {
@@ -163,18 +164,17 @@ class EmailDialog extends React.Component {
     validateEmail = (input) => {
         let valid = true
 
-        const mailFormat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         if (this.state.emailsWasTouched) {
             let emails = input.split(' ')
             emails.forEach(email => {
-                if (email.match(mailFormat)) {
+                if (email.match(emailPattern)) {
                 } else {
                     valid = false;
                 }
             })
         } else {
             this.props.teachers.forEach(t => {
-                if (t.emailAddress.match(mailFormat)) {
+                if (t.emailAddress.match(emailPattern)) {
                 } else {
                     valid = false;
                 }

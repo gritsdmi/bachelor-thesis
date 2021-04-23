@@ -4,20 +4,33 @@ import {Paper, TextField} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {get, post} from "../../utils/request"
 import NewPasswordDialog from "./NewPasswordDialog";
+import Box from "@material-ui/core/Box";
 
 const useStyles = theme => ({
     paper: {
         width: "400px",
         height: "400px",
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'column',
     },
     form: {
         display: "flex",
         flexDirection: "column",
+        width: '90%',
     },
     input: {
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
+    },
+    flex: {
+        display: 'flex',
+        justifyContent: 'center',
+        margin: theme.spacing(3),
+    },
+    button: {
+        margin: theme.spacing(2),
     },
 });
 
@@ -54,7 +67,7 @@ class Login extends React.Component {
             }, () => {
                 this.renameThis()
             }))
-            // .catch(err => handleResponseError(err))
+        // .catch(err => handleResponseError(err))
 
     }
 
@@ -165,7 +178,7 @@ class Login extends React.Component {
         const {classes} = this.props
 
         return (
-            <div>
+            <Box className={classes.flex}>
                 <NewPasswordDialog
                     open={this.state.newPasswordDialogOpen}
                     // onClose={this.onCloseDialog}
@@ -175,7 +188,7 @@ class Login extends React.Component {
                 <Paper
                     className={classes.paper}
                 >
-                    <h1>Login page</h1>
+                    <h1>Login</h1>
                     <form
                         className={classes.form}
                     >
@@ -194,16 +207,22 @@ class Login extends React.Component {
                         />
                         <Button
                             color={'primary'}
+                            variant={'contained'}
                             onClick={this.onClickLoginButton}
+                            className={classes.button}
                         >
                             Login
                         </Button>
                         <Button
+                            color={'secondary'}
+                            variant={'contained'}
                             onClick={this.tokenTest}
+                            className={classes.button}
+
                         >token test</Button>
                     </form>
                 </Paper>
-            </div>
+            </Box>
         );
     }
 }

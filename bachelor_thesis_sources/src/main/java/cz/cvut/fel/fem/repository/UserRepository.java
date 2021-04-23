@@ -35,7 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "and (lower(u.name) like lower(concat('%',:pattern,'%')) " +
             "or lower(u.surname) like lower(concat('%',:pattern,'%')) " +
             "or lower(u.login) like lower(concat('%',:pattern,'%')) ))")
-    Page<User> findByNameOrSurnameOrLoginContaining(@Param("pattern") String pattern, Pageable Pageable);
+    Page<User> findTeacherByNameOrSurnameOrLoginContaining(@Param("pattern") String pattern, Pageable Pageable);
 
     @Query("SELECT u FROM User u WHERE (u.id IN :ids " +
             "and (lower(u.name) like lower(concat('%',:pattern,'%')) " +

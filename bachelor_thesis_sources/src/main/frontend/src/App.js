@@ -10,29 +10,34 @@ import TeacherOverview from "./pages/teacher/TeacherOverview";
 import TeacherSettings from "./pages/teacher/TeacherSettings";
 import EmailTemplates from "./pages/manager/EmailTemplates";
 import Login from "./pages/login/Login";
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import {ThemeProvider} from '@material-ui/core/styles'
 import femTheme from './styles/theme'
+import ModeratePermissionsPage from "./pages/manager/ModeratePermissionsPage";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
 
 function App() {
     return (
-        <MuiThemeProvider theme={femTheme}>
-            <Container>
-                <Header/>
-                <Switch> {/* The Switch decides which component to show based on the current URL.*/}
-                    {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
-                    <Route exact path="/" component={CommissionsListPage}/>
-                    <Route exact path="/login" component={Login}/>
-                    <Route exact path="/commissions" component={CommissionsListPage}/>
-                    <Route exact path="/auto" component={AutoGeneratingPage}/>
-                    <Route exact path="/manual" component={ManualCreatingPage}/>
-                    <Route exact path="/manage" component={ManageTeachersPage}/>
-                    <Route exact path="/teacher" component={TeacherOverview}/>
-                    <Route exact path="/teacher/settings" component={TeacherSettings}/>
-                    <Route exact path="/emails" component={EmailTemplates}/>
-                </Switch>
-            </Container>
-        </MuiThemeProvider>
+        <ThemeProvider theme={femTheme}>
+            <CssBaseline>
+                <Container>
+                    <Header/>
+                    <Switch> {/* The Switch decides which component to show based on the current URL.*/}
+                        {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
+                        <Route exact path="/" component={CommissionsListPage}/>
+                        <Route exact path="/login" component={Login}/>
+                        <Route exact path="/commissions" component={CommissionsListPage}/>
+                        <Route exact path="/auto" component={AutoGeneratingPage}/>
+                        <Route exact path="/manual" component={ManualCreatingPage}/>
+                        <Route exact path="/manage" component={ManageTeachersPage}/>
+                        <Route exact path="/permissions" component={ModeratePermissionsPage}/>
+                        <Route exact path="/teacher" component={TeacherOverview}/>
+                        <Route exact path="/teacher/settings" component={TeacherSettings}/>
+                        <Route exact path="/emails" component={EmailTemplates}/>
+                    </Switch>
+                </Container>
+            </CssBaseline>
+        </ThemeProvider>
 
     );
 }

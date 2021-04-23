@@ -26,4 +26,6 @@ public class TeacherPropertyTO {
 
     private String approvedByScientificCouncilFrom;
 
+    private List<String> degrees;
+
 }

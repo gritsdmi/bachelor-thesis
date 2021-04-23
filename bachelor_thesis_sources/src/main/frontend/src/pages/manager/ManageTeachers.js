@@ -59,10 +59,6 @@ class ManageTeachersPage extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
-    onClickSearchButton = (event) => {
-        console.log("on click search button", event)
-    }
-
     onClickEditTeacherButton = (teacher) => {
         this.setState({
             currentTeacher: teacher,
@@ -82,21 +78,6 @@ class ManageTeachersPage extends React.Component {
         this.setState({searchPattern: value ? value : ''}
             , () => this.fetchTeachers(true))
     }
-
-    // teachersFilteredList() {
-    //     if (this.state.searchPattern === '') {
-    //         return this.state.teachers
-    //     }
-    //     return this.state.teachers
-    //         && this.state.searchPattern
-    //         && this.state.teachers.filter(teacher => {
-    //                 return (
-    //                     (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-    //                     || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
-    //                     || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
-    //             }
-    //         )
-    // }
 
     onChangePagination = (event, value) => {
         this.setState({
@@ -123,7 +104,6 @@ class ManageTeachersPage extends React.Component {
                     />
 
                     <SearchBox
-                        // onClickButton={this.onClickSearchButton}
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
                     />

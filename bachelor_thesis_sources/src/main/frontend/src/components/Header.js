@@ -82,10 +82,9 @@ class Header extends React.Component {
                         <Button>
                             <NavLink to="/emails"><AccountBoxIcon/></NavLink>
                         </Button>
-                        <Button
-                            onClick={this.onClickParseTeachers}
-                        >
-                            Parse teachers
+
+                        <Button>
+                            <NavLink to="/permissions"><AccountBoxIcon/></NavLink>
                         </Button>
 
                         <Button>
@@ -95,6 +94,15 @@ class Header extends React.Component {
                             <NavLink to="/teacher/settings">Teacher settings</NavLink>
                         </Button>
                         <Button
+                            color={'primary'}
+                            variant={'contained'}
+                            onClick={this.onClickParseTeachers}
+                        >
+                            Parse teachers
+                        </Button>
+                        <Button
+                            color={'primary'}
+                            variant={'contained'}
                             onClick={this.clearLS}
                         >
                             ClearLocalStorage

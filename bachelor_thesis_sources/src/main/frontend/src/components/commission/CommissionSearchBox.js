@@ -7,7 +7,7 @@ import moment from 'moment'
 import MomentUtils from '@date-io/moment';
 import "moment/locale/en-gb"
 import Button from "@material-ui/core/Button";
-import dateFormatMoment from "../../utils/constants";
+import {dateFormatMoment} from "../../utils/constants";
 import Box from "@material-ui/core/Box";
 
 moment.locale("en-gb")

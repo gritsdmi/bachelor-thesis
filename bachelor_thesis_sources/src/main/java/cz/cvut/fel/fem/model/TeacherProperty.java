@@ -44,6 +44,9 @@ public class TeacherProperty extends AbstractEntity {
     //new item
     private String approvedByScientificCouncilFrom;
 
+//    new item
+//    private List<String> availableExamDegrees;
+
 //    //new item
 //    @ElementCollection
 //    @CollectionTable(name = "teacher_commission_reaction",

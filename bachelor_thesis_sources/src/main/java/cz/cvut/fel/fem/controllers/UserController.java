@@ -3,8 +3,10 @@ package cz.cvut.fel.fem.controllers;
 import cz.cvut.fel.fem.model.Date;
 import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.auth.NewPassTO;
+import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.DateTO;
+import cz.cvut.fel.fem.to.NewUserTo;
 import cz.cvut.fel.fem.to.TeacherPropertyTO;
 import cz.cvut.fel.fem.to.UserTO;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
@@ -84,5 +86,19 @@ public class UserController implements Controller {
         return userService.getAvailableTeachersByDatePaged(date, pageRequestTO);
     }
 
+    @PostMapping("/page")
+    public Map<String, Object> getAllUsersPaged(@RequestBody PageRequestTO pageRequestTO) {
+        return userService.getAllUsersPaged(pageRequestTO);
+    }
+
+    @GetMapping("/roles")
+    public List<Role> getAllRoles() {
+        return userService.getAllRoles();
+    }
+
+    @PostMapping("/new")
+    public User createNewUser(@RequestBody NewUserTo newUserTo) {
+        return userService.createNewUser(newUserTo);
+    }
 
 }
