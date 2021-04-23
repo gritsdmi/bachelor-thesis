@@ -33,13 +33,11 @@ const useStyles = theme => ({
         flexDirection: 'row',
     },
     p0: {
-        paddingTop: '0px',
-        paddingBottom: '0px',
+        padding: '0px',
     },
 });
 
 const InitialState = {
-    user: null,
     disabledSave: true,
     roles: [],
     degrees: [],
@@ -68,7 +66,6 @@ class CreateUserDialog extends React.Component {
         this.state = {
             ...InitialState,
         }
-
     }
 
     componentDidMount() {
@@ -79,11 +76,8 @@ class CreateUserDialog extends React.Component {
 
     fetchRoles() {
         get('/user/roles')
-            .then(res => this.setState({
-                    roles: res.data,
-                }
-                // , () => console.log(this.state)
-            ))
+            .then(res => this.setState({roles: res.data}))
+            .catch(err => handleResponseError(err))
     }
 
     fetchPositions() {
@@ -99,10 +93,7 @@ class CreateUserDialog extends React.Component {
             .then(res => {
                 this.setState({
                     degrees: this.fixDegreesArr(res.data),
-                }, () => {
-                    this.addDefaultDegree()
-                    console.log(this.state.degrees)
-                })
+                }, () => this.addDefaultDegree())
             })
             .catch(err => handleResponseError(err))
     }
@@ -157,7 +148,6 @@ class CreateUserDialog extends React.Component {
 
         post('/user/new', newUser)
             .then(res => {
-                console.log(res)
                 if (res.status === 200) {
                     this.props.onSave()
                 }
@@ -168,13 +158,10 @@ class CreateUserDialog extends React.Component {
 
     inputsAreValid() {
         if (this.state.errorEmail) {
-            console.log('error email')
-
             return false
         }
 
         if (!this.state.nameInput || !this.state.surnameInput || !this.state.emailInput) {
-            console.log('here2')
             return false
         }
 
@@ -403,6 +390,7 @@ class CreateUserDialog extends React.Component {
                                                     key={idx}
                                                     value={pos}
                                                     button
+                                                    className={classes.p0}
                                                     onClick={() => this.handleChangePosition(pos)}
                                                 >
                                                     <ListItemIcon>
@@ -412,7 +400,7 @@ class CreateUserDialog extends React.Component {
                                                             disableRipple
                                                         />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={pos.position}/>
+                                                    <ListItemText primary={pos.description}/>
                                                 </ListItem>
                                             )
                                         })
@@ -434,6 +422,7 @@ class CreateUserDialog extends React.Component {
                                                     key={idx}
                                                     value={deg}
                                                     button
+                                                    className={classes.p0}
                                                     onClick={() => this.handleChangeDegree(deg)}
                                                 >
                                                     <ListItemIcon>

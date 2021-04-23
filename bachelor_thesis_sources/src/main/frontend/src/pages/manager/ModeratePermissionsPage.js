@@ -14,6 +14,7 @@ import Divider from "@material-ui/core/Divider";
 import CreateUserDialog from "../../components/manage/CreateUserDialog";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import Paper from "@material-ui/core/Paper";
 
 
 const useStyles = theme => ({
@@ -78,10 +79,6 @@ class ModeratePermissionsPage extends React.Component {
                         totalItemsCount: res.data.totalItemsCount,
                         totalPagesCount: res.data.totalPagesCount,
                     }
-                    , () => {
-                        console.log(res.data)
-                        console.log(this.state)
-                    }
                 )
             })
             .catch(err => handleResponseError(err))
@@ -116,7 +113,6 @@ class ModeratePermissionsPage extends React.Component {
     }
 
     onSaveUser = () => {
-        console.log('on save')
         this.onCloseCreateUserDialog()
         this.setState({snackOpen: true})
         this.fetchUsers()
@@ -192,31 +188,32 @@ class ModeratePermissionsPage extends React.Component {
                         </TextField>
                     </Box>
                 </Box>
-                <List>
-                    {
-                        this.state.users.map((user, idx) => {
-                            return (
-                                <Box key={idx}>
-                                    <ListItem>
-                                        <ListItemText primary={user.name + " " + user.surname}/>
-                                        <Button
-                                            color={'primary'}
-                                            variant={'contained'}
-                                            onClick={() => this.onClickEditUser(user)}
-                                        >
-                                            Edit user
-                                        </Button>
-                                    </ListItem>
-                                    {idx !== this.state.users.length - 1 &&
-                                    <Divider/>
-                                    }
-                                </Box>
+                <Paper>
+                    <List>
+                        {
+                            this.state.users.map((user, idx) => {
+                                return (
+                                    <Box key={idx}>
+                                        <ListItem>
+                                            <ListItemText primary={user.name + " " + user.surname}/>
+                                            <Button
+                                                color={'primary'}
+                                                variant={'contained'}
+                                                onClick={() => this.onClickEditUser(user)}
+                                            >
+                                                Edit user
+                                            </Button>
+                                        </ListItem>
+                                        {idx !== this.state.users.length - 1 &&
+                                        <Divider/>
+                                        }
+                                    </Box>
 
-                            )
-                        })
-                    }
-                </List>
-
+                                )
+                            })
+                        }
+                    </List>
+                </Paper>
                 <Box className={classes.paginationBox}>
                     <Pagination
                         count={this.state.totalPagesCount}
