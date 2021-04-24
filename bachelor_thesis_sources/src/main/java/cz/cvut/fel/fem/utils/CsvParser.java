@@ -21,7 +21,11 @@ import java.util.Map;
 @Service
 public class CsvParser {
 
-    private final String fileLocation = "src/main/resources/data.xlsx";
+    //    private final String fileLocation = "src/main/resources/data.xlsx";
+//    private final String fileDeployedLocation = "WEB-INF/classes/data.xlsx";
+    private final String fileDeployedLocation = "../webapps/fem/WEB-INF/classes/data.xlsx";
+
+    private final String path = fileDeployedLocation;
 
     private final Map<Integer, List<String>> document = new HashMap<>();
 
@@ -32,7 +36,7 @@ public class CsvParser {
         Workbook workbook = null;
 
         try {
-            file = new FileInputStream(fileLocation);
+            file = new FileInputStream(path);
             workbook = new XSSFWorkbook(file);
         } catch (IOException e) {
             e.printStackTrace();

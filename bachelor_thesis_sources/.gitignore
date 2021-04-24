@@ -59,3 +59,4 @@ build/
 **/*.jpg
 **/*.jpeg
 **/*.csv
+build.sh

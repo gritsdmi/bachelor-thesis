@@ -1,8 +1,12 @@
 import axios from "axios";
 
-const base_URL = "http://localhost:8080"
+const local_URL = "http://localhost:8080"
+const deploy_URL = "http://fem.felk.cvut.cz:8080/fem"
+const base_URL = deploy_URL
+// const base_URL = local_URL
 
 const token = "Bearer "
+const enableJWT = false
 
 const config = (jwt) => {
     return {
@@ -16,16 +20,24 @@ export function get(url) {
     const URL = base_URL + url;
     const jwt = JSON.parse(localStorage.getItem('token'));
 
-    if (jwt) {
-        console.log("sending get request with token to ", URL, config(jwt))
-        return axios.get(URL, config(jwt)); // no 'Access-Control-Allow-Origin header //next error: no http ok status
-    } else if (url.startsWith('/util')) {
-        console.log("sending get auth request to ", URL)
-        return axios.get(URL);
+    if (!enableJWT) {
+        const payload = base_URL + url;
+        console.log("sending get request to ", payload)
+        return axios.get(payload);
     } else {
-        console.log("there are not jwt token for get request. Login first!")
-        window.location.href = '/login'
+
+        if (jwt) {
+            console.log("sending get request with token to ", URL, config(jwt))
+            return axios.get(URL, config(jwt)); // no 'Access-Control-Allow-Origin header //next error: no http ok status
+        } else if (url.startsWith('/util')) {
+            console.log("sending get auth request to ", URL)
+            return axios.get(URL);
+        } else {
+            console.log("there are not jwt token for get request. Login first!")
+            window.location.href = '/loginpage'
+        }
     }
+
 }
 
 export function download(url, payload) {
@@ -37,20 +49,26 @@ export function download(url, payload) {
             'Authorization': token.concat(jwt),
         },
     }
-
-    if (jwt) {
-        console.log("sending download request with token to ", URL, config)
-        axios.post(URL, payload, config).then((response) => {
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'table.csv');
-            document.body.appendChild(link);
-            link.click();
-        });
+    if (!enableJWT) {
+        const payload = base_URL + url;
+        console.log("sending get request to ", payload)
+        return axios.get(payload);
     } else {
-        console.log("there are not jwt token for download request. Login first!")
-        window.location.href = '/login'
+
+        if (jwt) {
+            console.log("sending download request with token to ", URL, config)
+            axios.post(URL, payload, config).then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'table.csv');
+                document.body.appendChild(link);
+                link.click();
+            });
+        } else {
+            console.log("there are not jwt token for download request. Login first!")
+            window.location.href = '/loginpage'
+        }
     }
 }
 
@@ -58,19 +76,26 @@ export function post(url, payload) {
     const URL = base_URL + url;
     const jwt = JSON.parse(localStorage.getItem('token'));
 
-    if (jwt) {
-        console.log("sending post request with token to ", URL, config(jwt))
-        return axios.post(URL, payload, config(jwt));
-    } else if (url === '/auth') {
-        console.log("sending post auth request to ", URL)
-        return axios.post(URL, payload);
-    } else if (url.startsWith('/util')) {
-        console.log("sending post auth request to ", URL)
+    if (!enableJWT) {
+        const urll = base_URL + url;
+        console.log("sending post request to ", URL)
         return axios.post(URL, payload);
     } else {
-        console.log("there are not jwt token for post request. Login first!")
-        window.location.href = '/login'
+        if (jwt) {
+            console.log("sending post request with token to ", URL, config(jwt))
+            return axios.post(URL, payload, config(jwt));
+        } else if (url === '/auth') {
+            console.log("sending post auth request to ", URL)
+            return axios.post(URL, payload);
+        } else if (url.startsWith('/util')) {
+            console.log("sending post auth request to ", URL)
+            return axios.post(URL, payload);
+        } else {
+            console.log("there are not jwt token for post request. Login first!")
+            window.location.href = '/loginpage'
+        }
     }
+
 }
 
 export function del(url) {
@@ -88,23 +113,28 @@ export function del(url) {
         console.log("sending post auth request to ", URL)
     } else {
         console.log("there are not jwt token for post request. Login first!")
-        window.location.href = '/login'
+        window.location.href = '/loginpage'
     }
 }
 
 export function handleResponseError(err) {
     console.log("Error ", err)
-    if (err) {
-        if (err.response) {
-            console.log("Error code ", err.response.status)
-            if (err.response.status === 403) {
-                localStorage.clear()
-                window.location.href = '/login'
-            }
-            if (err.response.status === 415) {
-                console.log("Http 415 Unsupported Media type error with JSON")
+    if (!enableJWT) {
+        // const payload = base_URL + url;
+        // console.log("sending get request to ", payload)
+        // return axios.get(payload);
+    } else {
+        if (err) {
+            if (err.response) {
+                console.log("Error code ", err.response.status)
+                if (err.response.status === 403) {
+                    localStorage.clear()
+                    window.location.href = '/loginpage'
+                }
+                if (err.response.status === 415) {
+                    console.log("Http 415 Unsupported Media type error with JSON")
+                }
             }
         }
     }
-
 }

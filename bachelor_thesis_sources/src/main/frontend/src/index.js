@@ -7,8 +7,8 @@ import {BrowserRouter} from 'react-router-dom';
 
 ReactDOM.render(
     // <React.StrictMode>
-    // <BrowserRouter basename={'/fem'}>
-    <BrowserRouter>
+    <BrowserRouter basename={'/fem'}>
+        {/*<BrowserRouter>*/}
         <App/>
     </BrowserRouter>,
     // </React.StrictMode>,

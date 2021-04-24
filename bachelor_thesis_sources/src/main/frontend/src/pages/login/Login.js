@@ -65,14 +65,14 @@ class Login extends React.Component {
                 token: res.data.jwt,
                 data: res.data,
             }, () => {
-                this.renameThis()
+                console.log(res)
+                this.checkIfLoginFirst()
             }))
-        // .catch(err => handleResponseError(err))
+            .catch(err => console.log(err)) //TODO think about that
 
     }
 
-    //todo rename
-    renameThis() {
+    checkIfLoginFirst() {
         const data = this.state.data
         console.log(data)
 
@@ -109,6 +109,7 @@ class Login extends React.Component {
     }
 
     redirect() {
+        console.log('redirect')
         const data = this.state.data
         if (data.role === "ROLE_TEACHER") {
             window.location.href = '/teacher';
@@ -161,7 +162,7 @@ class Login extends React.Component {
         localStorage.clear()
         this.onCloseDialog()
         this.setState({...InitialState}, () => console.log(this.state))
-        window.location.href = '/login'
+        window.location.href = '/loginpage'
 
     }
 
@@ -181,7 +182,6 @@ class Login extends React.Component {
             <Box className={classes.flex}>
                 <NewPasswordDialog
                     open={this.state.newPasswordDialogOpen}
-                    // onClose={this.onCloseDialog}
                     onCancel={this.onClickCancel}
                     onSubmit={this.onSubmit}
                 />
@@ -206,6 +206,7 @@ class Login extends React.Component {
                             onChange={this.onChangeInputPass}
                         />
                         <Button
+                            // type={'submit'}
                             color={'primary'}
                             variant={'contained'}
                             onClick={this.onClickLoginButton}
@@ -223,7 +224,7 @@ class Login extends React.Component {
                     </form>
                 </Paper>
             </Box>
-        );
+        )
     }
 }
 

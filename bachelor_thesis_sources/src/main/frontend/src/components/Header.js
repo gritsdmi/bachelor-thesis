@@ -12,7 +12,6 @@ const InitialState = {
     username: null,
     role: null,
 }
-const n = {}
 
 class Header extends React.Component {
     //TODO reset styles
@@ -101,7 +100,7 @@ class Header extends React.Component {
                             Parse teachers
                         </Button>
                         <Button
-                            color={'primary'}
+                            color={'secondary'}
                             variant={'contained'}
                             onClick={this.clearLS}
                         >

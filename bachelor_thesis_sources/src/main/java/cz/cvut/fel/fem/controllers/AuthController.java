@@ -61,10 +61,13 @@ public class AuthController implements Controller {
 
         assert userFromDb != null;
         log.info(userDetails.toString());
-        return ResponseEntity.ok(new Response(jwt,
+        var response = ResponseEntity.ok(new Response(jwt,
                 userFromDb.getId(),
                 userDetails.getUsername(),
                 userFromDb.getRole(),
                 userFromDb.getFirstLogin()));
+//                .header("Access-Control-Allow-Origin", "*").build();;
+        log.info(response.toString());
+        return response;
     }
 }

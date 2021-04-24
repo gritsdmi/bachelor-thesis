@@ -24,8 +24,9 @@ function App() {
                     <Header/>
                     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
-                        <Route exact path="/" component={CommissionsListPage}/>
-                        <Route exact path="/login" component={Login}/>
+                        {/*<Route exact path="/" component={CommissionsListPage}/>*/}
+                        <Route exact path="/" component={Login}/>
+                        <Route exact path="/loginpage" component={Login}/>
                         <Route exact path="/commissions" component={CommissionsListPage}/>
                         <Route exact path="/auto" component={AutoGeneratingPage}/>
                         <Route exact path="/manual" component={ManualCreatingPage}/>
