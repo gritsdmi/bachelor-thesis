@@ -1,25 +1,32 @@
-import React, {useState} from "react";
-import {Paper, TextField} from "@material-ui/core";
+import React from "react";
+import {makeStyles, Paper, TextField} from "@material-ui/core";
 
-export default function SearchBox({onClickButton, searchPattern, onChange}) {
-    const [target] = useState('');
+const useStyles = makeStyles((theme) => ({
+    searchBox: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+    },
 
-    //todo pass label to props
+}));
+
+export default function SearchBox({onClickButton, searchPattern, onChange, label}) {
+    const classes = useStyles();
+
+    const lbl = label ? label : 'Name or username';
+
     return (
-        <>
-            <Paper> {/*todo css*/}
-                <TextField
-                    autoFocus
-                    fullWidth
-                    variant={"outlined"}
-                    size={"small"}
-                    label={"Name or username"}
-                    defaultValue=""
-                    onChange={onChange}
-                />
-                {/*<Button onClick={target.onClickButton}>Search</Button>*/}
-            </Paper>
-        </>
+        <Paper
+            className={classes.searchBox}
+        >
+            <TextField
+                autoFocus
+                fullWidth
+                variant={"outlined"}
+                size={"small"}
+                label={lbl}
+                defaultValue=""
+                onChange={onChange}
+            />
+        </Paper>
     );
 }
-

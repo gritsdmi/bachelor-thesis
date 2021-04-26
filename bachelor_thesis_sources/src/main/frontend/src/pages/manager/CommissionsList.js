@@ -225,7 +225,7 @@ class CommissionsListPage extends React.Component {
                 <CommissionInfoDialog
                     open={this.state.commissionInfoDialogOpen}
                     commission={this.state.currentCommission}
-                    onEditClick={this.onCommissionEditButtonClick}
+                    history={this.props.history}//used to redirect
                     onClose={this.onCommissionInfoClose}
                     updComm={this.updateCommission}
                 />

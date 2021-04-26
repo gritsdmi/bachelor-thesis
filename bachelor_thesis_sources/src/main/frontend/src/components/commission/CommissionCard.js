@@ -39,11 +39,18 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
         }
     }
 
+    function strLocations() {
+        let string = ""
+        if (commission.exam.location !== null) {
+            string = commission.exam.location.building + ":" + commission.exam.location.classroom
+        }
+        return string
+    }
+
     return (
         <>
             <Card className={classes.card}>
                 <CardHeader title={`Exam date ${commission.exam.date}`}/>
-
                 <CardContent>
                     <List>
                         {/*<ListItem>*/}
@@ -56,7 +63,7 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                             <ListItemText>Degree: {commission.exam.degree}</ListItemText>
                         </ListItem>
                         <ListItem>
-                            <ListItemText>Loc: {commission.exam.location.building}:{commission.exam.location.classroom}</ListItemText>
+                            <ListItemText>{strLocations()}</ListItemText>
                         </ListItem>
                         <ListItem>
                             <List>
@@ -68,15 +75,18 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
                 <CardActions className={classes.cardActions}>
                     {commission.state !== 'DRAFT' &&
                     <Button
+                        color={'primary'}
+                        variant={"contained"}
                         onClick={() => onInfoClick(commission)}
                     >Info</Button>}
                     {commission.state !== 'APPROVED' &&
                     <Button
+                        color={'primary'}
+                        variant={"contained"}
                         onClick={() => onEditClick(commission)}
                     >{buttonText()}</Button>}
                 </CardActions>
             </Card>
         </>
     )
-
 }

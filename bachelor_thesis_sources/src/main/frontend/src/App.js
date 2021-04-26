@@ -1,4 +1,4 @@
-import './App.css';
+import './styles/App.css';
 import CommissionsListPage from "./pages/manager/CommissionsList"
 import Header from "./components/Header";
 import {Route, Switch} from 'react-router-dom';
@@ -30,6 +30,7 @@ function App() {
                         <Route exact path="/commissions" component={CommissionsListPage}/>
                         <Route exact path="/auto" component={AutoGeneratingPage}/>
                         <Route exact path="/manual" component={ManualCreatingPage}/>
+                        {/*<Route exact path="/manual" render={(props) => <ManualCreatingPage{...props}/>}/>*/}
                         <Route exact path="/manage" component={ManageTeachersPage}/>
                         <Route exact path="/permissions" component={ModeratePermissionsPage}/>
                         <Route exact path="/teacher" component={TeacherOverview}/>

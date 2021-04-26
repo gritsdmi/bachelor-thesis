@@ -2,6 +2,7 @@ package cz.cvut.fel.fem.services;
 
 import cz.cvut.fel.fem.model.AbstractEntity;
 import cz.cvut.fel.fem.model.Commission;
+import cz.cvut.fel.fem.model.Exam;
 import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.model.enums.Degree;
@@ -112,11 +113,10 @@ public class CommissionService {
      * used model mapper (seems working)
      */
     public Commission update(Long commissionId, Commission commission) {
-//        var comm = commissionRepository.getOne(commissionId);
-        var newComm = modelMapper.map(commission, Commission.class);
-//        log.warning(commission.toString());
-//        log.warning(newComm.toString());
-        return commissionRepository.save(newComm);
+        var updatedComm = modelMapper.map(commission, Commission.class);
+        var updatedExam = modelMapper.map(commission.getExam(), Exam.class);
+        updatedComm.setExam(examService.update(updatedExam));
+        return commissionRepository.save(updatedComm);
     }
 
     /**

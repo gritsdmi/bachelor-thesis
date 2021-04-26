@@ -18,7 +18,11 @@ const useStyles = makeStyles((theme) => ({
     datePicker: {
         cursor: `pointer !important`,
         width: "200px",
-    }
+    },
+    commissionPropsPaper: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+    },
 
 }));
 
@@ -33,50 +37,15 @@ export default function CommissionProps({
                                             degrees,
                                             locations,
                                             defaults,
+                                            edit,
                                         }) {
     const classes = useStyles();
 
     return (
+        <Paper
+            className={classes.commissionPropsPaper}
+        >
 
-        <Paper>
-            <TextField
-                // fullWidth
-                select
-                value={defaults.degree ? defaults.degree : "Bc"}
-                helperText="Degree"
-                onChange={onChangeDegree}
-                className={classes.item}
-            >
-                {
-                    degrees.map((degree, idx) => {
-                        return (
-                            <MenuItem
-                                key={idx}
-                                value={degree}
-                            >{degree}
-                            </MenuItem>
-                        )
-                    })
-                }
-            </TextField>
-            <TextField
-                id="field-select"
-                select
-                fullWidth
-                value={defaults.field ? defaults.field : "BP_SIT"}
-                onChange={onChangeField}
-                helperText="Field of study"
-                className={classes.item}
-            >
-                {fields.map((field, idx) => (
-                    <MenuItem
-                        key={idx}
-                        value={field}
-                    >
-                        {field.field}
-                    </MenuItem>
-                ))}
-            </TextField>
             <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
                 <DateTimePicker
                     value={date}
@@ -105,6 +74,7 @@ export default function CommissionProps({
                 onChange={onChangeLoc}
                 className={classes.item}
                 helperText="Location"
+                error={!!!locations.length && !edit}
                 value={defaults.loc ? defaults.loc : locations.length > 0 ? locations[0] : ''}
             >
                 {
@@ -118,6 +88,50 @@ export default function CommissionProps({
                         )
                     })
                 }
+                {edit && defaults &&
+                <MenuItem
+                    key={'default'}
+                    value={defaults.loc}
+                >{defaults.loc.building + ":" + defaults.loc.classroom}
+                </MenuItem>}
+            </TextField>
+            <TextField
+                id="degree-select"
+                select
+                value={defaults.degree ? defaults.degree : "Bc"}
+                helperText="Degree"
+                onChange={onChangeDegree}
+                className={classes.item}
+            >
+                {
+                    degrees.map((degree, idx) => {
+                        return (
+                            <MenuItem
+                                key={idx}
+                                value={degree}
+                            >{degree}
+                            </MenuItem>
+                        )
+                    })
+                }
+            </TextField>
+            <TextField
+                id="field-select"
+                select
+                fullWidth
+                onChange={onChangeField}
+                helperText="Field of study"
+                className={classes.item}
+                value={defaults.field ? defaults.field : "BP_SIT"}
+            >
+                {fields.map((field, idx) => (
+                    <MenuItem
+                        key={idx}
+                        value={field}
+                    >
+                        {field.field}
+                    </MenuItem>
+                ))}
             </TextField>
         </Paper>
     )

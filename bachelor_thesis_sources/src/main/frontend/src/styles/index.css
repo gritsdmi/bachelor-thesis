@@ -5,6 +5,7 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #f7f7f7 !important;
 }
 
 code {
@@ -15,4 +16,8 @@ code {
 a {
     color: rgba(0, 0, 0, 87);
     text-decoration: none;
+}
+
+.MuiButton-root {
+    line-height: 1.2 !important;
 }

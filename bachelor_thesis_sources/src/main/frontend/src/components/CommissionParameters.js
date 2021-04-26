@@ -1,5 +1,5 @@
 import React from "react";
-import {Grid, InputAdornment, MenuItem, TextField,} from "@material-ui/core";
+import {Grid, InputAdornment, MenuItem, Paper, TextField,} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
 import {del, get, handleResponseError, post} from "../utils/request"
@@ -177,7 +177,7 @@ class CommissionGenerateParameters extends React.Component {
         const {classes} = this.props
 
         return (
-            <div>
+            <Paper>
                 <Grid container>
                     <Grid
                         item
@@ -254,10 +254,8 @@ class CommissionGenerateParameters extends React.Component {
                                 }}
                                 format={dateTimeFormatMoment}
                                 onChange={this.handleChangeDateTime}
-                                // label="With Today Button"
                                 helperText="Date and time"
                                 className={`${classes.item} ${classes.datePicker}`}
-                                // className={classes.item}
                                 showTodayButton
                             />
                         </MuiPickersUtilsProvider>
@@ -274,6 +272,7 @@ class CommissionGenerateParameters extends React.Component {
                             value={this.state.selectedLocation}
                             onChange={this.handleChangeLocation}
                             helperText="Location"
+                            error={!!!this.state.locations.length}
                             className={classes.item}
                         >
                             {
@@ -310,7 +309,7 @@ class CommissionGenerateParameters extends React.Component {
                         </Button>
                     </Grid>
                 </Grid>
-            </div>
+            </Paper>
         );
     }
 }

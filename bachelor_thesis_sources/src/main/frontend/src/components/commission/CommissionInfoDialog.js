@@ -14,7 +14,7 @@ import {
     Typography
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import {get, post} from "../../utils/request";
+import {get, handleResponseError, post} from "../../utils/request";
 import EmailDialog from "../email/EmailDialog";
 
 const useStyles = theme => ({
@@ -51,9 +51,6 @@ class CommissionInfoDialog extends React.Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (this.props.open) {
             if (this.props !== prevProps) {
-                console.log("CommissionInfoDialog UPDATE newprops ")
-                console.log(prevProps)
-                console.log(this.props)
                 get(`/commission/${this.props.commission.id}`)
                     .then(response => this.setState({
                         commission: response.data
@@ -65,31 +62,36 @@ class CommissionInfoDialog extends React.Component {
     }
 
     onSendEmailButtonClick = teacher => () => {
-        console.log("on send email button click", teacher)
         this.setState({
             emailDialogOpen: true,
         })
     }
 
     onCloseEmailButtonClick = () => {
-        console.log("on onCloseEmailButtonClick")
         this.setState({
             emailDialogOpen: false,
         })
     }
 
     onApproveButtonClick = commission => () => {
-        console.log("on approve button click", commission)
         const payload = {
             ...this.props.commission,
             state: 'APPROVED',
         }
-        console.log(payload)
         post(`/commission/${commission.id}`, payload)
             .then(response => this.setState({commission: response.data}
                 , () => this.props.updComm(response.data)))
-            .catch(response => console.log("some error occurred", response))
+            .catch(error => handleResponseError(error))
+    }
 
+    onCommissionEditButtonClick = () => {
+        // redirect to manual commission
+        // return <Redirect to="/manual/"/> // do not work
+        //TODO test on deploy
+        this.state.history.push({
+            pathname: "/manual",
+            commission: this.state.commission,
+        });
     }
 
     render() {
@@ -148,13 +150,19 @@ class CommissionInfoDialog extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         <Button
+                            color={'secondary'}
+                            variant={'contained'}
                             onClick={this.props.onClose}
                         >Close</Button>
                         <Button
+                            color={'primary'}
+                            variant={'contained'}
                             disabled={this.state.commission.state === 'APPROVED'}
-                            onClick={this.props.onEditClick}
+                            onClick={this.onCommissionEditButtonClick}
                         >Edit</Button>
                         <Button
+                            color={'primary'}
+                            variant={'contained'}
                             disabled={this.state.commission.state === 'APPROVED'}
                             onClick={this.onApproveButtonClick(this.props.commission)}
                         >Approve</Button>

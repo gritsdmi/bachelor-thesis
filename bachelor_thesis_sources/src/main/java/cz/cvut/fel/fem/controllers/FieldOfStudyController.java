@@ -37,6 +37,11 @@ public class FieldOfStudyController implements Controller {
         return fieldOfStudyService.getByDegree(degree);
     }
 
+    @GetMapping("byName/{name}")
+    public FieldOfStudy getByName(@PathVariable String name) {
+        return fieldOfStudyService.getByName(name);
+    }
+
     @PostMapping
     public FieldOfStudy create(@RequestBody FieldOfStudyTO fieldOfStudyTO) {
         return fieldOfStudyService.save(fieldOfStudyTO);

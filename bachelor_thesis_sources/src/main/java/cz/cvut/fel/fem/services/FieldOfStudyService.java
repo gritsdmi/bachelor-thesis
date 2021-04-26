@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -37,6 +38,14 @@ public class FieldOfStudyService {
         }
     }
 
+    public FieldOfStudy getByName(String name) {
+        var all = getAll();
+        var ret = all.stream()
+                .filter(fieldOfStudy -> fieldOfStudy.getField().toString().equals(name))
+                .collect(Collectors.toList());
+        return ret.get(0);
+    }
+
     public FieldOfStudy save(FieldOfStudyTO fieldOfStudyTO) {
         var field = new FieldOfStudy();
 
@@ -62,4 +71,6 @@ public class FieldOfStudyService {
     public void delete(FieldOfStudy fieldOfStudy) {
         fieldOfStudyRepository.delete(fieldOfStudy);
     }
+
+
 }

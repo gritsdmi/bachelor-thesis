@@ -21,11 +21,11 @@ import java.util.Map;
 @Service
 public class CsvParser {
 
-    //    private final String fileLocation = "src/main/resources/data.xlsx";
-//    private final String fileDeployedLocation = "WEB-INF/classes/data.xlsx";
+    private final String fileLocation = "src/main/resources/data.xlsx";
     private final String fileDeployedLocation = "../webapps/fem/WEB-INF/classes/data.xlsx";
 
-    private final String path = fileDeployedLocation;
+    //    private final String path = fileDeployedLocation;
+    private final String path = fileLocation;
 
     private final Map<Integer, List<String>> document = new HashMap<>();
 

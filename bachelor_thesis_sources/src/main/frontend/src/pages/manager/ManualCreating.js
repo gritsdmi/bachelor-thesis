@@ -2,7 +2,7 @@ import React from "react";
 import Container from "@material-ui/core/Container";
 import {withStyles} from "@material-ui/core/styles";
 import SearchBox from "../../components/SearchBox";
-import {Grid, ListItem, Paper, Snackbar, Table, TableBody, TableCell, TableRow} from "@material-ui/core";
+import {Grid, ListItem, ListItemText, Paper, Snackbar} from "@material-ui/core";
 import CommissionProps from "../../components/CommissionProps";
 import {get, handleResponseError, post} from "../../utils/request"
 import List from "@material-ui/core/List";
@@ -16,9 +16,12 @@ import CloseIcon from '@material-ui/icons/Close';
 import moment from 'moment'
 import "moment/locale/en-gb"
 import EditTeacherDialogClass from "../../components/manage/EditTeacherDialogClass";
-
-const dateFormatMoment = "DD.MM.yyyy"
-const timeFormatMoment = "HH:mm"
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
+import {dateFormatMoment, dateTimeFormatMoment, timeFormatMoment} from "../../utils/constants"
+import Divider from "@material-ui/core/Divider";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const InitialState = {
     searchPattern: '',
@@ -36,7 +39,7 @@ const InitialState = {
     edit: false,
     snackOpen: false,
 
-    currentPage: 1,
+    currentPage: 0,
     size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
@@ -48,11 +51,44 @@ const InitialState = {
 }
 
 const useStyles = theme => ({
-    cardContainer: {
+    currentCommissionRoot: {
+        marginLeft: theme.spacing(1),
+    },
+    currentCommissionPaper: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexDirection: 'column',
         justifyContent: 'center',
-    }
+    },
+    button: {
+        margin: theme.spacing(1),
+    },
+    currentCommissionItem: {
+        padding: '0',
+        margin: theme.spacing(1),
+    },
+    gridLine: {
+        margin: theme.spacing(1)
+    },
+    typography: {
+        alignSelf: 'center',
+        textAlign: 'center',
+    },
+    buttonBox: {
+        display: 'flex',
+    },
+    paginationBox: {
+        margin: theme.spacing(1),
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    pageSelect: {
+        width: '70px',
+        marginLeft: '10px',
+    },
+    flex: {
+        display: 'flex',
+    },
+
 });
 
 class ManualCreatingPage extends React.Component {
@@ -65,28 +101,23 @@ class ManualCreatingPage extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
+        // console.log(this.props)
         if (!this.props.location.commission) {
-            //click on header's button
-            //there are none any graft
-            console.log("ManualCreatingPage DID MOUNT creating new comm")
             this.fetchAll()
         } else {
             //edit some commission
 
-            console.log("ManualCreatingPage DID MOUNT => editing existed commission", this.props)
             this.setState({
                 commission: this.props.location.commission,
                 selectedDegree: this.props.location.commission.exam.degree,
-                selectedField: this.props.location.commission.exam.fieldOfStudy,
+                selectedField: this.props.location.commission.exam.fieldOfStudy,//todo getField by name
                 selectedLocation: this.props.location.commission.exam.location,
                 selectedDate: this.dateTimeStrToDate(this.props.location.commission.exam.date, this.props.location.commission.exam.time),
                 edit: true,
             }, () => {
-                console.log(this.state)
                 this.fetchTeachers()
                 this.fetchDegrees(true)
-                this.fetchFields()
+                this.fetchFields(true)
                 this.fetchLocations(moment(this.state.selectedDate).format(dateFormatMoment));
             })
         }
@@ -95,15 +126,11 @@ class ManualCreatingPage extends React.Component {
 
     dateTimeStrToDate(date, time) {
         const str = date.concat(' ').concat(time)
-        const format = dateFormatMoment.concat(' ').concat(timeFormatMoment)
-        console.log(str)
-        const obj = moment(str, format).toDate()
-        console.log(obj)
-        return obj
+        return moment(str, dateTimeFormatMoment).toDate()
     }
 
     fetchAll(trigger) {
-        this.fetchTeachers(trigger)
+        this.fetchTeachers()
         this.fetchDegrees()
         this.fetchLocations(moment(this.state.selectedDate).format(dateFormatMoment));
     }
@@ -111,12 +138,27 @@ class ManualCreatingPage extends React.Component {
     fetchLocations(dateF) {
         get(`/location/free/${dateF}`)
             .then(response => {
-                this.setState({
-                        locations: response.data,
-                        selectedLocation: response.data.length > 0 ? response.data[0] : '',
-                    }
-                    // , () => console.log(this.state.locations)
-                )
+                if (this.state.edit) {
+                    this.setState({
+                            locations: response.data,
+                        }
+                        , () => {
+                            // console.log(response.data)
+                            console.log(this.state)
+                        })
+                } else {
+                    this.setState({
+                            locations: response.data,
+                            selectedLocation: response.data.length > 0 ? response.data[0] : '',
+                        }
+                        , () => {
+                            console.log(this.state)
+
+                            // console.log(response.data)
+                            // console.log(this.state)
+                        }
+                    )
+                }
             })
             .catch(err => handleResponseError(err))
     }
@@ -138,10 +180,10 @@ class ManualCreatingPage extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    fetchTeachers(usePattern) {
+    fetchTeachers(paginationChanged) {
 
         const pageTO = {
-            page: usePattern ? this.state.currentPage : this.state.currentPage - 1,
+            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
             size: this.state.size,
             pattern: this.state.searchPattern,
         }
@@ -151,11 +193,13 @@ class ManualCreatingPage extends React.Component {
         post(`/user/teacher/date/${date}/page`, pageTO)
             .then(res => {
                 this.setState({
-                    teachers: res.data.list,
-                    currentPage: res.data.currentPage,
-                    totalItemsCount: res.data.totalItemsCount,
-                    totalPagesCount: res.data.totalPagesCount,
-                }, () => console.log(res.data))
+                        teachers: res.data.list,
+                        currentPage: res.data.currentPage,
+                        totalItemsCount: res.data.totalItemsCount,
+                        totalPagesCount: res.data.totalPagesCount,
+                    }
+                    // , () => console.log(res.data)
+                )
             })
             .catch(err => handleResponseError(err))
     }
@@ -166,13 +210,23 @@ class ManualCreatingPage extends React.Component {
                 if (edit) {
                     this.setState({
                         fields: res.data,
-                    })
+                    }, () => this.fetchFieldByName())
                 } else {
                     this.setState({
                         fields: res.data,
                         selectedField: res.data.length > 0 ? res.data[0] : '',
                     })
                 }
+            })
+            .catch(err => handleResponseError(err))
+    }
+
+    fetchFieldByName() {
+        get(`/field/byName/${this.state.selectedField}`)
+            .then(res => {
+                this.setState({
+                    selectedField: this.state.fields.find(f => f.id === res.data.id),
+                })
             })
             .catch(err => handleResponseError(err))
     }
@@ -187,7 +241,7 @@ class ManualCreatingPage extends React.Component {
         if (value && value !== '') {
             this.setState({
                 searchPattern: value
-            }, () => this.fetchTeachers(true))
+            }, () => this.fetchTeachers())
         } else {
             this.setState({searchPattern: ''})
         }
@@ -196,8 +250,7 @@ class ManualCreatingPage extends React.Component {
     handleChangeDate = (event) => {
         this.setState({
             selectedDate: event,
-        }, () => this.fetchAll(true))
-
+        }, () => this.fetchAll())
     }
 
     handleChangeLocation = (event) => {
@@ -214,7 +267,6 @@ class ManualCreatingPage extends React.Component {
     }
 
     onClickAddTeacherButton = (teacher) => {
-        console.log("onClickAddTeacherButton", teacher)
 
         if (!this.state.commission) {
             let newComm = {
@@ -228,7 +280,6 @@ class ManualCreatingPage extends React.Component {
                 },
                 state: "EDITABLE",
             }
-            console.log(newComm)
             this.setState({
                 commission: newComm,
             })
@@ -244,18 +295,14 @@ class ManualCreatingPage extends React.Component {
     }
 
     onClickRemoveTeacher = teacher => () => {
-        console.log("onClickRemoveTeacher", teacher)
         let com = {...this.state.commission}
         com.teachers = com.teachers.filter(item => item !== teacher)
-        console.log(com)
         this.setState({
             commission: com,
         }, () => console.log(this.state.commission))
-
     }
 
     onClickSaveCommission = () => {
-        console.log("onClickSaveCommission")
         if (!this.state.commission) {
             return
         }
@@ -265,6 +312,15 @@ class ManualCreatingPage extends React.Component {
         if (this.state.edit) {
             const payload = {
                 ...this.state.commission,
+                exam: {
+                    ...this.state.commission.exam,
+                    date: moment(this.state.selectedDate).format(dateFormatMoment),
+                    time: moment(this.state.selectedDate).format(timeFormatMoment),
+                    degree: this.state.selectedDegree,
+                    fieldOfStudy: this.state.selectedField.field,
+                    location: this.state.selectedLocation,
+                    semester: null,
+                }
             }
             console.log(payload)
 
@@ -299,25 +355,29 @@ class ManualCreatingPage extends React.Component {
             post(`/commission/create`, payload)
                 .then(res => {
                     console.log(res)
-                    if (res.status === 200) {
-                        this.setState({
-                            snackOpen: true,
-                        })
-                    }
+                    this.setState({
+                        ...InitialState,
+                        snackOpen: true,
+                    }, () => this.fetchAll())
                 })
                 .catch(err => handleResponseError(err))
 
-            this.setState({
-                ...InitialState
-            }, () => this.fetchAll())
-        }
 
+        }
     }
 
     onChangePagination = (event, value) => {
         this.setState({
             currentPage: value,
-        }, () => this.fetchTeachers())
+        }, () => this.fetchTeachers(true))
+    }
+
+    onChangePageSize = (e) => {
+        this.setState({
+                size: e.target.value,
+            }
+            , () => this.fetchTeachers(false)
+        )
     }
 
     handleChangeField = (e) => {
@@ -349,7 +409,6 @@ class ManualCreatingPage extends React.Component {
     }
 
     onClickEditTeacher = teacher => {
-        console.log("onClickEditTeacher", teacher)
         this.setState({
             currentTeacher: teacher,
             editTeacherDialogOpen: true,
@@ -363,18 +422,27 @@ class ManualCreatingPage extends React.Component {
         })
     }
 
+    strLocation() {
+        if (this.state.selectedLocation) {
+            return this.state.selectedLocation.building + ":" + this.state.selectedLocation.classroom
+        }
+        return ""
+    }
+
     render() {
 
         if (!this.state.locations || !this.state.degrees) {
             return <></>
         }
-        const teachersFilteredList = this.state.teachers
-        const defaults = {
+        const {classes} = this.props
+
+        let defaults = {
             date: this.state.selectedDate,
             loc: this.state.selectedLocation,
             degree: this.state.selectedDegree,
             field: this.state.selectedField,
         }
+        // defaults = this.state.edit ? defaults : false
 
         return (
             <>
@@ -384,9 +452,9 @@ class ManualCreatingPage extends React.Component {
                         <h1>Manual Creating Page</h1>
                     }
                     <SearchBox
-                        // onClickButton={}
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
+                        label='Name or username'
                     />
                     <EditTeacherDialogClass
                         open={this.state.editTeacherDialogOpen}
@@ -425,117 +493,144 @@ class ManualCreatingPage extends React.Component {
                         onChangeField={this.handleChangeField}
                         onChangeLoc={this.handleChangeLocation}
                         defaults={defaults}
+                        edit={this.state.edit}
                     />
 
                     <Grid container>
                         <Grid item xs>
                             <Paper>
-                                Search results
-                                <Pagination
-                                    count={this.state.totalPagesCount}
-                                    page={this.state.currentPage + 1}
-                                    siblingCount={1}
-                                    boundaryCount={1}
-                                    shape="rounded"
-                                    onChange={this.onChangePagination}
-                                />
+                                <Typography variant={"h5"} className={classes.typography}> Available
+                                    teachers </Typography>
+                                <Box className={classes.paginationBox}>
+                                    <Pagination
+                                        count={this.state.totalPagesCount}
+                                        page={this.state.currentPage + 1}
+                                        siblingCount={1}
+                                        boundaryCount={1}
+                                        shape="rounded"
+                                        onChange={this.onChangePagination}
+                                    />
+                                    <Box className={classes.flex}>
+                                        <Typography className={classes.typography}>Items per page: </Typography>
+                                        <TextField
+                                            select
+                                            value={this.state.size}
+                                            onChange={this.onChangePageSize}
+                                            className={classes.pageSelect}
+                                        >
+                                            {this.state.pageSizes.map((size, idx) => (
+                                                <MenuItem key={idx} value={size}>
+                                                    {size}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Box>
+                                </Box>
                                 <SearchResultPanel
-                                    data={teachersFilteredList}
+                                    data={this.state.teachers}
                                     onClick={this.onClickAddTeacherButton}
                                     disabledCheck={this.disabledButtonCheck}
                                     add={true}
                                     editButton={this.onClickEditTeacher}
                                 />
-                                <Pagination
-                                    count={this.state.totalPagesCount}
-                                    page={this.state.currentPage + 1}
-                                    siblingCount={1}
-                                    boundaryCount={1}
-                                    shape="rounded"
-                                    onChange={this.onChangePagination}
-                                />
+                                <Box className={classes.paginationBox}>
+                                    <Pagination
+                                        count={this.state.totalPagesCount}
+                                        page={this.state.currentPage + 1}
+                                        siblingCount={1}
+                                        boundaryCount={1}
+                                        shape="rounded"
+                                        onChange={this.onChangePagination}
+                                    />
+                                    <Box className={classes.flex}>
+                                        <Typography className={classes.typography}>Items per page: </Typography>
+                                        <TextField
+                                            select
+                                            value={this.state.size}
+                                            onChange={this.onChangePageSize}
+                                            className={classes.pageSelect}
+                                        >
+                                            {this.state.pageSizes.map((size, idx) => (
+                                                <MenuItem key={idx} value={size}>
+                                                    {size}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Box>
+                                </Box>
                             </Paper>
                         </Grid>
-                        <Grid item xs={4}>
-                            <Paper>
-                                Current Commission
-                                <Table>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell>
-                                                <List>
-                                                    {this.state.commission &&
-                                                    this.state.commission.teachers.map((t, idx) => {
-                                                        return (
-                                                            <ListItem
-                                                                key={idx}
-                                                            >
-                                                                {t.name + " " + t.surname}
-                                                                <Button
-                                                                    onClick={this.onClickRemoveTeacher(t)}
-                                                                >
-                                                                    <ClearIcon/>
-                                                                </Button>
-                                                            </ListItem>
-                                                        )
-                                                    })}
-                                                </List>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                Location
-                                            </TableCell>
-                                            <TableCell> {this.state.selectedLocation &&
-                                            this.state.selectedLocation.building + ":" +
-                                            this.state.selectedLocation.classroom
-                                            }
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                Date
-                                            </TableCell>
-                                            <TableCell>
-                                                {moment(this.state.selectedDate).format(dateFormatMoment)}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                Time
-                                            </TableCell>
-                                            <TableCell>
-                                                {moment(this.state.selectedDate).format(timeFormatMoment)}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                Degree
-                                            </TableCell>
-                                            <TableCell>
-                                                {this.state.selectedDegree}
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                Study field
-                                            </TableCell>
-                                            <TableCell>
-                                                {this.state.selectedField.field}
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                                <Button
-                                    onClick={this.onClickSaveCommission}
-                                >
-                                    Save
-                                </Button>
-                                <Button
-                                    onClick={this.onClickClearCurrentCommission}
-                                >
-                                    Clear
-                                </Button>
+                        <Grid className={classes.currentCommissionRoot} item xs={4}>
+                            <Paper className={classes.currentCommissionPaper}>
+                                <Typography variant={"h5"} className={classes.typography}> Current
+                                    Commission </Typography>
+                                <Divider/>
+                                <List>
+                                    {this.state.commission &&
+                                    this.state.commission.teachers.map((t, idx) => {
+                                        return (
+                                            <ListItem
+                                                className={classes.currentCommissionItem}
+                                                key={idx}
+                                            >
+                                                <ListItemText>{t.name + " " + t.surname}</ListItemText>
+                                                <Button
+                                                    //todo new transparent color
+                                                    onClick={this.onClickRemoveTeacher(t)}
+                                                >
+                                                    <ClearIcon/>
+                                                </Button>
+                                            </ListItem>
+                                        )
+                                    })}
+                                    {this.state.commission && !!this.state.commission.teachers.length && <Divider/>}
+                                </List>
+                                <Box>
+                                    <Grid className={classes.gridLine} container>
+                                        <Grid xs={3} item> <Typography>Location</Typography> </Grid>
+                                        <Grid xs item> <Typography>{this.strLocation()}</Typography> </Grid>
+                                    </Grid>
+                                    <Grid className={classes.gridLine} container>
+                                        <Grid xs={3} item> <Typography>Date</Typography> </Grid>
+                                        <Grid xs item>
+                                            <Typography> {moment(this.state.selectedDate).format(dateFormatMoment)} </Typography>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid className={classes.gridLine} container>
+                                        <Grid xs={3} item> <Typography>Time</Typography> </Grid>
+                                        <Grid xs item>
+                                            <Typography> {moment(this.state.selectedDate).format(timeFormatMoment)} </Typography>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid className={classes.gridLine} container>
+                                        <Grid xs={3} item> <Typography>Degree</Typography> </Grid>
+                                        <Grid xs item> <Typography>{this.state.selectedDegree}</Typography> </Grid>
+                                    </Grid>
+                                    <Grid className={classes.gridLine} container>
+                                        <Grid xs={3} item> <Typography>Study field</Typography> </Grid>
+                                        <Grid xs item> <Typography>{this.state.selectedField.field}</Typography> </Grid>
+                                    </Grid>
+                                </Box>
+                                <Divider/>
+                                <Box className={classes.buttonBox}>
+                                    <Button
+                                        color={'primary'}
+                                        disabled={!(this.state.commission && !!this.state.commission.teachers.length)}
+                                        variant={'contained'}
+                                        onClick={this.onClickSaveCommission}
+                                        className={classes.button}
+                                    >
+                                        Save
+                                    </Button>
+                                    <Button
+                                        color={'secondary'}
+                                        variant={'contained'}
+                                        onClick={this.onClickClearCurrentCommission}
+                                        className={classes.button}
+                                    >
+                                        Clear
+                                    </Button>
+                                </Box>
                             </Paper>
                         </Grid>
                     </Grid>
@@ -543,7 +638,6 @@ class ManualCreatingPage extends React.Component {
             </>
         )
     }
-
 }
 
 export default withStyles(useStyles)(ManualCreatingPage)
