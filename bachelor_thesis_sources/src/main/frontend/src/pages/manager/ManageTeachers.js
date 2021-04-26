@@ -6,20 +6,37 @@ import SearchResultPanel from "../../components/SearchResultPanel";
 import EditTeacherDialogClass from "../../components/manage/EditTeacherDialogClass";
 import Pagination from "@material-ui/lab/Pagination";
 import {withStyles} from "@material-ui/core/styles";
+import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
 
-const useStyles = theme => ({});
+const useStyles = theme => ({
+    paginationBox: {
+        margin: theme.spacing(1),
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    pageSelect: {
+        width: '70px',
+        marginLeft: '10px',
+    },
+    flex: {
+        display: 'flex',
+    },
+});
 const InitialState = {
     teachers: [],
     currentTeacher: null,
     editTeacherDialogOpen: false,
     searchPattern: '',
 
-    currentPage: 1,
+    currentPage: 0,
     size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
 
-    pageSizes: [2, 10, 25, 50, 100],
+    pageSizes: [10, 25, 50, 100],
 }
 
 class ManageTeachersPage extends React.Component {
@@ -36,10 +53,10 @@ class ManageTeachersPage extends React.Component {
         this.fetchTeachers()
     }
 
-    fetchTeachers(usePattern) {
+    fetchTeachers(paginationChanged) {
 
         const pageTO = {
-            page: usePattern ? this.state.currentPage : this.state.currentPage - 1,
+            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
             size: this.state.size,
             pattern: this.state.searchPattern,
         }
@@ -51,7 +68,7 @@ class ManageTeachersPage extends React.Component {
                     currentPage: res.data.currentPage,
                     totalItemsCount: res.data.totalItemsCount,
                     totalPagesCount: res.data.totalPagesCount,
-                }, () => console.log(res.data))
+                })
             })
             .catch(err => handleResponseError(err))
     }
@@ -76,13 +93,20 @@ class ManageTeachersPage extends React.Component {
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
         this.setState({searchPattern: value ? value : ''}
-            , () => this.fetchTeachers(true))
+            , () => this.fetchTeachers(false))
     }
 
     onChangePagination = (event, value) => {
         this.setState({
             currentPage: value,
-        }, () => this.fetchTeachers())
+        }, () => this.fetchTeachers(true))
+    }
+
+    onChangePageSize = (e) => {
+        this.setState({
+                size: e.target.value,
+            }, () => this.fetchTeachers(false)
+        )
     }
 
     render() {
@@ -107,27 +131,61 @@ class ManageTeachersPage extends React.Component {
                         searchPattern={this.state.searchPattern}
                         onChange={this.handleSearchBoxInput}
                     />
-                    <Pagination
-                        count={this.state.totalPagesCount}
-                        page={this.state.currentPage + 1}
-                        siblingCount={1}
-                        boundaryCount={1}
-                        shape="rounded"
-                        onChange={this.onChangePagination}
-                    />
+                    <Box className={classes.paginationBox}>
+                        <Pagination
+                            count={this.state.totalPagesCount}
+                            page={this.state.currentPage + 1}
+                            siblingCount={1}
+                            boundaryCount={1}
+                            shape="rounded"
+                            onChange={this.onChangePagination}
+                        />
+                        <Box className={classes.flex}>
+                            <Typography className={classes.typography}>Items per page: </Typography>
+                            <TextField
+                                select
+                                value={this.state.size}
+                                onChange={this.onChangePageSize}
+                                className={classes.pageSelect}
+                            >
+                                {this.state.pageSizes.map((size, idx) => (
+                                    <MenuItem key={idx} value={size}>
+                                        {size}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                    </Box>
                     <SearchResultPanel
                         data={this.state.teachers}
                         onClick={this.onClickEditTeacherButton}//works w/o argument
                         edit={true}
                     />
-                    <Pagination
-                        count={this.state.totalPagesCount}
-                        page={this.state.currentPage + 1}
-                        siblingCount={1}
-                        boundaryCount={1}
-                        shape="rounded"
-                        onChange={this.onChangePagination}
-                    />
+                    <Box className={classes.paginationBox}>
+                        <Pagination
+                            count={this.state.totalPagesCount}
+                            page={this.state.currentPage + 1}
+                            siblingCount={1}
+                            boundaryCount={1}
+                            shape="rounded"
+                            onChange={this.onChangePagination}
+                        />
+                        <Box className={classes.flex}>
+                            <Typography className={classes.typography}>Items per page: </Typography>
+                            <TextField
+                                select
+                                value={this.state.size}
+                                onChange={this.onChangePageSize}
+                                className={classes.pageSelect}
+                            >
+                                {this.state.pageSizes.map((size, idx) => (
+                                    <MenuItem key={idx} value={size}>
+                                        {size}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                    </Box>
                 </Container>
             </>
         )

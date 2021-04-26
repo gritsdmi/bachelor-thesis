@@ -207,7 +207,12 @@ class EditTeacherDialogClass extends React.Component {
                         </Table>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={onClose}>Close</Button>
+                        <Button
+                            color={'secondary'}
+                            variant={'contained'}
+                            onClick={onClose}
+                        >
+                            Close</Button>
                     </DialogActions>
                 </Dialog>}
             </div>

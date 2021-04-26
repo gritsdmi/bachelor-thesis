@@ -5,24 +5,49 @@ import {Paper} from "@material-ui/core";
 import {handleResponseError, post} from "../../utils/request"
 import CommissionCard from "../../components/commission/CommissionCard";
 import Pagination from "@material-ui/lab/Pagination";
+import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
+import Container from "@material-ui/core/Container";
 
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-    }
+    },
+    typography: {
+        alignSelf: 'center',
+        textAlign: 'center',
+    },
+    buttonBox: {
+        display: 'flex',
+    },
+    paginationBox: {
+        margin: theme.spacing(1),
+        display: 'flex',
+        justifyContent: 'flex-end',
+    },
+    pageSelect: {
+        width: '70px',
+        marginLeft: '10px',
+    },
+    flex: {
+        display: 'flex',
+    },
 });
 
 const InitialState = {
     commissions: [],
 
-    currentPage: 1,
+    currentPage: 0,
     size: 100, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
 
-    pageSizes: [2, 10, 25, 50, 100],
+    pageSizes: [10, 25, 50, 100],
+    disabledGenerateButton: false,
 }
 
 class AutoGeneratingPage extends React.Component {
@@ -38,12 +63,12 @@ class AutoGeneratingPage extends React.Component {
         this.fetchCommissions()
     }
 
-    fetchCommissions() {
+    fetchCommissions(paginationChanged) {
 
         const pageTO = {
-            page: this.state.currentPage - 1,
+            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
             size: this.state.size,
-            title: ' ',
+            pattern: ' ',
         }
 
         post(`/commission/draft/page`, pageTO)
@@ -54,18 +79,13 @@ class AutoGeneratingPage extends React.Component {
                         totalItemsCount: res.data.totalItemsCount,
                         totalPagesCount: res.data.totalPagesCount,
                     }
-                    // , () => console.log(res.data)
                 )
             })
             .catch(err => handleResponseError(err))
     }
 
     onGenerationComplete = (resp) => {
-        console.log("on generationComplete", resp)
-        this.setState({
-            commissions: resp.data
-        }, () => console.log(this.state.commissions))
-
+        this.fetchCommissions(false)
     }
 
     onClickCreate = (commission) => {
@@ -82,7 +102,14 @@ class AutoGeneratingPage extends React.Component {
     onChangePagination = (event, value) => {
         this.setState({
             currentPage: value,
-        }, () => this.fetchCommissions())
+        }, () => this.fetchCommissions(true))
+    }
+
+    onChangePageSize = (e) => {
+        this.setState({
+                size: e.target.value,
+            }, () => this.fetchCommissions(false)
+        )
     }
 
     render() {
@@ -94,43 +121,71 @@ class AutoGeneratingPage extends React.Component {
                         key={k}
                         commission={commission}
                         onEditClick={this.onClickCreate}
-                        // onClose={this.onCommissionInfoClose}
                     />
                 )
             })
         return (
-            <>
+            <Container>
                 <h1>
                     AutoGenerating Page
                 </h1>
                 <CommissionParameters
                     onComplete={this.onGenerationComplete}
                 />
-
-                {/*<CommissionProps*/}
-                {/*    onComplete={this.onGenerationComplete}*/}
-                {/*/>*/}
-                <Pagination
-                    count={this.state.totalPagesCount}
-                    page={this.state.currentPage + 1}
-                    siblingCount={1}
-                    boundaryCount={1}
-                    shape="rounded"
-                    onChange={this.onChangePagination}
-                />
+                <Box className={classes.paginationBox}>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
+                    />
+                    <Box className={classes.flex}>
+                        <Typography className={classes.typography}>Items per page: </Typography>
+                        <TextField
+                            select
+                            value={this.state.size}
+                            onChange={this.onChangePageSize}
+                            className={classes.pageSelect}
+                        >
+                            {this.state.pageSizes.map((size, idx) => (
+                                <MenuItem key={idx} value={size}>
+                                    {size}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Box>
+                </Box>
                 <Paper className={classes.cardContainer}>
                     {comm}
                 </Paper>
-                <Pagination
-                    count={this.state.totalPagesCount}
-                    page={this.state.currentPage + 1}
-                    siblingCount={1}
-                    boundaryCount={1}
-                    shape="rounded"
-                    onChange={this.onChangePagination}
-                />
-
-            </>
+                <Box className={classes.paginationBox}>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
+                    />
+                    <Box className={classes.flex}>
+                        <Typography className={classes.typography}>Items per page: </Typography>
+                        <TextField
+                            select
+                            value={this.state.size}
+                            onChange={this.onChangePageSize}
+                            className={classes.pageSelect}
+                        >
+                            {this.state.pageSizes.map((size, idx) => (
+                                <MenuItem key={idx} value={size}>
+                                    {size}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Box>
+                </Box>
+            </Container>
         )
     }
 }

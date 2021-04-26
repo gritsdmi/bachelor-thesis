@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import {get, post} from "../../utils/request"
 import NewPasswordDialog from "./NewPasswordDialog";
 import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = theme => ({
     paper: {
@@ -32,6 +33,11 @@ const useStyles = theme => ({
     button: {
         margin: theme.spacing(2),
     },
+    errorText: {
+        alignSelf: 'center',
+        // padding: theme.spacing(2),
+        padding: theme.spacing(2),
+    }
 });
 
 const InitialState = {
@@ -40,6 +46,8 @@ const InitialState = {
     token: '',
     newPasswordDialogOpen: false,
     data: null,
+    errorLabel: false,
+    errorText: "Auth failed",
 }
 
 class Login extends React.Component {
@@ -57,19 +65,20 @@ class Login extends React.Component {
             password: this.state.passwordInput,
         }
 
-        console.log("onClickLoginButton", payload)
-
-
         post('/auth', payload)
             .then(res => this.setState({
                 token: res.data.jwt,
                 data: res.data,
             }, () => {
-                console.log(res)
                 this.checkIfLoginFirst()
             }))
-            .catch(err => console.log(err)) //TODO think about that
-
+            .catch(err => {
+                this.setState({
+                    errorLabel: true,
+                })
+                //TODO think about that
+                console.log(err)
+            })
     }
 
     checkIfLoginFirst() {
@@ -109,16 +118,16 @@ class Login extends React.Component {
     }
 
     redirect() {
-        console.log('redirect')
+        console.log('redirect') //TODO redirect error here
         const data = this.state.data
         if (data.role === "ROLE_TEACHER") {
-            window.location.href = '/teacher';
+            window.location.href = '/fem/teacher';
         }
         if (data.role === "ROLE_MANAGER") {
-            window.location.href = '/commissions'
+            window.location.href = '/fem/commissions'
         }
         if (data.role === "ROLE_TEST") {
-            window.location.href = '/commissions'
+            window.location.href = '/fem/commissions'
         }
     }
 
@@ -132,15 +141,10 @@ class Login extends React.Component {
         }
     }
 
-    onChangeInputLogin = (e) => {
+    onChangeInput = (e) => {
         this.setState({
-            loginInput: e.target.value,
-        })
-    }
-
-    onChangeInputPass = (e) => {
-        this.setState({
-            passwordInput: e.target.value,
+            [e.target.name]: e.target.value,
+            errorLabel: false,
         })
     }
 
@@ -162,12 +166,11 @@ class Login extends React.Component {
         localStorage.clear()
         this.onCloseDialog()
         this.setState({...InitialState}, () => console.log(this.state))
-        window.location.href = '/loginpage'
+        window.location.href = '/fem/index.html'
 
     }
 
     onSubmit = input => () => {
-        console.log("onSubmit", input)
         if (!input || input === '') {
             return
         }
@@ -192,19 +195,29 @@ class Login extends React.Component {
                     <form
                         className={classes.form}
                     >
+
                         <TextField
+                            name={'loginInput'}
+                            error={this.state.errorLabel}
                             className={classes.input}
                             id={"login-input"}
                             label={'Login'}
-                            onChange={this.onChangeInputLogin}
+                            onChange={this.onChangeInput}
                         />
                         <TextField
+                            name={'passwordInput'}
+                            error={this.state.errorLabel}
                             className={classes.input}
                             id={"password-input"}
                             label={'Password'}
                             type={'password'}
-                            onChange={this.onChangeInputPass}
+                            onChange={this.onChangeInput}
                         />
+                        <Typography
+                            className={classes.errorText}
+                            color={'secondary'}>
+                            {this.state.errorLabel ? this.state.errorText : ' '}
+                        </Typography>
                         <Button
                             // type={'submit'}
                             color={'primary'}
@@ -214,13 +227,13 @@ class Login extends React.Component {
                         >
                             Login
                         </Button>
-                        <Button
-                            color={'secondary'}
-                            variant={'contained'}
-                            onClick={this.tokenTest}
-                            className={classes.button}
 
-                        >token test</Button>
+                        {/*<Button*/}
+                        {/*    color={'secondary'}*/}
+                        {/*    variant={'contained'}*/}
+                        {/*    onClick={this.tokenTest}*/}
+                        {/*    className={classes.button}*/}
+                        {/*>token test</Button>*/}
                     </form>
                 </Paper>
             </Box>

@@ -69,7 +69,7 @@ export default function EditTeacherDialog({open, onClose, teacher}) {
     //
     //     }
     // }
-
+    console.error("REMOVE THIS")
     const onClickEditContract = (evt) => {
         console.log("onClick test")
         if (!openContractInput) {

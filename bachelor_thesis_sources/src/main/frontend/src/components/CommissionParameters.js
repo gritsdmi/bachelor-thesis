@@ -69,7 +69,7 @@ class CommissionGenerateParameters extends React.Component {
                     this.fetchFields()
                 })
             })
-            .catch(error => console.log(error))
+            .catch(err => handleResponseError(err))
     }
 
     fetchFields(didMount) {
@@ -80,7 +80,7 @@ class CommissionGenerateParameters extends React.Component {
             .then(res => {
                 this.setState({
                         fields: res.data,
-                        selectedField: res.data.length > 0 ? res.data[0] : ''
+                        selectedField: res.data.length > 0 ? res.data[0] : '',
                     }
                 )
             })
@@ -96,7 +96,7 @@ class CommissionGenerateParameters extends React.Component {
             .then(response => {
                 this.setState({
                     locations: response.data,
-                    selectedLocation: response.data ? response.data[0] : '',
+                    selectedLocation: response.data.length ? response.data[0] : '',
                 }, () => console.log(this.state.locations))
             })
             .catch(err => handleResponseError(err))
@@ -108,24 +108,17 @@ class CommissionGenerateParameters extends React.Component {
     }
 
     handleChangeDate = (event) => {
-        console.log("handleChangeDate", moment(event).format(dateFormatMoment))
         this.setState({
             selectedDate: event,
         }, () => this.fetchLocations(this.state.selectedDate))
-
     }
 
     handleChangeDateTime = (event) => {
-        console.log("handleChangeDate", moment(event).format(dateFormatMoment))
-        const date = moment(event).format(dateFormatMoment)
-        const time = moment(event).format(timeFormatMoment)
-        console.log(date, time)
         this.setState({
             selectedDate: event,
             selectedTime: event,
             selectedDateTime: event,
         }, () => this.fetchLocations(this.state.selectedDate))
-
     }
 
     handleChangeDegree = (event) => {
@@ -156,16 +149,14 @@ class CommissionGenerateParameters extends React.Component {
             date: moment(this.state.selectedDate).format(dateFormatMoment),
             time: moment(this.state.selectedTime).format(timeFormatMoment),
             degree: this.state.selectedDegree,
-            locationId: this.state.selectedLocation.id,
+            locationId: this.state.selectedLocation ? this.state.selectedLocation : null,
             teachers: [],
         }
         console.log("onClickGenerateButton", payload)
 
         post("/util/gen/2", payload)
-            // .then(response => console.log(response))
             .then(response => this.props.onComplete(response))
             .catch(err => handleResponseError(err))
-
     }
 
 
@@ -179,11 +170,7 @@ class CommissionGenerateParameters extends React.Component {
         return (
             <Paper>
                 <Grid container>
-                    <Grid
-                        item
-                        xs={1}
-                        className={classes.item}
-                    >
+                    <Grid item xs={1} className={classes.item}>
                         <TextField
                             id="degree-select"
                             select
@@ -205,13 +192,8 @@ class CommissionGenerateParameters extends React.Component {
                                 })
                             }
                         </TextField>
-
                     </Grid>
-                    <Grid
-                        className={classes.item}
-                        item
-                        xs={1}
-                    >
+                    <Grid item xs={1} className={classes.item}>
                         <TextField
                             id="field-select"
                             select
@@ -231,22 +213,17 @@ class CommissionGenerateParameters extends React.Component {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid
-                        className={classes.item}
-                        item
-                    >
+                    <Grid item className={classes.item}>
                         <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
                             <DateTimePicker
                                 value={this.state.selectedDateTime}
                                 disablePast
                                 ampm={false}
                                 minutesStep={15}
-                                // rightArrowIcon={<TodayIcon/>}
-
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment
-                                            // position="end"
+                                            position="end"
                                         >
                                             <TodayIcon/>
                                         </InputAdornment>
@@ -260,11 +237,7 @@ class CommissionGenerateParameters extends React.Component {
                             />
                         </MuiPickersUtilsProvider>
                     </Grid>
-                    <Grid
-                        item
-                        xs={2}
-                        className={classes.item}
-                    >
+                    <Grid item xs={2} className={classes.item}>
                         <TextField
                             id="location-select"
                             select
@@ -275,30 +248,30 @@ class CommissionGenerateParameters extends React.Component {
                             error={!!!this.state.locations.length}
                             className={classes.item}
                         >
-                            {
-                                this.state.locations.map((location, idx) => {
-                                    return (
-                                        <MenuItem
-                                            key={idx}
-                                            value={location}
-                                        >{location.building + ":" + location.classroom}
-                                        </MenuItem>
-                                    )
-                                })
+                            {this.state.locations &&
+                            this.state.locations.map((location, idx) => {
+                                return (
+                                    <MenuItem
+                                        key={idx}
+                                        value={location}
+                                    >{location.building + ":" + location.classroom}
+                                    </MenuItem>
+                                )
+                            })
                             }
                         </TextField>
                     </Grid>
-                    <Grid
-                        item
-                        className={classes.item}
-                    >
+                    <Grid item className={classes.item}>
                         <Button
+                            color={'primary'}
+                            variant={'contained'}
                             onClick={this.onClickGenerateButton}
                         >
                             Generate 2
                         </Button>
 
                         <Button
+                            color={'secondary'}
                             onClick={() => {
                                 del(`/commission`)
                                     .then(res => console.log(res))

@@ -46,9 +46,11 @@ class Header extends React.Component {
             <>
                 <Paper>
                     <Box>
-                        <h3>
-                            GruSt - application for managing state exam topics.
-                        </h3>
+                        <Typography
+                            variant={'h3'}
+                        >
+                            Final exam commissions manager
+                        </Typography>
                     </Box>
                     <Box>
                         <Typography>
@@ -93,7 +95,7 @@ class Header extends React.Component {
                             <NavLink to="/teacher/settings">Teacher settings</NavLink>
                         </Button>
                         <Button
-                            color={'primary'}
+                            color={'secondary'}
                             variant={'contained'}
                             onClick={this.onClickParseTeachers}
                         >
@@ -108,8 +110,6 @@ class Header extends React.Component {
                         </Button>
                     </Box>
                 </Paper>
-
-
             </>
         )
     }

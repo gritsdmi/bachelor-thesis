@@ -110,7 +110,7 @@ class ManualCreatingPage extends React.Component {
             this.setState({
                 commission: this.props.location.commission,
                 selectedDegree: this.props.location.commission.exam.degree,
-                selectedField: this.props.location.commission.exam.fieldOfStudy,//todo getField by name
+                selectedField: this.props.location.commission.exam.fieldOfStudy,
                 selectedLocation: this.props.location.commission.exam.location,
                 selectedDate: this.dateTimeStrToDate(this.props.location.commission.exam.date, this.props.location.commission.exam.time),
                 edit: true,
@@ -375,8 +375,7 @@ class ManualCreatingPage extends React.Component {
     onChangePageSize = (e) => {
         this.setState({
                 size: e.target.value,
-            }
-            , () => this.fetchTeachers(false)
+            }, () => this.fetchTeachers(false)
         )
     }
 

@@ -2,11 +2,12 @@ import axios from "axios";
 
 const local_URL = "http://localhost:8080"
 const deploy_URL = "http://fem.felk.cvut.cz:8080/fem"
+
 // const base_URL = deploy_URL
 const base_URL = local_URL
 
 const token = "Bearer "
-const enableJWT = false
+const enableJWT = true
 
 const config = (jwt) => {
     return {
@@ -34,7 +35,7 @@ export function get(url) {
             return axios.get(URL);
         } else {
             console.log("there are not jwt token for get request. Login first!")
-            window.location.href = '/loginpage'
+            window.location.href = '/fem/index.html'
         }
     }
 
@@ -67,7 +68,7 @@ export function download(url, payload) {
             });
         } else {
             console.log("there are not jwt token for download request. Login first!")
-            window.location.href = '/loginpage'
+            window.location.href = '/fem/index.html'
         }
     }
 }
@@ -92,7 +93,7 @@ export function post(url, payload) {
             return axios.post(URL, payload);
         } else {
             console.log("there are not jwt token for post request. Login first!")
-            window.location.href = '/loginpage'
+            window.location.href = '/fem/index.html'
         }
     }
 
@@ -113,7 +114,7 @@ export function del(url) {
         console.log("sending post auth request to ", URL)
     } else {
         console.log("there are not jwt token for post request. Login first!")
-        window.location.href = '/loginpage'
+        window.location.href = '/fem/index.html'
     }
 }
 
@@ -129,7 +130,7 @@ export function handleResponseError(err) {
                 console.log("Error code ", err.response.status)
                 if (err.response.status === 403) {
                     localStorage.clear()
-                    window.location.href = '/loginpage'
+                    window.location.href = '/fem/index.html'
                 }
                 if (err.response.status === 415) {
                     console.log("Http 415 Unsupported Media type error with JSON")

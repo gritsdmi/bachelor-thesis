@@ -55,6 +55,13 @@ public class CommissionService {
         return commissionRepository.getAllByState(CommissionState.DRAFT);
     }
 
+    public Map<String, Object> getDraftsPaginated() {
+        var pageRequest = PageRequest.of(0, 50);
+        var page = commissionRepository.findByState(CommissionState.DRAFT, pageRequest);
+
+        return new PageResponseTO(page).getData();
+    }
+
     public List<Commission> getNotDraft() {
         return commissionRepository.findByStateNot(CommissionState.DRAFT);
     }
@@ -155,10 +162,12 @@ public class CommissionService {
         var commission = new Commission();
 
         var exam = examService.create();
+        var location = creatorTO.getLocationId();
 
         exam.setDate(creatorTO.getDate());
         exam.setTime(creatorTO.getTime());
-        exam.setLocation(locationService.get(creatorTO.getLocationId()));
+        if (location != null)
+            exam.setLocation(locationService.get(creatorTO.getLocationId()));
         exam.setDegree(creatorTO.getDegree());
         exam.setFieldOfStudy(creatorTO.getField());
 
