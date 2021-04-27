@@ -38,9 +38,9 @@ const InitialState = {
     selectedDegree: '',
     selectedField: '',
     selectedLocation: '',
-    selectedDate: new Date(),
-    selectedTime: new Date(),
-    selectedDateTime: new Date(),
+    selectedDate: new Date().setHours(9, 0),
+    selectedTime: new Date().setHours(9, 0),
+    selectedDateTime: new Date().setHours(9, 0),
 
 }
 
@@ -74,8 +74,6 @@ class CommissionGenerateParameters extends React.Component {
 
     fetchFields(didMount) {
 
-        console.log("fetchFields", this.state.selectedDegree)
-
         get(`/field/degree/${this.state.selectedDegree}`)
             .then(res => {
                 this.setState({
@@ -90,14 +88,14 @@ class CommissionGenerateParameters extends React.Component {
     fetchLocations(date) {
 
         const dateF = moment(date).format(dateFormatMoment)
-        console.log("fetchLocations payload", dateF)
 
         get(`/location/free/${dateF}`)
             .then(response => {
                 this.setState({
-                    locations: response.data,
-                    selectedLocation: response.data.length ? response.data[0] : '',
-                }, () => console.log(this.state.locations))
+                        locations: response.data,
+                        selectedLocation: response.data.length ? response.data[0] : '',
+                    }
+                )
             })
             .catch(err => handleResponseError(err))
     }

@@ -33,7 +33,7 @@ const InitialState = {
     selectedDegree: '',
     selectedField: '',
     selectedLocation: '',
-    selectedDate: new Date(),
+    selectedDate: new Date().setHours(9, 0),
 
     commission: null,
     edit: false,
