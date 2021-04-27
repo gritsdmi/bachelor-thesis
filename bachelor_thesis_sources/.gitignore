@@ -60,3 +60,4 @@ build/
 **/*.jpeg
 **/*.csv
 build.sh
+**/*.ldb

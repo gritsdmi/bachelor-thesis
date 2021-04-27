@@ -34,6 +34,23 @@ public class ExamService {
         return new ArrayList<>(Arrays.asList(Degree.ALL, Degree.Bc, Degree.Ing, Degree.PhD));
     }
 
+    public Degree getDegreeByName(String name) {
+        var ret = Degree.ALL;
+
+        switch (name) {
+            case "Bc":
+                ret = Degree.Bc;
+                break;
+            case "Ing":
+                ret = Degree.Ing;
+                break;
+            case "PhD":
+                ret = Degree.PhD;
+                break;
+        }
+        return ret;
+    }
+
     public List<Exam> getByDate(String date) {
         return examRepository.getAllByDate(date);
     }

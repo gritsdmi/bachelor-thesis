@@ -94,7 +94,7 @@ public class CommissionController implements Controller {
 
     @PostMapping("/byTeacher/{teacherId}/page")
     public Map<String, Object> getByTeacher(@PathVariable Long teacherId, @RequestBody PageRequestTO pageRequestTO) {
-        return commissionService.getByTeacher(teacherId, pageRequestTO);
+        return commissionService.getByPropsByTeacherPaginated(teacherId, pageRequestTO);
     }
 
     @PostMapping("/draft/page")

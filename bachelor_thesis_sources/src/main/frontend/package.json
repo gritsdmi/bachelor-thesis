@@ -1,5 +1,5 @@
 {
-  "homepage": "http://fem.felk.cvut.cz:8080/fem",
+  "homepage": "http://fem.felk.cvut.cz:8080/fem/index.html",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,

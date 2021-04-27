@@ -7,7 +7,7 @@ import moment from 'moment'
 import MomentUtils from '@date-io/moment';
 import "moment/locale/en-gb"
 import Button from "@material-ui/core/Button";
-import {dateFormatMoment} from "../../utils/constants";
+import {dateFormatMoment, enumerateDaysBetweenDates} from "../../utils/constants";
 import Box from "@material-ui/core/Box";
 
 moment.locale("en-gb")
@@ -26,7 +26,6 @@ const useStyles = theme => ({
     },
     buttonBox: {
         display: 'flex',
-
     },
     button: {
         marginLeft: theme.spacing(0.5),
@@ -46,19 +45,19 @@ const InitialState = {
 
 }
 
-const enumerateDaysBetweenDates = function (startDate, endDate) {
-    let dates = [];
-
-    let currDate = moment(startDate).startOf('day');
-    const lastDate = moment(endDate).startOf('day');
-
-    dates.push(currDate.clone().format(dateFormatMoment))
-    while (currDate.add(1, 'days').diff(lastDate) <= 0) {
-        dates.push(currDate.clone().format(dateFormatMoment));
-    }
-
-    return dates;
-};
+// const enumerateDaysBetweenDates = function (startDate, endDate) {
+//     let dates = [];
+//
+//     let currDate = moment(startDate).startOf('day');
+//     const lastDate = moment(endDate).startOf('day');
+//
+//     dates.push(currDate.clone().format(dateFormatMoment))
+//     while (currDate.add(1, 'days').diff(lastDate) <= 0) {
+//         dates.push(currDate.clone().format(dateFormatMoment));
+//     }
+//
+//     return dates;
+// };
 
 const filterProps = (state) => {
 
@@ -172,7 +171,6 @@ class CommissionSearchBox extends React.Component {
             selectedDateTo: e,
         }, () => this.props.onChange(filterProps(this.state)))
     }
-
 
     render() {
 

@@ -128,6 +128,10 @@ export function handleResponseError(err) {
         if (err) {
             if (err.response) {
                 console.log("Error code ", err.response.status)
+                if (err.response.status === 400) {
+                    console.log("Http 400 Bad Request")
+
+                }
                 if (err.response.status === 403) {
                     localStorage.clear()
                     window.location.href = '/fem/index.html'

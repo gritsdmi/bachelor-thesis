@@ -308,6 +308,32 @@ public class CommissionService {
 
     }
 
+    public Map<String, Object> getByPropsByTeacherPaginated(Long teacherId, PageRequestTO pageRequestTO) {
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+
+        var byTeacher = getByTeacher(teacherId).stream()
+                .filter(commission -> !commission.getState().equals(CommissionState.DRAFT))
+                .map(AbstractEntity::getId)
+                .collect(Collectors.toList());
+
+        Page<Commission> page;
+        if (pageRequestTO.getProps().getSelectedDegree().equals(Degree.ALL)) {
+            page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
+                    pageRequestTO.getProps().getSelectedDatesRange(),
+                    byTeacher,
+                    pageRequest);
+        } else {
+            page = commissionRepository.getByDegreeAndAllFieldsPaginated(
+                    pageRequestTO.getProps().getSelectedDatesRange(),
+                    byTeacher,
+                    pageRequestTO.getProps().getSelectedDegree(),
+                    pageRequest);
+        }
+
+        return new PageResponseTO(page).getData();
+
+    }
+
     //    //do not work
 //    private void removeByDateLocation(Long locId, String date) {
 //        var allCom = commissionRepository.findAll();

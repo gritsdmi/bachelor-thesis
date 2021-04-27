@@ -82,7 +82,7 @@ class CommissionsListPage extends React.Component {
         const pageTO = {
             page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
             size: this.state.size,
-            title: ' ',
+            pattern: ' ',
             props: {...props},
         }
         console.log(pageTO)
@@ -184,16 +184,14 @@ class CommissionsListPage extends React.Component {
     onChangePageSize = (e) => {
         this.setState({
                 size: e.target.value,
-            }
-            , () => this.fetchByFilter(this.state.filterProps, false)
+            }, () => this.fetchByFilter(this.state.filterProps, false)
         )
     }
 
     onClickChangeView = () => {
         this.setState({
                 cardView: !this.state.cardView,
-            }
-            , () => this.fetchByFilter(this.state.filterProps, false)
+            }, () => this.fetchByFilter(this.state.filterProps, false)
         )
     }
 
