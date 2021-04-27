@@ -3,12 +3,11 @@ import {createMuiTheme, responsiveFontSizes} from "@material-ui/core";
 const femTheme = createMuiTheme({
     palette: {
         primary: {
-            // light: "#7986cb",
-            // main: "#3f51b5",
-            // dark: "#303f9f",
             light: "#67b9f0",
-            main: "#18A0FB",
-            dark: "#0088e3",
+            // main: "#18A0FB",
+            main: "#007ac3",//web fel
+            // dark: "#0088e3",//on hover
+            dark: "#004a77",//on hover web fel
             contrastText: "#fff",
         },
         secondary: {

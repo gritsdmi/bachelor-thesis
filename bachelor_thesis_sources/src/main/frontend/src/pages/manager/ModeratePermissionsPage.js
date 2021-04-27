@@ -147,13 +147,12 @@ class ModeratePermissionsPage extends React.Component {
                 <SearchBox
                     onChange={this.onChangeInput}
                 />
-                create new user
                 <Button
                     onClick={this.onCLickCreateUser}
                     color={'primary'}
                     variant={'contained'}
                 >
-                    create
+                    Create new user
                 </Button>
                 <CreateUserDialog
                     open={this.state.createUserDialogOpen}

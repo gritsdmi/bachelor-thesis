@@ -45,7 +45,8 @@ public class User extends AbstractEntity {
     @OneToOne
     private StudentProperty student;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "manager", referencedColumnName = "id")
     private ManagerProperty manager;
 
     @OneToMany(mappedBy = "author")

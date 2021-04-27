@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @ToString
@@ -20,7 +17,9 @@ public class EmailTemplate extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private EmailType emailType;
 
+    @Column(columnDefinition = "text")
     private String text;
 
+    @Column(columnDefinition = "text")
     private String subject;
 }

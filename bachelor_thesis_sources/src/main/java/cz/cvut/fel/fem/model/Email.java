@@ -5,6 +5,7 @@ import cz.cvut.fel.fem.model.enums.EmailType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
@@ -27,8 +28,12 @@ public class Email extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private EmailType type;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     private String subject;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     private String messageText;
 
 }
