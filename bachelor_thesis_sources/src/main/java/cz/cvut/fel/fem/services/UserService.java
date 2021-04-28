@@ -12,7 +12,7 @@ import cz.cvut.fel.fem.to.TeacherPropertyTO;
 import cz.cvut.fel.fem.to.UserTO;
 import cz.cvut.fel.fem.to.page.PageRequestTO;
 import cz.cvut.fel.fem.to.page.PageResponseTO;
-import cz.cvut.fel.fem.utils.CsvParser;
+import cz.cvut.fel.fem.utils.csv.CsvParser;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

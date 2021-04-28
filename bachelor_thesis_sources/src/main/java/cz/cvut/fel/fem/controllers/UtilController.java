@@ -6,7 +6,7 @@ import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.CreatorTO;
 import cz.cvut.fel.fem.to.GenerateRequestTO;
 import cz.cvut.fel.fem.utils.CommissionMaker;
-import cz.cvut.fel.fem.utils.Util;
+import cz.cvut.fel.fem.utils.csv.CSVCreator;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -36,7 +36,7 @@ public class UtilController implements Controller {
     private CommissionMaker commissionMaker;
 
     @Autowired
-    private Util util;
+    private CSVCreator CSVCreator;
 
     @GetMapping("/{sheetNumber}")
     public List<User> parseCSV(@PathVariable Integer sheetNumber) {
@@ -55,7 +55,7 @@ public class UtilController implements Controller {
 
         File file = null;
         try {
-            file = util.generateCSV(request);
+            file = CSVCreator.generateCSV(request);
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package cz.cvut.fel.fem.utils;
+package cz.cvut.fel.fem.utils.csv;
 
 import lombok.Getter;
 import lombok.extern.java.Log;

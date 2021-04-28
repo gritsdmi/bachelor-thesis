@@ -1,4 +1,4 @@
-package cz.cvut.fel.fem.utils;
+package cz.cvut.fel.fem.utils.csv;
 
 import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.services.CommissionService;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Log
-public class Util {
+public class CSVCreator {
 
     @Autowired
     private CommissionService commissionService;
