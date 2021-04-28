@@ -11,6 +11,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
+import Container from "@material-ui/core/Container";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -263,7 +264,7 @@ class TeacherSettings extends React.Component {
         const {classes} = this.props
 
         return (
-            <>
+            <Container className={'pageContent'}>
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',
@@ -317,7 +318,7 @@ class TeacherSettings extends React.Component {
                         onClickSave={this.onClickSavePreference}
                     />
                 </Paper>
-            </>
+            </Container>
         );
     }
 

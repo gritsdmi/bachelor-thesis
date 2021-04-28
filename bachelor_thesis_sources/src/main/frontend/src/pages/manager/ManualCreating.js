@@ -444,7 +444,7 @@ class ManualCreatingPage extends React.Component {
         // defaults = this.state.edit ? defaults : false
 
         return (
-            <>
+            <Box className={'pageContent'}>
                 <Container>
                     {this.state.edit ?
                         <h1>Edit commission</h1> :
@@ -634,7 +634,7 @@ class ManualCreatingPage extends React.Component {
                         </Grid>
                     </Grid>
                 </Container>
-            </>
+            </Box>
         )
     }
 }

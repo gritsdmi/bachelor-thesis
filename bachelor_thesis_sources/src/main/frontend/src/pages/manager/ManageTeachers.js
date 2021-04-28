@@ -115,7 +115,7 @@ class ManageTeachersPage extends React.Component {
         }
         const {classes} = this.props
         return (
-            <>
+            <Box className={'pageContent'}>
                 <Container>
                     <h1>
                         Manage Teachers Page
@@ -187,7 +187,7 @@ class ManageTeachersPage extends React.Component {
                         </Box>
                     </Box>
                 </Container>
-            </>
+            </Box>
         )
     }
 }

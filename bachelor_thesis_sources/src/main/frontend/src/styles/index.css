@@ -28,3 +28,23 @@ a {
     background-color: #dddddd;
     border-bottom: 1px solid #aaa;
 }
+
+.footerBox {
+    background-color: #333333;
+    color: white;
+    height: 50px;
+    padding: 20px;
+    margin-top: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.mainContainer {
+    display: flex !important;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.pageContent {
+    margin-bottom: 30px;
+}

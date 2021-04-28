@@ -125,7 +125,7 @@ class AutoGeneratingPage extends React.Component {
                 )
             })
         return (
-            <Container>
+            <Container className={'pageContent'}>
                 <h1>
                     AutoGenerating Page
                 </h1>

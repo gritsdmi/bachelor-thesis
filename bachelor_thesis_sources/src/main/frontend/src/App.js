@@ -14,13 +14,14 @@ import {ThemeProvider} from '@material-ui/core/styles'
 import femTheme from './styles/theme'
 import ModeratePermissionsPage from "./pages/manager/ModeratePermissionsPage";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import Footer from "./components/Footer";
 
 
 function App() {
     return (
         <ThemeProvider theme={femTheme}>
             <CssBaseline>
-                <Container>
+                <Container className={'mainContainer'}>
                     <Header/>
                     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
@@ -38,6 +39,7 @@ function App() {
                         <Route exact path="/teacher/settings" component={TeacherSettings}/>
                         <Route exact path="/emails" component={EmailTemplates}/>
                     </Switch>
+                    <Footer/>
                 </Container>
             </CssBaseline>
         </ThemeProvider>

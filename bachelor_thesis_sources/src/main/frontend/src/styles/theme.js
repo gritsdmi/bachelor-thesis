@@ -9,6 +9,7 @@ const femTheme = createMuiTheme({
             // dark: "#0088e3",//on hover
             dark: "#004a77",//on hover web fel
             contrastText: "#fff",
+            // contrastText: "#0065bd", barva kosu
         },
         secondary: {
             light: "#ff4081",

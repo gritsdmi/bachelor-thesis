@@ -15,6 +15,7 @@ import CreateUserDialog from "../../components/manage/CreateUserDialog";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Paper from "@material-ui/core/Paper";
+import Container from "@material-ui/core/Container";
 
 
 const useStyles = theme => ({
@@ -122,7 +123,7 @@ class ModeratePermissionsPage extends React.Component {
         const {classes} = this.props
 
         return (
-            <>
+            <Container className={'pageContent'}>
                 <h1>Moderate permissions</h1>
 
                 <Snackbar
@@ -241,7 +242,7 @@ class ModeratePermissionsPage extends React.Component {
                         </TextField>
                     </Box>
                 </Box>
-            </>
+            </Container>
         );
     }
 

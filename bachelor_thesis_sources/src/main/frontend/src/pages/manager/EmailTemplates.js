@@ -80,7 +80,7 @@ class EmailTemplates extends React.Component {
     render() {
         const {classes} = this.props
         return (
-            <Container>
+            <Container className={'pageContent'}>
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'bottom',

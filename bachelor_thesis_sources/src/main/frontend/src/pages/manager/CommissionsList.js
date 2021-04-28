@@ -219,7 +219,7 @@ class CommissionsListPage extends React.Component {
             })
 
         return (
-            <>
+            <Box className={'pageContent'}>
                 <CommissionInfoDialog
                     open={this.state.commissionInfoDialogOpen}
                     commission={this.state.currentCommission}
@@ -305,7 +305,7 @@ class CommissionsListPage extends React.Component {
                         </Box>
                     </Box>
                 </Container>
-            </>
+            </Box>
         )
     }
 }
