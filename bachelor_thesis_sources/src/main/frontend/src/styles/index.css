@@ -29,14 +29,18 @@ a {
     border-bottom: 1px solid #bbb;
 }
 
+.titleBack .title {
+    padding-left: 20px;
+}
+
 .footerBox {
     background-color: #333333;
     color: white;
     height: 50px;
     padding: 20px;
     margin-top: auto;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .mainContainer {
@@ -47,4 +51,8 @@ a {
 
 .pageContent {
     margin-bottom: 30px;
+}
+
+.header {
+    padding: 30px;
 }

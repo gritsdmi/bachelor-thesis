@@ -6,6 +6,14 @@ import Paper from '@material-ui/core/Paper';
 import {NavLink} from "react-router-dom";
 import {get} from "../utils/request"
 import {Typography} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
+
+
+const useStyles = theme => ({
+
+    header: {},
+
+})
 
 const InitialState = {
     userId: null,
@@ -14,7 +22,6 @@ const InitialState = {
 }
 
 class Header extends React.Component {
-    //TODO reset styles
 
     constructor(props) {
         super(props)
@@ -42,77 +49,76 @@ class Header extends React.Component {
     }
 
     render() {
+        const {classes} = this.props
         return (
-            <>
-                <Paper>
-                    <Box>
-                        <Typography
-                            variant={'h3'}
-                        >
-                            Final exam commissions manager
-                        </Typography>
-                    </Box>
-                    <Box>
-                        <Typography>
-                            id:
-                            {this.state.userId}
-                        </Typography>
-                        <Typography>
-                            username:
-                            {this.state.username}
-                        </Typography>
-                        <Typography>
-                            role:
-                            {this.state.role}
-                        </Typography>
-                    </Box>
-                    <Box>
-                        <Button>
-                            <NavLink to="/commissions">Commissions List</NavLink>
-                        </Button>
-                        <Button>
-                            <NavLink to="/auto">Auto Generating</NavLink>
-                        </Button>
-                        <Button>
-                            <NavLink to="/manual">Manual Generating</NavLink>
-                        </Button>
-                        <Button>
-                            <NavLink to="/manage">Manage teachers</NavLink>
-                        </Button>
+            <Paper className='header'>
+                <Box>
+                    <Typography
+                        variant={'h3'}
+                    >
+                        Final exam commissions manager
+                    </Typography>
+                </Box>
+                <Box>
+                    <Typography>
+                        id:
+                        {this.state.userId}
+                    </Typography>
+                    <Typography>
+                        username:
+                        {this.state.username}
+                    </Typography>
+                    <Typography>
+                        role:
+                        {this.state.role}
+                    </Typography>
+                </Box>
+                <Box>
+                    <Button>
+                        <NavLink to="/commissions">Commissions List</NavLink>
+                    </Button>
+                    <Button>
+                        <NavLink to="/auto">Auto Generating</NavLink>
+                    </Button>
+                    <Button>
+                        <NavLink to="/manual">Manual Generating</NavLink>
+                    </Button>
+                    <Button>
+                        <NavLink to="/manage">Manage teachers</NavLink>
+                    </Button>
 
-                        <Button>
-                            <NavLink to="/emails"><AccountBoxIcon/></NavLink>
-                        </Button>
+                    <Button>
+                        <NavLink to="/emails"><AccountBoxIcon/></NavLink>
+                    </Button>
 
-                        <Button>
-                            <NavLink to="/permissions"><AccountBoxIcon/></NavLink>
-                        </Button>
+                    <Button>
+                        <NavLink to="/permissions"><AccountBoxIcon/></NavLink>
+                    </Button>
 
-                        <Button>
-                            <NavLink to="/teacher">Teacher</NavLink>
-                        </Button>
-                        <Button>
-                            <NavLink to="/teacher/settings">Teacher settings</NavLink>
-                        </Button>
-                        <Button
-                            color={'secondary'}
-                            variant={'contained'}
-                            onClick={this.onClickParseTeachers}
-                        >
-                            Parse teachers
-                        </Button>
-                        <Button
-                            color={'secondary'}
-                            variant={'contained'}
-                            onClick={this.clearLS}
-                        >
-                            ClearLocalStorage
-                        </Button>
-                    </Box>
-                </Paper>
-            </>
+                    <Button>
+                        <NavLink to="/teacher">Teacher</NavLink>
+                    </Button>
+                    <Button>
+                        <NavLink to="/teacher/settings">Teacher settings</NavLink>
+                    </Button>
+                    <Button
+                        color={'secondary'}
+                        variant={'contained'}
+                        onClick={this.onClickParseTeachers}
+                    >
+                        Parse teachers
+                    </Button>
+                    <Button
+                        color={'secondary'}
+                        variant={'contained'}
+                        onClick={this.clearLS}
+                    >
+                        ClearLocalStorage
+                    </Button>
+                </Box>
+            </Paper>
         )
     }
 }
 
-export default Header
+export default withStyles(useStyles)(Header)

@@ -20,10 +20,14 @@ import {Typography} from "@material-ui/core";
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
-        // flexWrap: 'wrap',
-        flexDirection: 'column',
         padding: theme.spacing(2),
-        // justifyContent: 'space-around',
+    },
+    cardContainerCard: {
+        flexWrap: 'wrap',
+        justifyContent: 'space-around',
+    },
+    cardContainerList: {
+        flexDirection: 'column',
     },
     paginationBox: {
         margin: theme.spacing(1),
@@ -56,7 +60,7 @@ const InitialState = {
     totalItemsCount: null,
     totalPagesCount: null,
 
-    pageSizes: [2, 6, 10, 25, 50, 100],
+    pageSizes: [6, 10, 25, 50, 100],
 
     filterProps: null,
     csvDialogOpen: false,
@@ -132,7 +136,7 @@ class CommissionsListPage extends React.Component {
             })
     }
 
-    onCommissionInfoButtonClick = (commission) => {
+    onClickCommissionInfoButton = (commission) => {
         console.log("onCommissionInfoButtonClick", commission.teachers)
         this.setState({
             commissionInfoDialogOpen: true,
@@ -159,8 +163,7 @@ class CommissionsListPage extends React.Component {
 
     }
 
-    onCommissionEditButtonClick = (commission) => {
-        // redirect to manual commission
+    onClickCommissionEditButton = (commission) => {
         console.log("onCommissionEditButtonClick", commission)
         // return <Redirect to="/manual/"/> // do not work
         //TODO test on deploy
@@ -171,7 +174,6 @@ class CommissionsListPage extends React.Component {
     }
 
     onClickGenerateCSV = () => {
-        console.log("onClickGenerateCSV")
         this.setState({
             csvDialogOpen: true,
         })
@@ -208,15 +210,14 @@ class CommissionsListPage extends React.Component {
                         <CommissionCard
                             key={idx}
                             commission={commission}
-                            onInfoClick={this.onCommissionInfoButtonClick}
-                            onEditClick={this.onCommissionEditButtonClick}
-                            onClose={this.onCommissionInfoClose}
+                            onInfoClick={this.onClickCommissionInfoButton}
+                            onEditClick={this.onClickCommissionEditButton}
                         /> :
                         <CommissionListItem
                             key={idx}
                             commission={commission}
-                            onClickInfoButton={this.onCommissionInfoButtonClick}
-                            lastItem={idx === this.state.commissions.length - 1}
+                            onClickInfoButton={this.onClickCommissionInfoButton}
+                            onClickEditButton={this.onClickCommissionEditButton}
                         />
                 )
             })
@@ -278,7 +279,8 @@ class CommissionsListPage extends React.Component {
                     </Box>
                 </Box>
 
-                <Paper className={classes.cardContainer}>
+                <Paper
+                    className={`${classes.cardContainer} ${this.state.cardView ? classes.cardContainerCard : classes.cardContainerList}`}>
                     {cardsList}
                 </Paper>
 

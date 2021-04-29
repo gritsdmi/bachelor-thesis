@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 //used in commission list and teacher overview
-export default function CommissionListItem({commission, onClickInfoButton, lastItem}) {
+export default function CommissionListItem({commission, onClickInfoButton, onClickEditButton, lastItem}) {
 
     function strTeachers() {
         let string = ""
@@ -68,8 +68,8 @@ export default function CommissionListItem({commission, onClickInfoButton, lastI
                         <Typography> {"Teachers:" + strTeachers()}</Typography>
                     </Grid>
                 </Grid>
-                <Grid direction={'column'} container justify={"center"} item xs={1}>
-                    <Grid item container justify={"center"}>
+                <Grid direction={'column'} container justify={"center"} item xs={2}>
+                    <Grid item container justify={"space-evenly"}>
                         <Button
                             color={'primary'}
                             variant={"contained"}
@@ -77,10 +77,16 @@ export default function CommissionListItem({commission, onClickInfoButton, lastI
                         >
                             Info
                         </Button>
+                        <Button
+                            color={'primary'}
+                            variant={"contained"}
+                            onClick={() => onClickEditButton(commission)}
+                        >
+                            Edit
+                        </Button>
                     </Grid>
                 </Grid>
             </Grid>
-            {/*{!lastItem && <Divider/>}*/}
         </Paper>
     )
 }

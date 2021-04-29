@@ -1,7 +1,9 @@
 import React from "react";
-import {Card, CardActions, CardContent, CardHeader, ListItem, ListItemText, makeStyles} from "@material-ui/core";
+import {ListItem, ListItemText, makeStyles, Paper} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import List from "@material-ui/core/List";
+import Box from "@material-ui/core/Box";
+import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -10,11 +12,16 @@ const useStyles = makeStyles((theme) => ({
     },
     cardActions: {
         display: "flex",
-        justifyContent: "center"
-    }
+        justifyContent: "space-evenly",
+        margin: theme.spacing(2),
+    },
+    list: {
+        padding: theme.spacing(2),
+        minHeight: '430px',
+    },
 }));
 
-export default function CommissionCard({commission, onInfoClick, onEditClick, onClose}) {
+export default function CommissionCard({commission, onInfoClick, onEditClick}) {
 
     const classes = useStyles();
 
@@ -40,53 +47,54 @@ export default function CommissionCard({commission, onInfoClick, onEditClick, on
     }
 
     function strLocations() {
-        let string = ""
+        let string = "Location "
         if (commission.exam.location !== null) {
-            string = commission.exam.location.building + ":" + commission.exam.location.classroom
+            string += commission.exam.location.building + ":" + commission.exam.location.classroom
         }
         return string
     }
 
     return (
-        <>
-            <Card className={classes.card}>
-                <CardHeader title={`Exam date ${commission.exam.date}`}/>
-                <CardContent>
+        <Paper className={classes.card}>
+            <Box className={'titleBack'}>
+                <Typography className={'title'} variant={'h6'}>Exam {commission.exam.date}</Typography>
+            </Box>
+            <List dense className={classes.list}>
+                <ListItem>
+                    <ListItemText>State: {commission.state}</ListItemText>
+                </ListItem>
+                <ListItem>
+                    <ListItemText>Time: {commission.exam.time}</ListItemText>
+                </ListItem>
+                <ListItem>
+                    <ListItemText>Degree: {commission.exam.degree}</ListItemText>
+                </ListItem>
+                <ListItem>
+                    <ListItemText>Study field: {commission.exam.fieldOfStudy}</ListItemText>
+                </ListItem>
+                <ListItem>
+                    <ListItemText>{strLocations()}</ListItemText>
+                </ListItem>
+                <ListItem>
                     <List>
-                        {/*<ListItem>*/}
-                        {/*    <ListItemText>State: {commission.state}</ListItemText>*/}
-                        {/*</ListItem>*/}
-                        <ListItem>
-                            <ListItemText>Time: {commission.exam.time}</ListItemText>
-                        </ListItem>
-                        <ListItem>
-                            <ListItemText>Degree: {commission.exam.degree}</ListItemText>
-                        </ListItem>
-                        <ListItem>
-                            <ListItemText>{strLocations()}</ListItemText>
-                        </ListItem>
-                        <ListItem>
-                            <List>
-                                {teachers()}
-                            </List>
-                        </ListItem>
+                        {teachers()}
                     </List>
-                </CardContent>
-                <CardActions className={classes.cardActions}>
-                    {commission.state !== 'DRAFT' &&
-                    <Button
-                        color={'primary'}
-                        variant={"contained"}
-                        onClick={() => onInfoClick(commission)}
-                    >Info</Button>}
-                    {commission.state !== 'APPROVED' &&
-                    <Button
-                        color={'primary'}
-                        variant={"contained"}
-                        onClick={() => onEditClick(commission)}
-                    >{buttonText()}</Button>}
-                </CardActions>
-            </Card>
-        </>
+                </ListItem>
+            </List>
+            <Box className={classes.cardActions}>
+                {commission.state !== 'DRAFT' &&
+                <Button
+                    color={'primary'}
+                    variant={"contained"}
+                    onClick={() => onInfoClick(commission)}
+                >Info</Button>}
+                {commission.state !== 'APPROVED' &&
+                <Button
+                    color={'primary'}
+                    variant={"contained"}
+                    onClick={() => onEditClick(commission)}
+                >{buttonText()}</Button>}
+            </Box>
+        </Paper>
     )
 }
