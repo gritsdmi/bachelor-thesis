@@ -25,8 +25,8 @@ a {
 .titleBack {
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
-    background-color: #dddddd;
-    border-bottom: 1px solid #aaa;
+    background-color: #eee;
+    border-bottom: 1px solid #bbb;
 }
 
 .footerBox {

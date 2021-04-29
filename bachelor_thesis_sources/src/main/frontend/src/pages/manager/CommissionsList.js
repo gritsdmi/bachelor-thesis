@@ -20,8 +20,10 @@ import {Typography} from "@material-ui/core";
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
+        // flexWrap: 'wrap',
+        flexDirection: 'column',
+        padding: theme.spacing(2),
+        // justifyContent: 'space-around',
     },
     paginationBox: {
         margin: theme.spacing(1),
@@ -214,12 +216,13 @@ class CommissionsListPage extends React.Component {
                             key={idx}
                             commission={commission}
                             onClickInfoButton={this.onCommissionInfoButtonClick}
+                            lastItem={idx === this.state.commissions.length - 1}
                         />
                 )
             })
 
         return (
-            <Box className={'pageContent'}>
+            <Container className={'pageContent'}>
                 <CommissionInfoDialog
                     open={this.state.commissionInfoDialogOpen}
                     commission={this.state.currentCommission}
@@ -233,79 +236,81 @@ class CommissionsListPage extends React.Component {
                     onClose={this.onCloseCSVDialog}
                 />
 
-                <Container>
-                    <Box>
-                        <h1>
-                            Commissions List Page
-                        </h1>
-                    </Box>
-                    <Box>
-                        <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
-                    </Box>
-                    <CommissionSearchBox
-                        onChange={this.onChangeFilter}
-                        onClickGenButton={this.onClickGenerateCSV}
-                        onClickChangeView={this.onClickChangeView}
+                <Box>
+                    <h1>
+                        Commissions List Page
+                    </h1>
+                </Box>
+                <Box>
+                    <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
+                </Box>
+                <CommissionSearchBox
+                    onChange={this.onChangeFilter}
+                    onClickGenButton={this.onClickGenerateCSV}
+                    onClickChangeView={this.onClickChangeView}
+                />
+                <Box className={classes.paginationBox}>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
                     />
-                    <Box className={classes.paginationBox}>
-                        <Pagination
-                            count={this.state.totalPagesCount}
-                            page={this.state.currentPage + 1}
-                            siblingCount={1}
-                            boundaryCount={1}
-                            shape="rounded"
-                            onChange={this.onChangePagination}
-                        />
-                        <Box className={classes.flex}>
-                            <Typography className={classes.typography}>Items per page: </Typography>
-                            <TextField
-                                select
-                                value={this.state.size}
-                                onChange={this.onChangePageSize}
-                                className={classes.pageSelect}
-                            >
-                                {this.state.pageSizes.map((size, idx) => (
-                                    <MenuItem
-                                        key={idx}
-                                        value={size}
-                                    >
-                                        {size}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Box>
+                    <Box className={classes.flex}>
+                        <Typography className={classes.typography}>Items per page: </Typography>
+                        <TextField
+                            select
+                            value={this.state.size}
+                            onChange={this.onChangePageSize}
+                            className={classes.pageSelect}
+                        >
+                            {this.state.pageSizes.map((size, idx) => (
+                                <MenuItem
+                                    key={idx}
+                                    value={size}
+                                >
+                                    {size}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Box>
-                    <Paper className={classes.cardContainer}>{cardsList}</Paper>
-                    <Box className={classes.paginationBox}>
-                        <Pagination
-                            count={this.state.totalPagesCount}
-                            page={this.state.currentPage + 1}
-                            siblingCount={1}
-                            boundaryCount={1}
-                            shape="rounded"
-                            onChange={this.onChangePagination}
-                        />
-                        <Box className={classes.flex}>
-                            <Typography className={classes.typography}>Items per page: </Typography>
-                            <TextField
-                                select
-                                value={this.state.size}
-                                onChange={this.onChangePageSize}
-                                className={classes.pageSelect}
-                            >
-                                {this.state.pageSizes.map((size, idx) => (
-                                    <MenuItem
-                                        key={idx}
-                                        value={size}
-                                    >
-                                        {size}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Box>
+                </Box>
+
+                <Paper className={classes.cardContainer}>
+                    {cardsList}
+                </Paper>
+
+                <Box className={classes.paginationBox}>
+                    <Pagination
+                        count={this.state.totalPagesCount}
+                        page={this.state.currentPage + 1}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        shape="rounded"
+                        onChange={this.onChangePagination}
+                    />
+                    <Box className={classes.flex}>
+                        <Typography className={classes.typography}>Items per page: </Typography>
+                        <TextField
+                            select
+                            value={this.state.size}
+                            onChange={this.onChangePageSize}
+                            className={classes.pageSelect}
+                        >
+                            {this.state.pageSizes.map((size, idx) => (
+                                <MenuItem
+                                    key={idx}
+                                    value={size}
+                                >
+                                    {size}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Box>
-                </Container>
-            </Box>
+                </Box>
+            </Container>
         )
     }
 }

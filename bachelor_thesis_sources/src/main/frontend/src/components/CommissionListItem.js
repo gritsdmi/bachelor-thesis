@@ -2,25 +2,30 @@ import React from "react";
 import {Grid, makeStyles, Paper} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
-    card: {
-        margin: theme.spacing(2),
-        width: '250px',
-    },
-    cardActions: {
-        display: "flex",
-        justifyContent: "center"
-    },
+
     item: {
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
+        // color:"red",
+    },
+    buttonBox: {
+        justifyContent: 'center',
+    },
+    m1: {
+        margin: theme.spacing(1),
+    },
+    title: {
+        paddingLeft: '20px',
     }
-}));
 
-export default function CommissionListItem({commission, onClickInfoButton}) {
-    const classes = useStyles();
+}))
+
+//used in commission list and teacher overview
+export default function CommissionListItem({commission, onClickInfoButton, lastItem}) {
 
     function strTeachers() {
         let string = ""
@@ -37,10 +42,17 @@ export default function CommissionListItem({commission, onClickInfoButton}) {
         return string
     }
 
+    const classes = useStyles()
+
     return (
-        <Paper>
+        <Paper
+            className={`${classes.item}`}
+        >
+            <Box className={'titleBack'}>
+                <Typography className={classes.title} variant={'h6'}>Exam {commission.exam.date}</Typography>
+            </Box>
             <Grid container direction={'row'} wrap={"nowrap"}>
-                <Grid direction={'column'} container item xs>
+                <Grid direction={'column'} container item xs className={classes.item}>
                     <Grid item>
                         <Typography> {"Location " + strLocations()} </Typography>
                     </Grid>
@@ -48,15 +60,15 @@ export default function CommissionListItem({commission, onClickInfoButton}) {
                         <Typography>{"Date " + commission.exam.date + " Time " + commission.exam.time}</Typography>
                     </Grid>
                 </Grid>
-                <Grid direction={'column'} container item xs>
+                <Grid direction={'column'} container item xs className={classes.item}>
                     <Grid item>
                         <Typography>{"State " + commission.state}</Typography>
                     </Grid>
                     <Grid item>
-                        <Typography> {"Teachers " + strTeachers()}</Typography>
+                        <Typography> {"Teachers:" + strTeachers()}</Typography>
                     </Grid>
                 </Grid>
-                <Grid direction={'column'} container item xs={1}>
+                <Grid direction={'column'} container justify={"center"} item xs={1}>
                     <Grid item container justify={"center"}>
                         <Button
                             color={'primary'}
@@ -68,6 +80,7 @@ export default function CommissionListItem({commission, onClickInfoButton}) {
                     </Grid>
                 </Grid>
             </Grid>
+            {/*{!lastItem && <Divider/>}*/}
         </Paper>
     )
 }
