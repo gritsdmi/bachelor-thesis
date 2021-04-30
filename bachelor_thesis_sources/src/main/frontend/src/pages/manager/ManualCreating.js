@@ -52,7 +52,7 @@ const InitialState = {
 
 const useStyles = theme => ({
     currentCommissionRoot: {
-        marginLeft: theme.spacing(1),
+        marginLeft: theme.spacing(2),
     },
     currentCommissionPaper: {
         display: 'flex',
@@ -65,6 +65,8 @@ const useStyles = theme => ({
     currentCommissionItem: {
         padding: '0',
         margin: theme.spacing(1),
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
     },
     gridLine: {
         margin: theme.spacing(1)
@@ -75,6 +77,7 @@ const useStyles = theme => ({
     },
     buttonBox: {
         display: 'flex',
+        justifyContent: 'space-evenly'
     },
     paginationBox: {
         margin: theme.spacing(1),
@@ -88,6 +91,9 @@ const useStyles = theme => ({
     flex: {
         display: 'flex',
     },
+    p1: {
+        padding: theme.spacing(1),
+    }
 
 });
 
@@ -498,9 +504,11 @@ class ManualCreatingPage extends React.Component {
                     <Grid container>
                         <Grid item xs>
                             <Paper>
-                                <Typography variant={"h5"} className={classes.typography}> Available
-                                    teachers </Typography>
-                                <Box className={classes.paginationBox}>
+                                {/*<Typography variant={"h5"} className={classes.typography}> Available teachers </Typography>*/}
+                                <Box className={'titleBack'}>
+                                    <Typography className={'title'} variant={'h5'}>Available teachers</Typography>
+                                </Box>
+                                <Box className={'paginationBox'}>
                                     <Pagination
                                         count={this.state.totalPagesCount}
                                         page={this.state.currentPage + 1}
@@ -509,13 +517,12 @@ class ManualCreatingPage extends React.Component {
                                         shape="rounded"
                                         onChange={this.onChangePagination}
                                     />
-                                    <Box className={classes.flex}>
+                                    <Box>
                                         <Typography className={classes.typography}>Items per page: </Typography>
                                         <TextField
                                             select
                                             value={this.state.size}
                                             onChange={this.onChangePageSize}
-                                            className={classes.pageSelect}
                                         >
                                             {this.state.pageSizes.map((size, idx) => (
                                                 <MenuItem key={idx} value={size}>
@@ -532,7 +539,7 @@ class ManualCreatingPage extends React.Component {
                                     add={true}
                                     editButton={this.onClickEditTeacher}
                                 />
-                                <Box className={classes.paginationBox}>
+                                <Box className={'paginationBox'}>
                                     <Pagination
                                         count={this.state.totalPagesCount}
                                         page={this.state.currentPage + 1}
@@ -541,13 +548,12 @@ class ManualCreatingPage extends React.Component {
                                         shape="rounded"
                                         onChange={this.onChangePagination}
                                     />
-                                    <Box className={classes.flex}>
+                                    <Box>
                                         <Typography className={classes.typography}>Items per page: </Typography>
                                         <TextField
                                             select
                                             value={this.state.size}
                                             onChange={this.onChangePageSize}
-                                            className={classes.pageSelect}
                                         >
                                             {this.state.pageSizes.map((size, idx) => (
                                                 <MenuItem key={idx} value={size}>
@@ -561,10 +567,11 @@ class ManualCreatingPage extends React.Component {
                         </Grid>
                         <Grid className={classes.currentCommissionRoot} item xs={4}>
                             <Paper className={classes.currentCommissionPaper}>
-                                <Typography variant={"h5"} className={classes.typography}> Current
-                                    Commission </Typography>
+                                <Box className={'titleBack'}>
+                                    <Typography className={'title'} variant={'h6'}>Current Commission</Typography>
+                                </Box>
                                 <Divider/>
-                                <List>
+                                <List className={classes.p1}>
                                     {this.state.commission &&
                                     this.state.commission.teachers.map((t, idx) => {
                                         return (
@@ -574,7 +581,9 @@ class ManualCreatingPage extends React.Component {
                                             >
                                                 <ListItemText>{t.name + " " + t.surname}</ListItemText>
                                                 <Button
-                                                    //todo new transparent color
+                                                    id={'uniqueButton'}
+                                                    color={'secondary'}
+                                                    variant={'text'}
                                                     onClick={this.onClickRemoveTeacher(t)}
                                                 >
                                                     <ClearIcon/>
@@ -584,7 +593,7 @@ class ManualCreatingPage extends React.Component {
                                     })}
                                     {this.state.commission && !!this.state.commission.teachers.length && <Divider/>}
                                 </List>
-                                <Box>
+                                <Box className={classes.p1}>
                                     <Grid className={classes.gridLine} container>
                                         <Grid xs={3} item> <Typography>Location</Typography> </Grid>
                                         <Grid xs item> <Typography>{this.strLocation()}</Typography> </Grid>
@@ -611,7 +620,7 @@ class ManualCreatingPage extends React.Component {
                                     </Grid>
                                 </Box>
                                 <Divider/>
-                                <Box className={classes.buttonBox}>
+                                <Box className={`${classes.buttonBox} `}>
                                     <Button
                                         color={'primary'}
                                         disabled={!(this.state.commission && !!this.state.commission.teachers.length)}

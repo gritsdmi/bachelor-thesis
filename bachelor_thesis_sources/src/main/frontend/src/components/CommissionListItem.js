@@ -49,7 +49,7 @@ export default function CommissionListItem({commission, onClickInfoButton, onCli
             className={`${classes.item}`}
         >
             <Box className={'titleBack'}>
-                <Typography className={classes.title} variant={'h6'}>Exam {commission.exam.date}</Typography>
+                <Typography className={'title'} variant={'h6'}>Exam {commission.exam.date}</Typography>
             </Box>
             <Grid container direction={'row'} wrap={"nowrap"}>
                 <Grid direction={'column'} container item xs className={classes.item}>

@@ -37,8 +37,7 @@ export default function SearchResultPanel({
                         onClick={() => editButton(item)}
                     >
                         Edit teacher
-                    </Button>
-                        }
+                    </Button>}
                     <Button
                         className={classes.button}
                         color={'primary'}
@@ -50,12 +49,11 @@ export default function SearchResultPanel({
                         {edit && "Edit"}
                         {rec && "Recommend"}
                     </Button>
-                    </ListItem>
-                    <Divider/>
-                </Box>
-            )
-        }
-    );
+                </ListItem>
+                {data.length - 1 !== key && <Divider/>}
+            </Box>
+        )
+    });
 
     return (
         <>

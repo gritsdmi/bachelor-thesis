@@ -56,3 +56,24 @@ a {
 .header {
     padding: 30px;
 }
+
+#uniqueButton {
+    color: black;
+    margin-right: 16px;
+}
+
+.paginationBox {
+    margin: 8px;
+    padding: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.paginationBox .MuiBox-root {
+    display: flex;
+}
+
+.paginationBox .MuiBox-root .MuiTextField-root {
+    width: 70px;
+    margin-left: 10px;
+}

@@ -17,6 +17,12 @@ const femTheme = createMuiTheme({
             dark: "#c51162",
             contrastText: "#fff",
         },
+        redButton: {
+            light: "#0f0",
+            main: "#f50057",
+            dark: "#c51162",
+            contrastText: "#fff",
+        }
     },
 
     // typography: {
