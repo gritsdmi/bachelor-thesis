@@ -257,7 +257,7 @@ public class CommissionService {
 
     /**
      * Get commissions for commissions list page.
-     * Used filter parameters such as dates, degrees, study fields.
+     * Used filter parameters such as dates, degrees, study fields and semesters.
      *
      * @param pageRequestTO page request.
      * @return page contains requested data.
@@ -265,47 +265,94 @@ public class CommissionService {
      * @see CommissionFilterProps
      */
     public Map<String, Object> getByPropsPaginated(PageRequestTO pageRequestTO) {
+        if (pageRequestTO.getProps().getSelectedSemester() != null) {
+            log.severe("by semester");
+            return getByPropsBySemesterPaginated(pageRequestTO);
+        } else {
+
+            var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+            var props = pageRequestTO.getProps();
+
+            log.info(pageRequest.toString());
+            log.info(props.toString());
+            var notDraft = getNotDraft().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+            log.info("not draft " + notDraft.toString());
+
+            Page<Commission> page;
+            if (props.getSelectedField().getDegree().equals(Degree.ALL)) {
+                // request with all degrees and all fields
+                page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
+                        props.getSelectedDatesRange(),
+                        notDraft, pageRequest);
+                log.info("request with all degrees and all fields");
+                log.info(page.getContent().toString());
+
+            } else {
+                if (props.getSelectedField().getField().equals(FieldOfStudyEnum.ALL)) {
+                    // request with selected degree and all fields according to this degree
+                    page = commissionRepository.getByDegreeAndAllFieldsPaginated(props.getSelectedDatesRange(),
+                            notDraft,
+                            props.getSelectedField().getDegree(),
+                            pageRequest);
+                    log.info("request with selected degree and all fields according to this degree");
+
+                } else {
+                    //request specified degree and field of study
+                    page = commissionRepository.getByDegreeAndFieldPaginated(props.getSelectedDatesRange(),
+                            notDraft,
+                            props.getSelectedField().getDegree(),
+                            props.getSelectedField().getField().toString(),
+                            pageRequest);
+                    log.info("request specified degree and field of study");
+
+                }
+            }
+
+//        log.info(page.toString());
+            return new PageResponseTO(page).getData();
+        }
+
+    }
+
+    public Map<String, Object> getByPropsBySemesterPaginated(PageRequestTO pageRequestTO) {
         var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
         var props = pageRequestTO.getProps();
-
-        log.info(pageRequest.toString());
-        log.info(props.toString());
-        var notDraft = getNotDraft().stream().map(AbstractEntity::getId).collect(Collectors.toList());
-        log.info("not draft " + notDraft.toString());
-
+        var notDraft = getNotDraft().stream()
+//                .filter(commission -> commission.getExam().getSemester().equals(pageRequestTO.getProps().getSelectedSemester()))
+                .map(AbstractEntity::getId)
+                .collect(Collectors.toList());
         Page<Commission> page;
+
         if (props.getSelectedField().getDegree().equals(Degree.ALL)) {
             // request with all degrees and all fields
-            page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
-                    props.getSelectedDatesRange(),
+            page = commissionRepository.getByAllDegreesAndAllFieldsBySemesterPaginated(
+                    props.getSelectedSemester(),
                     notDraft, pageRequest);
-            log.info("request with all degrees and all fields");
+            log.info("request with all degrees and all fields by semester");
             log.info(page.getContent().toString());
 
         } else {
             if (props.getSelectedField().getField().equals(FieldOfStudyEnum.ALL)) {
                 // request with selected degree and all fields according to this degree
-                page = commissionRepository.getByDegreeAndAllFieldsPaginated(props.getSelectedDatesRange(),
+                page = commissionRepository.getByDegreeAndAllFieldsBySemesterPaginated(props.getSelectedSemester(),
                         notDraft,
                         props.getSelectedField().getDegree(),
                         pageRequest);
-                log.info("request with selected degree and all fields according to this degree");
+                log.info("request with selected degree and all fields according to this degree by semester");
 
             } else {
                 //request specified degree and field of study
-                page = commissionRepository.getByDegreeAndFieldPaginated(props.getSelectedDatesRange(),
+                page = commissionRepository.getByDegreeAndFieldBySemesterPaginated(props.getSelectedSemester(),
                         notDraft,
                         props.getSelectedField().getDegree(),
                         props.getSelectedField().getField().toString(),
                         pageRequest);
-                log.info("request specified degree and field of study");
+                log.info("request specified degree and field of study by semester");
 
             }
         }
 
-//        log.info(page.toString());
         return new PageResponseTO(page).getData();
-
     }
 
     public Map<String, Object> getByPropsByTeacherPaginated(Long teacherId, PageRequestTO pageRequestTO) {

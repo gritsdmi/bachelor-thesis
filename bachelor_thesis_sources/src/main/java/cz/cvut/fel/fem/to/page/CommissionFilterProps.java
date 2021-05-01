@@ -18,5 +18,6 @@ public class CommissionFilterProps {
     private final FieldOfStudy selectedField;
     private final List<String> selectedDatesRange;
     private final CommissionState selectedState;
+    private final String selectedSemester;
 
 }

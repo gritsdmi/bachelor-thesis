@@ -32,18 +32,17 @@ UPDATE users
 SET teacher = 100000
 WHERE id = 100000;
 
-INSERT INTO exam (id, degree, location_id)
-VALUES (10000000, 'Bc', 101);
+INSERT INTO exam (id, degree, location_id, semester)
+VALUES (10000000, 'Bc', 101, 'Summer 2020/2021');
 
 INSERT INTO commission (id, exam_id, state)
 VALUES (10000000, 10000000, 'DRAFT');
 -- ///////////////////////////////////////////////////////////////
 
 INSERT INTO Field_Of_Study (id, field, deg)
-VALUES
-(1000, 'BP_EEM', 'Bc'),
-(1001, 'BP_EK', 'Bc'),
-(1002, 'BP_EEK', 'Bc'),
+VALUES (1000, 'BP_EEM', 'Bc'),
+       (1001, 'BP_EK', 'Bc'),
+       (1002, 'BP_EEK', 'Bc'),
 (1003, 'BP_KYR', 'Bc'),
 (1004, 'BP_BIO', 'Bc'),
 (1005, 'BP_OI', 'Bc'),

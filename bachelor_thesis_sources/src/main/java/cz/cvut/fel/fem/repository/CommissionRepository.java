@@ -39,7 +39,6 @@ public interface CommissionRepository extends JpaRepository<Commission, Long> {
                                                 Pageable pageable);
 
     //request with all degrees and all fields
-//    @Query("select c from Commission c where ( c.id in :ids)")
     @Query("select c from Commission c where (c.exam.date in :dates and c.id in :ids)")
     Page<Commission> getByAllDegreesAndAllFieldsPaginated(
             @Param("dates") List<String> dates,
@@ -68,4 +67,35 @@ public interface CommissionRepository extends JpaRepository<Commission, Long> {
                                                   @Param("fieldOfStudy") String fieldOfStudy,
                                                   Pageable pageable);
 
+
+    //request with all degrees and all fields BY SEMESTER
+    @Query("select c from Commission c where (c.exam.semester = :semester and c.id in :ids)")
+    Page<Commission> getByAllDegreesAndAllFieldsBySemesterPaginated(
+            @Param("semester") String semester,
+            @Param("ids") List<Long> ids,
+            Pageable pageable);
+
+    // request with selected degree and all fields according to this degree BY SEMESTER
+    @Query(
+            value = "select com from Commission com where (com.exam.semester = :semester and com.id in :ids " +
+                    "and com.exam.degree = :degree)"
+    )
+    Page<Commission> getByDegreeAndAllFieldsBySemesterPaginated(
+            @Param("semester") String semester,
+            @Param("ids") List<Long> ids,
+            @Param("degree") Degree degree,
+            Pageable pageable);
+
+    // request specified degree and field of study BY SEMESTER
+    @Query(
+            value = "select com from Commission com where (com.exam.semester = :semester and com.id in :ids " +
+                    "and com.exam.degree = :degree " +
+                    "and com.exam.fieldOfStudy = :fieldOfStudy)"
+    )
+    Page<Commission> getByDegreeAndFieldBySemesterPaginated(
+            @Param("semester") String semester,
+            @Param("ids") List<Long> ids,
+            @Param("degree") Degree degree,
+            @Param("fieldOfStudy") String fieldOfStudy,
+            Pageable pageable);
 }

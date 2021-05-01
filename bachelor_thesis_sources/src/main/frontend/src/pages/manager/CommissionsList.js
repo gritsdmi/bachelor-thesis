@@ -55,7 +55,7 @@ const InitialState = {
     currentCommission: null,
     cardView: false,
 
-    currentPage: 1,
+    currentPage: 0,
     size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
@@ -79,7 +79,6 @@ class CommissionsListPage extends React.Component {
 
     componentDidMount() {
     }
-
 
     fetchByFilter(filterProps, paginationChanged) {
 
@@ -113,19 +112,10 @@ class CommissionsListPage extends React.Component {
         }, () => this.fetchByFilter(this.state.filterProps, true))
     }
 
-    onChangeFilter = (filterProps, didMount) => {
-        if (didMount) {
-            console.log("onChangeFilter did mount", filterProps)
-            this.setState({
-                filterProps: filterProps,
-            }, () => this.onChangePagination(null, 1))
-
-        } else {
-            console.log("onChangeFilter", filterProps)
-            this.setState({
-                filterProps: filterProps,
-            }, () => this.fetchByFilter(filterProps, false))
-        }
+    onChangeFilter = (filterProps) => {
+        this.setState({
+            filterProps: filterProps,
+        }, () => this.fetchByFilter(filterProps, false))
 
     }
 
@@ -137,7 +127,6 @@ class CommissionsListPage extends React.Component {
     }
 
     onClickCommissionInfoButton = (commission) => {
-        console.log("onCommissionInfoButtonClick", commission.teachers)
         this.setState({
             commissionInfoDialogOpen: true,
             currentCommission: commission,
@@ -145,7 +134,6 @@ class CommissionsListPage extends React.Component {
     }
 
     updateCommission = (commission) => {
-        console.log("updateCommission", commission)
         const comm = this.state.commissions;
         comm[comm.indexOf(this.state.currentCommission)] = commission;
         this.setState({
