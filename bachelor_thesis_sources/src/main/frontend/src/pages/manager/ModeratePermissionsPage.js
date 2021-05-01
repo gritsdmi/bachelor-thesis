@@ -16,16 +16,14 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Paper from "@material-ui/core/Paper";
 import Container from "@material-ui/core/Container";
-
+import EditUserDialog from "../../components/manage/EditUserDialog";
 
 const useStyles = theme => ({
-
     paginationBox: {
         margin: theme.spacing(1),
         display: 'flex',
         justifyContent: 'flex-end',
     },
-
     typography: {
         alignSelf: 'center',
     },
@@ -41,6 +39,8 @@ const InitialState = {
     currentPattern: '',
 
     createUserDialogOpen: false,
+    editUserDialogOpen: false,
+    editedUser: null,
 
     currentPage: 0,
     size: 10, //count items in current page
@@ -49,6 +49,7 @@ const InitialState = {
 
     pageSizes: [10, 25, 50, 100],
     snackOpen: false,
+    snackText: '',
 
 }
 
@@ -99,6 +100,10 @@ class ModeratePermissionsPage extends React.Component {
 
     onClickEditUser = (user) => {
         console.log("onClickEditUser", user)
+        this.setState({
+            editUserDialogOpen: true,
+            editedUser: user,
+        })
     }
 
     onCLickCreateUser = () => {
@@ -113,9 +118,31 @@ class ModeratePermissionsPage extends React.Component {
         })
     }
 
-    onSaveUser = () => {
+    onCloseEditUserDialog = () => {
+        this.setState({
+            editUserDialogOpen: false,
+            editedUser: null,
+        })
+    }
+
+    onSaveNewUser = () => {
         this.onCloseCreateUserDialog()
-        this.setState({snackOpen: true})
+        this.onSave(true)
+    }
+
+    onSaveEditedUser = (value) => {
+        console.log(value)
+
+        this.onCloseEditUserDialog()
+        this.onSave(false, value)
+    }
+
+    onSave(newUser, value) {
+        this.setState({
+            snackOpen: true,
+            snackText: newUser ? "User successfully created" : value === 'pas'
+                ? "Password was reset" : "User was updated",
+        })
         this.fetchUsers()
     }
 
@@ -134,7 +161,7 @@ class ModeratePermissionsPage extends React.Component {
                     open={this.state.snackOpen}
                     autoHideDuration={4000}
                     onClose={() => this.setState({snackOpen: false})}
-                    message="User successfully created"
+                    message={this.state.snackText}
                     action={
                         <React.Fragment>
                             <IconButton size="small" aria-label="close" color="inherit"
@@ -158,7 +185,13 @@ class ModeratePermissionsPage extends React.Component {
                 <CreateUserDialog
                     open={this.state.createUserDialogOpen}
                     onClose={this.onCloseCreateUserDialog}
-                    onSave={this.onSaveUser}
+                    onSave={this.onSaveNewUser}
+                />
+                <EditUserDialog
+                    open={this.state.editUserDialogOpen}
+                    onClose={this.onCloseEditUserDialog}
+                    onSave={this.onSaveEditedUser}
+                    user={this.state.editedUser}
                 />
                 <Box className={classes.paginationBox}>
                     <Pagination
@@ -204,11 +237,8 @@ class ModeratePermissionsPage extends React.Component {
                                                 Edit user
                                             </Button>
                                         </ListItem>
-                                        {idx !== this.state.users.length - 1 &&
-                                        <Divider/>
-                                        }
+                                        {idx !== this.state.users.length - 1 && <Divider/>}
                                     </Box>
-
                                 )
                             })
                         }
@@ -243,9 +273,8 @@ class ModeratePermissionsPage extends React.Component {
                     </Box>
                 </Box>
             </Container>
-        );
+        )
     }
-
 }
 
 export default withStyles(useStyles)(ModeratePermissionsPage)

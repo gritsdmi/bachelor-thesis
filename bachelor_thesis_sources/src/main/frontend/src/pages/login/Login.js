@@ -106,7 +106,7 @@ class Login extends React.Component {
                 password: newPass,
             }
 
-            post(`/user/teacher/pass/`, payload)
+            post(`/user/pass/`, payload)
                 .then(res => {
                     console.log(res)
                     this.redirect()

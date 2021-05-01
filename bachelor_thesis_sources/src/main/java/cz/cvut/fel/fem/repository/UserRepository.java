@@ -14,16 +14,20 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("select u from User u where (u.teacher.contract is not null and u.teacher.contract > 0)")
+    List<User> findByActiveTrue();
+
+    Page<User> findByActiveTrue(Pageable pageable);
+
+    @Query("select u from User u where (u.active = true and u.teacher.contract is not null and u.teacher.contract > 0)")
     List<User> getTeachersWhoCan();
 
-    @Query("select u from User u where (u.name = :pattern or u.surname = :pattern or u.login = :pattern)")
+    @Query("select u from User u where (u.active = true and u.name = :pattern or u.surname = :pattern or u.login = :pattern)")
     List<User> getAllByName(@Param("pattern") String pattern);
 
     /**
      * get all teachers
      */
-    @Query("select u from User u where (u.teacher is not null)")
+    @Query("select u from User u where (u.active = true and u.teacher is not null)")
     List<User> getAllTeachers();
 
     /**

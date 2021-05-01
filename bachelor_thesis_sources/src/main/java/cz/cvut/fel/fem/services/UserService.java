@@ -52,15 +52,20 @@ public class UserService {
         this.csvParser = csvParser;
     }
 
-    public User create(UserTO userTO) {
-        var user = new User();
-        return userRepository.save(user);
+    /**
+     * returns only active users
+     *
+     * @return list of User
+     */
+    public List<User> getAllActive() {
+        return userRepository.findByActiveTrue();
     }
 
-    public List<User> getAll() {
-        return userRepository.findAll();
-    }
-
+    /**
+     * returns all active teachers
+     *
+     * @return list of active teachers
+     */
     public List<User> getAllTeachers() {
         return userRepository.getAllTeachers();
     }
@@ -70,22 +75,22 @@ public class UserService {
     }
 
     public List<User> getUserByName(String name) {
-        return userRepository.getAllByName(name);
+        return userRepository.getAllByName(name).stream().filter(User::getActive).collect(Collectors.toList());
     }
 
     /**
      * using model mapper (seems working)
      */
     public User update(Long id, UserTO userTO) {
-        var teacher = userRepository.getOne(id);
-        log.info(teacher.toString());
+//        var teacher = userRepository.getOne(id);
+//        log.info(teacher.toString());
         var user = modelMapper.map(userTO, User.class);
         log.info(user.toString());
         return userRepository.save(user);
     }
 
     /**
-     * Returns teachers who has contract more than 0.
+     * Returns active teachers who has contract more than 0.
      *
      * @return List of Teacher
      */
@@ -134,17 +139,17 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void addDate(List<User> list, Date date) {
-        for (User t : list)
-            addDate(t, date);
-    }
+//    public void addDate(List<User> list, Date date) {
+//        for (User t : list)
+//            addDate(t, date);
+//    }
 
     /**
      * Used in teacher calendar
      *
-     * @param userId
-     * @param dateTO
-     * @return
+     * @param userId long id of user
+     * @param dateTO date's transfer object
+     * @return updated user
      */
     public User addDate(Long userId, DateTO dateTO) {
         var teacher = userRepository.getOne(userId);
@@ -165,7 +170,7 @@ public class UserService {
      * add date to teacher's unavailable dates list.
      *
      * @param teacherId user's id
-     * @param dateStr   date
+     * @param dateStr   date in format "dd.MM.uuuu"
      */
     public void addUnavailableDate(Long teacherId, String dateStr) {
         var teacher = getTeacher(teacherId);
@@ -198,7 +203,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void removeDate(User teacher, Date date) {
+    private void removeDate(User teacher, Date date) {
         teacher.getTeacher().getUnavailableDates().removeIf(d -> d.getDate().equals(date.getDate()));
         var t = userRepository.getOne(teacher.getId()).getTeacher().getUnavailableDates();
         dateService.delete(date);
@@ -209,7 +214,13 @@ public class UserService {
         return userRepository.getOne(teacherId);
     }
 
-    public Map<String, Object> getAll(PageRequestTO pageRequestTO) {
+    /**
+     * Used only on manage teachers page. DOES NOT return deactivated teachers.
+     *
+     * @param pageRequestTO pageable request
+     * @return page with list of teachers
+     */
+    public Map<String, Object> getAllActive(PageRequestTO pageRequestTO) {
 
         var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
         Page<User> page;
@@ -217,7 +228,7 @@ public class UserService {
         if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
             page = userRepository.findTeacherByNameOrSurnameOrLoginContaining(pageRequestTO.getPattern().toLowerCase(), pageRequest);
         } else {
-            page = userRepository.findAll(pageRequest);
+            page = userRepository.findByActiveTrue(pageRequest);
         }
 
         return new PageResponseTO(page).getData();
@@ -256,10 +267,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    private List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    /**
+     * Used only on manage permissions page. returns all users including deactivated.
+     *
+     * @param request pageable request
+     * @return page with list of users
+     */
     public Map<String, Object> getAllUsersPaged(PageRequestTO request) {
         var pageRequest = PageRequest.of(request.getPage(), request.getSize());
 
-        var allUsers = getAll().stream().map(AbstractEntity::getId).collect(Collectors.toList());
+        var allUsers = getAllUsers().stream()
+                .map(AbstractEntity::getId)
+                .collect(Collectors.toList());
         Page<User> page;
 
         if (request.getPattern() != null && !request.getPattern().equals("")) {
@@ -279,11 +302,11 @@ public class UserService {
     public User createNewUser(NewUserTo newUserTo) {
         log.info(newUserTo.toString());
 
-//        var user = new User();
         var user = modelMapper.map(newUserTo, User.class);
         user.setLogin(newUserTo.getEmailAddress().split("@")[0]);
         user.setPassword(newUserTo.getEmailAddress().split("@")[0]);
         user.setFirstLogin(true);
+        user.setActive(true);
         //TODO figure out with requirement: data.xl -> 2.sheet -> columns F and G
 
         log.info(user.toString());
@@ -301,8 +324,6 @@ public class UserService {
         log.info(user.toString());
 
         return userRepository.save(user);
-
-//        return null;
     }
 
 //
@@ -341,6 +362,7 @@ public class UserService {
                     user.setLogin(v.get(0));
                     user.setPassword(v.get(0));
                     user.setFirstLogin(true);
+                    user.setActive(true);
                     user.setRole(Role.ROLE_TEACHER);
 
 //                    log.severe(v.get(2));

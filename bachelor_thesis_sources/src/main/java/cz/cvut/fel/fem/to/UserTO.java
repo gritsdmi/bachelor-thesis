@@ -4,6 +4,7 @@ import cz.cvut.fel.fem.model.Email;
 import cz.cvut.fel.fem.model.ManagerProperty;
 import cz.cvut.fel.fem.model.StudentProperty;
 import cz.cvut.fel.fem.model.TeacherProperty;
+import cz.cvut.fel.fem.model.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -47,6 +48,10 @@ public class UserTO {
     private ManagerProperty manager;
 
     private StudentProperty student;
+
+    private Role role;
+
+    private Boolean active;
 
     public UserTO() {
     }

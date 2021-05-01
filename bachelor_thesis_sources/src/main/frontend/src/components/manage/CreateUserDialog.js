@@ -14,7 +14,6 @@ import {emailPattern, intOrFloatPattern} from "../../utils/constants";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 
-
 const useStyles = theme => ({
     title: {
         textAlign: 'center',
@@ -185,12 +184,6 @@ class CreateUserDialog extends React.Component {
                 errorContract: !!!value.match(intOrFloatPattern),
             })
         }
-
-        // if (name === 'departmentInput') {
-        //     this.setState({
-        //         errorDepartment: !!!value.match(intPattern),
-        //     })
-        // }
 
         if (name === 'emailInput') {
             this.setState({

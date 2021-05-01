@@ -20,9 +20,9 @@ VALUES (1, 'FINAL', 'testSubject FINAL', 'lorem ipsum FINAL'),
 -- INSERT INTO users (id, name, surname)
 -- VALUES (100000, 'name_test_1', 'surname_test_1');
 
-INSERT INTO users (id, name, surname, email_address, login, password, first_login, role)
-VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', false, 'ROLE_TEST'),
-       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email', 'email', false, 'ROLE_TEST');
+INSERT INTO users (id, name, surname, email_address, login, password, first_login, role, active)
+VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', false, 'ROLE_TEST', false),
+       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email', 'email', false, 'ROLE_TEST', false);
 
 INSERT INTO teacher_property (id, contract)
 VALUES (100000, 1),

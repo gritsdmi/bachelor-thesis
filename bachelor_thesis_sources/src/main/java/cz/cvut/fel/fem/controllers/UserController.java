@@ -27,7 +27,7 @@ public class UserController implements Controller {
 
     @GetMapping
     public List<User> get() {
-        return userService.getAll();
+        return userService.getAllActive();
     }
 
     @GetMapping("/teacher")
@@ -50,12 +50,17 @@ public class UserController implements Controller {
         return userService.getExamDates(teacherId);
     }
 
+    @GetMapping("/resetPass/{id}")
+    public User resetPassword(@PathVariable Long id) {
+        return userService.resetPassword(id);
+    }
+
     @PostMapping("/teacher/prop/{id}")
     public User updateTeacherProperty(@PathVariable Long id, @RequestBody TeacherPropertyTO teacherPropertyTO) {
         return userService.updateTeacherProperty(id, teacherPropertyTO);
     }
 
-    @PostMapping("/teacher/{id}")
+    @PostMapping("/{id}")
     public User update(@PathVariable Long id, @RequestBody UserTO userTO) {
         return userService.update(id, userTO);
     }
@@ -65,7 +70,7 @@ public class UserController implements Controller {
         return userService.addDate(teacherId, dateTO);
     }
 
-    @PostMapping("/teacher/pass")
+    @PostMapping("/pass")
     public User setNewPassword(@RequestBody NewPassTO newPassTO) {
         log.warning(newPassTO.toString());
         return userService.setNewPassword(newPassTO);
@@ -78,7 +83,7 @@ public class UserController implements Controller {
 
     @PostMapping("/teacher/page")
     public Map<String, Object> getAllTeachersPaged(@RequestBody PageRequestTO pageRequestTO) {
-        return userService.getAll(pageRequestTO);
+        return userService.getAllActive(pageRequestTO);
     }
 
     @PostMapping("/teacher/date/{date}/page")

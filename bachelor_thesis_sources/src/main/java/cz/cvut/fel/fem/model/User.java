@@ -32,6 +32,8 @@ public class User extends AbstractEntity {
 
     private Boolean firstLogin;
 
+    private Boolean active;
+
     private String titlesPost; //vedecky titul
 
     private String titlesPre; //akademicky titul

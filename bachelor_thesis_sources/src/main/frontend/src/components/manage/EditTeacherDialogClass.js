@@ -106,7 +106,7 @@ class EditTeacherDialogClass extends React.Component {
             }
             payload.teacher.contract = parseFloat(this.state.contractInput)
             console.log("update payload ", payload) //UserTO
-            post(`/user/teacher/${this.props.teacher.id}`, payload)
+            post(`/user/${this.props.teacher.id}`, payload)
                 .then(response => console.log(response.data))
                 .catch(err => console.log(err))
         }
