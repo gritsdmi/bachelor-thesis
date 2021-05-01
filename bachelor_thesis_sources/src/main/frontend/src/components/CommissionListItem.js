@@ -77,13 +77,14 @@ export default function CommissionListItem({commission, onClickInfoButton, onCli
                         >
                             Info
                         </Button>
+                        {onClickEditButton &&
                         <Button
                             color={'primary'}
                             variant={"contained"}
                             onClick={() => onClickEditButton(commission)}
                         >
                             Edit
-                        </Button>
+                        </Button>}
                     </Grid>
                 </Grid>
             </Grid>

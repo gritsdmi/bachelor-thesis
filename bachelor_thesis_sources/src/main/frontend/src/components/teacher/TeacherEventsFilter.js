@@ -1,43 +1,52 @@
 import React from "react";
-import {makeStyles, MenuItem, Paper, TextField} from "@material-ui/core";
+import {FormControlLabel, makeStyles, MenuItem, Paper, Radio, RadioGroup, TextField} from "@material-ui/core";
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import {dateFormatMoment} from "../../utils/constants";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
-    card: {
-        margin: theme.spacing(2),
-        width: '250px',
-    },
-    cardActions: {
-        display: "flex",
-        justifyContent: "center"
-    },
-
     item: {
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-
-        width: "150px",
+        width: "170px",
     },
     flex: {
         display: 'flex',
         alignItems: 'center',
     },
+    radioGroup: {
+        display: 'flex',
+    },
+    rightBox: {
+        display: 'flex',
+        alignItems: 'center !important',
+        // flexGrow: 1,
+        paddingRight: theme.spacing(8),
+    },
+    leftBox: {
+        display: 'flex',
+        alignItems: 'center !important',
+        flexGrow: 1,
+    },
+
 }));
 
 export default function TeacherEventsFilter({
                                                 degrees,
                                                 comStates,
                                                 selectedDegree,
-                                                selectedState,
                                                 onChangeSelect,
                                                 selectedDateFrom,
                                                 selectedDateTo,
                                                 handleChangeDateFrom,
                                                 handleChangeDateTo,
+                                                semesters,
+                                                bySemester,
+                                                selectedSemester,
+                                                onChangeRadio,
                                             }) {
     const classes = useStyles();
 
@@ -46,72 +55,96 @@ export default function TeacherEventsFilter({
     }
 
     return (
-        <Paper>
-            <TextField
-                select
-                value={selectedState}
-                name={'selectedState'}
-                helperText={'Commission state'}
-                onChange={onChangeSelect}
-                className={classes.item}
+        <Paper
+            className={classes.flex}
+        >
+            <Box
+                className={classes.leftBox}
             >
-                {
-                    comStates.map((state, idx) => {
-                        return (
+                <TextField
+                    select
+                    name={'selectedDegree'}
+                    value={selectedDegree}
+                    helperText={'Degrees'}
+                    onChange={onChangeSelect}
+                    className={classes.item}
+                >
+                    {
+                        degrees.map((deg, idx) => {
+                            return (
+                                <MenuItem
+                                    key={idx}
+                                    value={deg}
+                                >
+                                    {deg}
+                                </MenuItem>
+                            )
+                        })
+                    }
+                </TextField>
+                {bySemester === 'sem' ?
+                    <TextField
+                        id="semester-select"
+                        name={'selectedSemester'}
+                        select
+                        value={selectedSemester}
+                        onChange={onChangeSelect}
+                        helperText="Semester"
+                        className={classes.item}
+                    >
+                        {semesters.map((semester, idx) => (
                             <MenuItem
                                 key={idx}
-                                value={state}
+                                value={semester}
                             >
-                                {state}
+                                {semester}
                             </MenuItem>
-                        )
-                    })
+                        ))}
+                    </TextField>
+                    :
+                    <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
+                        <DatePicker
+                            id="date-picker-inline"
+                            format={dateFormatMoment}
+                            autoOk={true}
+                            value={selectedDateFrom}
+                            onChange={handleChangeDateFrom}
+                            className={classes.item}
+                            maxDate={selectedDateTo}
+                            helperText="Date from"
+                        />
+                        <DatePicker
+                            id="date-picker-inline"
+                            format={dateFormatMoment}
+                            autoOk={true}
+                            value={selectedDateTo}
+                            onChange={handleChangeDateTo}
+                            className={classes.item}
+                            minDate={selectedDateFrom}
+                            helperText="Date to"
+                        />
+                    </MuiPickersUtilsProvider>
                 }
-            </TextField>
-
-            <TextField
-                select
-                name={'selectedDegree'}
-                value={selectedDegree}
-                helperText={'Degrees'}
-                onChange={onChangeSelect}
-                className={classes.item}
+            </Box>
+            <Box
+                className={classes.rightBox}
             >
-                {
-                    degrees.map((deg, idx) => {
-                        return (
-                            <MenuItem
-                                key={idx}
-                                value={deg}
-                            >
-                                {deg}
-                            </MenuItem>
-                        )
-                    })
-                }
-            </TextField>
-            <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
-                <DatePicker
-                    id="date-picker-inline"
-                    format={dateFormatMoment}
-                    autoOk={true}
-                    value={selectedDateFrom}
-                    onChange={handleChangeDateFrom}
-                    className={classes.item}
-                    maxDate={selectedDateTo}
-                    helperText="Date from"
-                />
-                <DatePicker
-                    id="date-picker-inline"
-                    format={dateFormatMoment}
-                    autoOk={true}
-                    value={selectedDateTo}
-                    onChange={handleChangeDateTo}
-                    className={classes.item}
-                    minDate={selectedDateFrom}
-                    helperText="Date to"
-                />
-            </MuiPickersUtilsProvider>
+                <RadioGroup
+                    name={"bySemester"}
+                    value={bySemester}
+                    onChange={onChangeRadio}
+                    className={classes.radioGroup}
+                >
+                    <FormControlLabel value={"date"}
+                                      control={<Radio color={'primary'} size={'small'}/>}
+                                      label="By date"
+                    />
+                    <FormControlLabel value={"sem"}
+                                      control={<Radio color={'primary'} size={'small'}/>}
+                                      label="By semester"
+                    />
+                </RadioGroup>
+            </Box>
         </Paper>
     )
 }

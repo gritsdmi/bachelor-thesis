@@ -15,8 +15,8 @@ import {enumerateDaysBetweenDates} from "../../utils/constants";
 const useStyles = theme => ({
     cardContainer: {
         display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
+        flexDirection: 'column',
+        padding: theme.spacing(2),
     },
     item: {
         margin: theme.spacing(1),
@@ -48,11 +48,14 @@ const InitialState = {
     commissions: [],
     teacher: null,
     comStates: ['ALL', 'EDITABLE', 'APPROVED'],
+    semesters: [],
 
     commissionInfoDialogOpen: false,
     currentCommission: null,
     selectedDegree: '',
     selectedState: 'ALL',
+    selectedSemester: '',
+    bySemester: 'sem',
 
     selectedDateFrom: new Date(),
     selectedDateTo: new Date(),
@@ -76,21 +79,22 @@ class TeacherOverview extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchDegrees()
         this.fetchTeacher()
+        this.fetchDegrees(true)
     }
 
     fetchTeacher() {
         get(`/user/teacher/${this.state.teacherId}`)
             .then(response => {
                 this.setState({
-                    teacher: response.data,
-                }, () => console.log(response.data))
+                        teacher: response.data,
+                    }
+                )
             })
             .catch(err => handleResponseError(err))
     }
 
-    fetchDegrees() {
+    fetchDegrees(didMount) {
         get("/exam/degrees")
             .then(response => {
                 this.setState({
@@ -98,10 +102,27 @@ class TeacherOverview extends React.Component {
                         selectedDegree: response.data[0],
                     }
                     , () => {
-                        this.fetchCommissions(false)
+                        if (didMount) {
+                            this.fetchSemesters()
+                        } else {
+                            this.fetchCommissions(false)
+                        }
                     }
                 )
             })
+            .catch(err => handleResponseError(err))
+    }
+
+    fetchSemesters() {
+        get('/exam/semesters')
+            .then(res => this.setState({
+                    semesters: res.data,
+                    selectedSemester: res.data[res.data.length - 1],
+                }
+                , () => {
+                    this.fetchCommissions(false)
+                }
+            ))
             .catch(err => handleResponseError(err))
     }
 
@@ -111,8 +132,8 @@ class TeacherOverview extends React.Component {
             selectedDegree: this.state.selectedDegree,
             selectedField: null,
             selectedDatesRange: enumerateDaysBetweenDates(this.state.selectedDateFrom, this.state.selectedDateTo),
-            // selectedState: this.state.selectedState,
             selectedState: null,
+            selectedSemester: this.state.bySemester === 'sem' ? this.state.selectedSemester : null,
         }
         // filterProps.selectedState = null
 
@@ -122,7 +143,6 @@ class TeacherOverview extends React.Component {
             pattern: ' ',
             props: {...filterProps},
         }
-        console.log(pageTO)
         post(`/commission/byTeacher/${this.state.teacherId}/page`, pageTO)
             .then(res => {
                 this.setState({
@@ -130,14 +150,13 @@ class TeacherOverview extends React.Component {
                         currentPage: res.data.currentPage,
                         totalItemsCount: res.data.totalItemsCount,
                         totalPagesCount: res.data.totalPagesCount,
-                    }, () => console.log(res)
+                    }
                 )
             })
             .catch(err => handleResponseError(err))
     }
 
     onChangeSelect = (evt) => {
-
         this.setState({
             [evt.target.name]: evt.target.value,
         }, () => this.fetchCommissions(false))
@@ -187,6 +206,14 @@ class TeacherOverview extends React.Component {
             , () => this.fetchCommissions(false))
     }
 
+    onChangeRadio = (e) => {
+        this.setState({
+            [e.target.name]: e.target.value,
+        }, () => {
+            this.fetchCommissions(false)
+        })
+    }
+
     render() {
         const comList = this.state.commissions.map((comm, idx) => {
             return (
@@ -220,6 +247,10 @@ class TeacherOverview extends React.Component {
                     selectedDateTo={this.state.selectedDateTo}
                     handleChangeDateFrom={this.handleChangeDateFrom}
                     handleChangeDateTo={this.handleChangeDateTo}
+                    bySemester={this.state.bySemester}
+                    semesters={this.state.semesters}
+                    selectedSemester={this.state.selectedSemester}
+                    onChangeRadio={this.onChangeRadio}
                 />
                 <Box className={classes.paginationBox}>
                     <Pagination
@@ -246,7 +277,9 @@ class TeacherOverview extends React.Component {
                         </TextField>
                     </Box>
                 </Box>
-                <Paper>
+                <Paper
+                    className={classes.cardContainer}
+                >
                     {comList}
                 </Paper>
                 <Box className={classes.paginationBox}>

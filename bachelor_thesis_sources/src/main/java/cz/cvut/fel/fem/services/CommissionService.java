@@ -266,7 +266,6 @@ public class CommissionService {
      */
     public Map<String, Object> getByPropsPaginated(PageRequestTO pageRequestTO) {
         if (pageRequestTO.getProps().getSelectedSemester() != null) {
-            log.severe("by semester");
             return getByPropsBySemesterPaginated(pageRequestTO);
         } else {
 
@@ -308,7 +307,6 @@ public class CommissionService {
                 }
             }
 
-//        log.info(page.toString());
             return new PageResponseTO(page).getData();
         }
 
@@ -318,7 +316,6 @@ public class CommissionService {
         var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
         var props = pageRequestTO.getProps();
         var notDraft = getNotDraft().stream()
-//                .filter(commission -> commission.getExam().getSemester().equals(pageRequestTO.getProps().getSelectedSemester()))
                 .map(AbstractEntity::getId)
                 .collect(Collectors.toList());
         Page<Commission> page;
@@ -328,9 +325,6 @@ public class CommissionService {
             page = commissionRepository.getByAllDegreesAndAllFieldsBySemesterPaginated(
                     props.getSelectedSemester(),
                     notDraft, pageRequest);
-            log.info("request with all degrees and all fields by semester");
-            log.info(page.getContent().toString());
-
         } else {
             if (props.getSelectedField().getField().equals(FieldOfStudyEnum.ALL)) {
                 // request with selected degree and all fields according to this degree
@@ -338,8 +332,6 @@ public class CommissionService {
                         notDraft,
                         props.getSelectedField().getDegree(),
                         pageRequest);
-                log.info("request with selected degree and all fields according to this degree by semester");
-
             } else {
                 //request specified degree and field of study
                 page = commissionRepository.getByDegreeAndFieldBySemesterPaginated(props.getSelectedSemester(),
@@ -347,8 +339,6 @@ public class CommissionService {
                         props.getSelectedField().getDegree(),
                         props.getSelectedField().getField().toString(),
                         pageRequest);
-                log.info("request specified degree and field of study by semester");
-
             }
         }
 
@@ -356,6 +346,38 @@ public class CommissionService {
     }
 
     public Map<String, Object> getByPropsByTeacherPaginated(Long teacherId, PageRequestTO pageRequestTO) {
+        if (pageRequestTO.getProps().getSelectedSemester() != null) {
+            return getByPropsByTeacherBySemesterPaginated(teacherId, pageRequestTO);
+        } else {
+
+            var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+
+            var byTeacher = getByTeacher(teacherId).stream()
+                    .filter(commission -> !commission.getState().equals(CommissionState.DRAFT))
+                    .map(AbstractEntity::getId)
+                    .collect(Collectors.toList());
+
+            Page<Commission> page;
+            if (pageRequestTO.getProps().getSelectedDegree().equals(Degree.ALL)) {
+                page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
+                        pageRequestTO.getProps().getSelectedDatesRange(),
+                        byTeacher,
+                        pageRequest);
+            } else {
+                page = commissionRepository.getByDegreeAndAllFieldsPaginated(
+                        pageRequestTO.getProps().getSelectedDatesRange(),
+                        byTeacher,
+                        pageRequestTO.getProps().getSelectedDegree(),
+                        pageRequest);
+            }
+
+            return new PageResponseTO(page).getData();
+        }
+
+    }
+
+    public Map<String, Object> getByPropsByTeacherBySemesterPaginated(Long teacherId, PageRequestTO pageRequestTO) {
+
         var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
 
         var byTeacher = getByTeacher(teacherId).stream()
@@ -365,20 +387,19 @@ public class CommissionService {
 
         Page<Commission> page;
         if (pageRequestTO.getProps().getSelectedDegree().equals(Degree.ALL)) {
-            page = commissionRepository.getByAllDegreesAndAllFieldsPaginated(
-                    pageRequestTO.getProps().getSelectedDatesRange(),
+            page = commissionRepository.getByAllDegreesAndAllFieldsBySemesterPaginated(
+                    pageRequestTO.getProps().getSelectedSemester(),
                     byTeacher,
                     pageRequest);
         } else {
-            page = commissionRepository.getByDegreeAndAllFieldsPaginated(
-                    pageRequestTO.getProps().getSelectedDatesRange(),
+            page = commissionRepository.getByDegreeAndAllFieldsBySemesterPaginated(
+                    pageRequestTO.getProps().getSelectedSemester(),
                     byTeacher,
                     pageRequestTO.getProps().getSelectedDegree(),
                     pageRequest);
         }
 
         return new PageResponseTO(page).getData();
-
     }
 
     //    //do not work
@@ -432,8 +453,6 @@ public class CommissionService {
 
     public void removeDrafts() {
         var drafts = getDrafts();
-
         remove(drafts);
     }
-
 }
