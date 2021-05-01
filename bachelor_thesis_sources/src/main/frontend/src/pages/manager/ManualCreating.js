@@ -186,10 +186,10 @@ class ManualCreatingPage extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    fetchTeachers(paginationChanged) {
+    fetchTeachers(paginationChanged, patternChanged) {
 
         const pageTO = {
-            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
+            page: paginationChanged ? this.state.currentPage - 1 : patternChanged ? 0 : this.state.currentPage,
             size: this.state.size,
             pattern: this.state.searchPattern,
         }
@@ -204,7 +204,6 @@ class ManualCreatingPage extends React.Component {
                         totalItemsCount: res.data.totalItemsCount,
                         totalPagesCount: res.data.totalPagesCount,
                     }
-                    // , () => console.log(res.data)
                 )
             })
             .catch(err => handleResponseError(err))
@@ -244,13 +243,9 @@ class ManualCreatingPage extends React.Component {
 
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
-        if (value && value !== '') {
-            this.setState({
-                searchPattern: value
-            }, () => this.fetchTeachers())
-        } else {
-            this.setState({searchPattern: ''})
-        }
+        this.setState({
+            searchPattern: value ? value : ''
+        }, () => this.fetchTeachers(false, true))
     }
 
     handleChangeDate = (event) => {
@@ -401,10 +396,7 @@ class ManualCreatingPage extends React.Component {
         if (!this.state.commission) {
             return false
         }
-        if (this.state.commission.teachers.includes(item)) {
-            return true
-        }
-        return false
+        return this.state.commission.teachers.includes(item);
     }
 
     onCloseSnackbar = () => {

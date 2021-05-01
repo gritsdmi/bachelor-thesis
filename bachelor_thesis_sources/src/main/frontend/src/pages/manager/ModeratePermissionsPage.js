@@ -42,7 +42,7 @@ const InitialState = {
 
     createUserDialogOpen: false,
 
-    currentPage: 1,
+    currentPage: 0,
     size: 10, //count items in current page
     totalItemsCount: null,
     totalPagesCount: null,
@@ -61,13 +61,13 @@ class ModeratePermissionsPage extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchUsers(true)
+        this.fetchUsers()
     }
 
-    fetchUsers(paginationChanged) {
+    fetchUsers(paginationChanged, patternChanged) {
 
         const pageTO = {
-            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
+            page: paginationChanged ? this.state.currentPage - 1 : patternChanged ? 0 : this.state.currentPage,
             size: this.state.size,
             pattern: this.state.currentPattern,
         }
@@ -88,7 +88,7 @@ class ModeratePermissionsPage extends React.Component {
     onChangeInput = (e) => {
         this.setState({
             currentPattern: e.target.value,
-        }, () => this.fetchUsers())
+        }, () => this.fetchUsers(false, true))
     }
 
     onChangePagination = (event, value) => {

@@ -48,19 +48,18 @@ class ManageTeachersPage extends React.Component {
         }
     }
 
-
     componentDidMount() {
         this.fetchTeachers()
     }
 
-    fetchTeachers(paginationChanged) {
+    fetchTeachers(paginationChanged, patternChanged) {
 
         const pageTO = {
-            page: paginationChanged ? this.state.currentPage - 1 : this.state.currentPage,
+            page: paginationChanged ? this.state.currentPage - 1 : patternChanged ? 0 : this.state.currentPage,
             size: this.state.size,
             pattern: this.state.searchPattern,
         }
-
+        console.log(pageTO)
         post(`/user/teacher/page`, pageTO)
             .then(res => {
                 this.setState({
@@ -71,9 +70,6 @@ class ManageTeachersPage extends React.Component {
                 })
             })
             .catch(err => handleResponseError(err))
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
     }
 
     onClickEditTeacherButton = (teacher) => {
@@ -93,7 +89,7 @@ class ManageTeachersPage extends React.Component {
     handleSearchBoxInput = (event) => {
         const value = event.target.value;
         this.setState({searchPattern: value ? value : ''}
-            , () => this.fetchTeachers(false))
+            , () => this.fetchTeachers(false, true))
     }
 
     onChangePagination = (event, value) => {
