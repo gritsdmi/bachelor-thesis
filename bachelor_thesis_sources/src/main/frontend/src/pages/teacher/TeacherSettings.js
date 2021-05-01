@@ -2,7 +2,7 @@ import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import {Paper, Snackbar} from "@material-ui/core";
 import Calendar from "react-calendar";
-import '../../styles/calendar.css';
+import '../../calendar.css';
 import moment from 'moment'
 import TeacherDateDialog from "../../components/teacher/TeacherDateDialog";
 import {get, handleResponseError, post} from "../../utils/request";

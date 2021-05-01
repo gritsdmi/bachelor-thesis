@@ -1,7 +1,6 @@
 import React from "react";
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import Paper from '@material-ui/core/Paper';
 import {NavLink} from "react-router-dom";
 import {get} from "../utils/request"
@@ -11,7 +10,9 @@ import {withStyles} from "@material-ui/core/styles";
 
 const useStyles = theme => ({
 
-    header: {},
+    buttons: {
+        padding: theme.spacing(1),
+    },
 
 })
 
@@ -51,7 +52,7 @@ class Header extends React.Component {
     render() {
         const {classes} = this.props
         return (
-            <Paper className='header'>
+            <Paper className={'header'}>
                 <Box>
                     <Typography
                         variant={'h3'}
@@ -73,34 +74,15 @@ class Header extends React.Component {
                         {this.state.role}
                     </Typography>
                 </Box>
-                <Box>
-                    <Button>
-                        <NavLink to="/commissions">Commissions List</NavLink>
-                    </Button>
-                    <Button>
-                        <NavLink to="/auto">Auto Generating</NavLink>
-                    </Button>
-                    <Button>
-                        <NavLink to="/manual">Manual Generating</NavLink>
-                    </Button>
-                    <Button>
-                        <NavLink to="/manage">Manage teachers</NavLink>
-                    </Button>
-
-                    <Button>
-                        <NavLink to="/emails"><AccountBoxIcon/></NavLink>
-                    </Button>
-
-                    <Button>
-                        <NavLink to="/permissions"><AccountBoxIcon/></NavLink>
-                    </Button>
-
-                    <Button>
-                        <NavLink to="/teacher">Teacher</NavLink>
-                    </Button>
-                    <Button>
-                        <NavLink to="/teacher/settings">Teacher settings</NavLink>
-                    </Button>
+                <Box className={classes.buttons}>
+                    <NavLink to="/commissions"> Commissions List </NavLink>
+                    <NavLink to="/auto">Auto Generating</NavLink>
+                    <NavLink to="/manual">Manual Generating</NavLink>
+                    <NavLink to="/manage">Manage teachers</NavLink>
+                    <NavLink to="/emails">emails</NavLink>
+                    <NavLink to="/permissions">admin</NavLink>
+                    <NavLink to="/teacher">Teacher</NavLink>
+                    <NavLink to="/teacherPref">Teacher settings</NavLink>
                     <Button
                         color={'secondary'}
                         variant={'contained'}

@@ -1,4 +1,4 @@
-import './styles/App.css';
+import './App.css';
 import CommissionsListPage from "./pages/manager/CommissionsList"
 import Header from "./components/Header";
 import {Route, Switch} from 'react-router-dom';
@@ -11,7 +11,7 @@ import TeacherSettings from "./pages/teacher/TeacherSettings";
 import EmailTemplates from "./pages/manager/EmailTemplates";
 import Login from "./pages/login/Login";
 import {ThemeProvider} from '@material-ui/core/styles'
-import femTheme from './styles/theme'
+import femTheme from './theme'
 import ModeratePermissionsPage from "./pages/manager/ModeratePermissionsPage";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Footer from "./components/Footer";
@@ -36,7 +36,7 @@ function App() {
                         <Route exact path="/manage" component={ManageTeachersPage}/>
                         <Route exact path="/permissions" component={ModeratePermissionsPage}/>
                         <Route exact path="/teacher" component={TeacherOverview}/>
-                        <Route exact path="/teacher/settings" component={TeacherSettings}/>
+                        <Route exact path="/teacherPref" component={TeacherSettings}/>
                         <Route exact path="/emails" component={EmailTemplates}/>
                     </Switch>
                     <Footer/>
