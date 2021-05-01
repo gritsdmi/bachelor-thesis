@@ -2,7 +2,7 @@ package cz.cvut.fel.fem.utils.csv;
 
 import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.services.CommissionService;
-import cz.cvut.fel.fem.to.GenerateRequestTO;
+import cz.cvut.fel.fem.to.GenerateCSVRequestTO;
 import lombok.extern.java.Log;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -27,20 +27,29 @@ public class CSVCreator {
     @Autowired
     private CommissionService commissionService;
 
-    public File generateCSV(GenerateRequestTO request) throws ParseException {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.uuuu");
+    final String fileName = "src/main/resources/new.csv";
 
-        LocalDate from = LocalDate.parse(request.getDateTo(), dtf);
-        LocalDate to = LocalDate.parse(request.getDateTo(), dtf);
+    public File generateCSV(GenerateCSVRequestTO request) throws ParseException {
+        var data = commissionService.getNotDraft();
 
-        var commissions = commissionService.getNotDraft();
+        if (request.getSemester() != null) {
+            data = data.stream()
+                    .filter(commission -> commission.getExam().getSemester().equals(request.getSemester()))
+                    .collect(Collectors.toList());
+        } else {
 
-        var data = commissions.stream()
-                .filter(com -> {
-                    var date = LocalDate.parse(com.getExam().getDate(), dtf);
-                    return (date.isEqual(from) || date.isEqual(to)) || (date.isBefore(to) && date.isAfter(from));
-                })
-                .collect(Collectors.toList());
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.uuuu");
+
+            LocalDate from = LocalDate.parse(request.getDateTo(), dtf);
+            LocalDate to = LocalDate.parse(request.getDateTo(), dtf);
+
+            data = data.stream()
+                    .filter(com -> {
+                        var date = LocalDate.parse(com.getExam().getDate(), dtf);
+                        return (date.isEqual(from) || date.isEqual(to)) || (date.isBefore(to) && date.isAfter(from));
+                    })
+                    .collect(Collectors.toList());
+        }
 
         try {
             var filename = createCSVFile(data);
@@ -54,8 +63,7 @@ public class CSVCreator {
 
     private String createCSVFile(List<Commission> data) throws IOException {
 
-        final String[] HEADERS = {"id", "T1", "T2", "T3", "T4", "T5", "Date", "Time", "Degree", "Study field"};
-        final String fileName = "src/main/resources/new.csv";
+        final String[] HEADERS = {"id", "T1", "T2", "T3", "T4", "T5", "Semester", "Date", "Time", "Degree", "Study field"};
 
         FileWriter out = new FileWriter(fileName);
         try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(HEADERS))) {
@@ -87,11 +95,11 @@ public class CSVCreator {
                 ret.add("");
             }
         }
+        ret.add(commission.getExam().getSemester());
         ret.add(commission.getExam().getDate());
         ret.add(commission.getExam().getTime());
         ret.add(commission.getExam().getDegree().toString());
         ret.add(commission.getExam().getFieldOfStudy());
         return ret;
     }
-
 }

@@ -129,7 +129,7 @@ class CommissionSearchBox extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    fetchSemesters(didMount) {
+    fetchSemesters() {
         get('/exam/semesters')
             .then(res => this.setState({
                     semesters: res.data,

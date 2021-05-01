@@ -4,7 +4,7 @@ import cz.cvut.fel.fem.model.Commission;
 import cz.cvut.fel.fem.model.User;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.CreatorTO;
-import cz.cvut.fel.fem.to.GenerateRequestTO;
+import cz.cvut.fel.fem.to.GenerateCSVRequestTO;
 import cz.cvut.fel.fem.utils.CommissionMaker;
 import cz.cvut.fel.fem.utils.csv.CSVCreator;
 import lombok.extern.java.Log;
@@ -51,7 +51,7 @@ public class UtilController implements Controller {
     }
 
     @RequestMapping(path = "/download", method = RequestMethod.POST)
-    public ResponseEntity<Resource> download(@RequestBody GenerateRequestTO request) throws IOException {
+    public ResponseEntity<Resource> download(@RequestBody GenerateCSVRequestTO request) throws IOException {
 
         File file = null;
         try {

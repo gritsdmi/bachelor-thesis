@@ -6,8 +6,10 @@ import {
     DialogTitle,
     FormControlLabel,
     Grid,
+    MenuItem,
     Radio,
-    RadioGroup
+    RadioGroup,
+    TextField
 } from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -15,7 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
-import {download} from "../utils/request";
+import {download, get, handleResponseError} from "../utils/request";
 
 
 const dateFormatMoment = "DD.MM.yyyy"
@@ -43,22 +45,21 @@ const useStyles = theme => ({
         paddingRight: theme.spacing(2),
         paddingLeft: theme.spacing(2),
     },
-    gridRoot: {
-        "&.MuiGrid-root": {
-            // backgroundColor: "red",
-            // margin: theme.spacing(3),
-        }
-    },
     gridLine: {
         padding: theme.spacing(2),
     },
+    semSelect: {
+        paddingLeft: theme.spacing(2),
+    }
 });
 
 const InitialState = {
     selectedDateFrom: new Date(),
     selectedDateTo: new Date(),
+    selectedSemester: '',
+    semesters: [],
 
-    radioBy: 'date',
+    radioBy: 'sem',
 
 }
 
@@ -72,32 +73,48 @@ class GenerateCSVDialog extends React.Component {
     }
 
     componentDidMount() {
+        get('/exam/semesters')
+            .then(res => this.setState({
+                    semesters: res.data,
+                    selectedSemester: res.data[res.data.length - 1],
+                }
+            ))
+            .catch(err => handleResponseError(err))
     }
 
-    onChangeRadio = (e) => {
+    // componentDidUpdate(prevProps, prevState, snapshot) {
+    //     if (prevProps !== this.props) {
+    //         if (this.props.open) {
+    //             this.setState({
+    //                 selectedSemester: this.props.semesters[this.props.semesters.length - 1]
+    //             })
+    //         }
+    //     }
+    // }
+
+    onChange = (e) => {
         this.setState({
-            radioBy: e.target.value,
+            [e.target.name]: e.target.value,
         })
     }
 
     handleChangeDateFrom = e => {
         this.setState({
             selectedDateFrom: e,
-        }, () => console.log(this.state.selectedDateFrom))
-
+        })
     }
 
     handleChangeDateTo = e => {
         this.setState({
             selectedDateTo: e,
-        }, () => console.log(this.state.selectedDateTo))
+        })
     }
 
     onClickDownload = () => {
         const payload = {
             dateFrom: moment(this.state.selectedDateFrom).format(dateFormatMoment),
             dateTo: moment(this.state.selectedDateTo).format(dateFormatMoment),
-            semester: null,
+            semester: this.state.selectedSemester === 'sem' ? this.state.selectedSemester : null,
         }
 
         download(`/util/download`, payload)
@@ -127,8 +144,11 @@ class GenerateCSVDialog extends React.Component {
                                 <Typography>Period</Typography>
                             </Grid>
                             <Grid xs item>
-                                <RadioGroup value={this.state.radioBy} onChange={this.onChangeRadio}
-                                            className={`${classes.flexRow} ${classes.radioGroup}`}>
+                                <RadioGroup
+                                    name={'radioBy'}
+                                    value={this.state.radioBy}
+                                    onChange={this.onChange}
+                                    className={`${classes.flexRow} ${classes.radioGroup}`}>
                                     <FormControlLabel value='date'
                                                       control={<Radio color={'primary'} size={'small'}/>}
                                                       label="by Date"
@@ -142,33 +162,58 @@ class GenerateCSVDialog extends React.Component {
                         </Grid>
                         <Grid item container className={classes.gridLine}>
                             <Grid xs={3} item className={classes.typography}>
-                                <Typography>Dates</Typography>
+                                {this.state.radioBy === 'date' ?
+                                    <Typography>Dates</Typography> :
+                                    <Typography>Semester</Typography>}
                             </Grid>
-                            <Grid xs item className={classes.flexRow}>
-                                <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
-                                    <DatePicker
-                                        id="date-picker-inline-from"
-                                        format={dateFormatMoment}
-                                        autoOk={true}
-                                        value={this.state.selectedDateFrom}
-                                        onChange={this.handleChangeDateFrom}
-                                        className={classes.datePick}
-                                        maxDate={this.state.selectedDateTo}
-                                        helperText="Date from"
+                            {this.state.radioBy === 'date' ?
+                                <Grid xs item className={classes.flexRow}>
+                                    <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
+                                        <DatePicker
+                                            id="date-picker-inline-from"
+                                            format={dateFormatMoment}
+                                            autoOk={true}
+                                            value={this.state.selectedDateFrom}
+                                            onChange={this.handleChangeDateFrom}
+                                            className={classes.datePick}
+                                            maxDate={this.state.selectedDateTo}
+                                            helperText="Date from"
 
-                                    />
-                                    <DatePicker
-                                        id="date-picker-inline-to"
-                                        format={dateFormatMoment}
-                                        autoOk={true}
-                                        value={this.state.selectedDateTo}
-                                        onChange={this.handleChangeDateTo}
-                                        className={classes.datePick}
-                                        minDate={this.state.selectedDateFrom}
-                                        helperText="Date to"
-                                    />
-                                </MuiPickersUtilsProvider>
-                            </Grid>
+                                        />
+                                        <DatePicker
+                                            id="date-picker-inline-to"
+                                            format={dateFormatMoment}
+                                            autoOk={true}
+                                            value={this.state.selectedDateTo}
+                                            onChange={this.handleChangeDateTo}
+                                            className={classes.datePick}
+                                            minDate={this.state.selectedDateFrom}
+                                            helperText="Date to"
+                                        />
+                                    </MuiPickersUtilsProvider>
+                                </Grid>
+                                :
+                                <Grid xs item className={classes.flexRow}>
+                                    <TextField
+                                        id="semester-select"
+                                        name={'selectedSemester'}
+                                        select
+                                        value={this.state.selectedSemester}
+                                        onChange={this.onChange}
+                                        helperText="Semester"
+                                        className={classes.semSelect}
+                                    >
+                                        {this.state.semesters.map((semester, idx) => (
+                                            <MenuItem
+                                                key={idx}
+                                                value={semester}
+                                            >
+                                                {semester}
+                                            </MenuItem>
+                                        ))}
+                                    </TextField>
+                                </Grid>
+                            }
                         </Grid>
                     </Grid>
                 </DialogContent>
