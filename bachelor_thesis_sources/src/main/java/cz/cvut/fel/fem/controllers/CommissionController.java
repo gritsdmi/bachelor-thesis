@@ -104,7 +104,6 @@ public class CommissionController implements Controller {
 
     @PostMapping("/filter/page")
     public Map<String, Object> getByFilterPaged(@RequestBody PageRequestTO pageRequestTO) {
-        log.info("filter page");
         return commissionService.getByPropsPaginated(pageRequestTO);
     }
 

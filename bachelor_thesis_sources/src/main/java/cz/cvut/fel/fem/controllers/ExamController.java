@@ -36,6 +36,11 @@ public class ExamController implements Controller {
         return examService.getDegrees();
     }
 
+    @GetMapping("/semesters")
+    public List<String> getSemesters() {
+        return examService.getAllSemesters();
+    }
+
 
     //DO NOT USE THEM
 //    @PostMapping

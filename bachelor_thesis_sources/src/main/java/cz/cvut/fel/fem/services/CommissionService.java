@@ -134,15 +134,15 @@ public class CommissionService {
      */
     public Commission saveManual(CreatorTO creatorTO) {
         var commission = new Commission();
-        var exam = examService.create();
+        var exam = examService.create(creatorTO);
 
-        exam.setDate(creatorTO.getDate());
-        exam.setTime(creatorTO.getTime());
-        if (creatorTO.getLocationId() != null) {
-            exam.setLocation(locationService.get(creatorTO.getLocationId()));
-        }
-        exam.setDegree(creatorTO.getDegree());
-        exam.setFieldOfStudy(creatorTO.getField());
+//        exam.setDate(creatorTO.getDate());
+//        exam.setTime(creatorTO.getTime());
+//        if (creatorTO.getLocationId() != null) {
+//            exam.setLocation(locationService.get(creatorTO.getLocationId()));
+//        }
+//        exam.setDegree(creatorTO.getDegree());
+//        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.EDITABLE);
@@ -161,15 +161,15 @@ public class CommissionService {
 
         var commission = new Commission();
 
-        var exam = examService.create();
-        var location = creatorTO.getLocationId();
-
-        exam.setDate(creatorTO.getDate());
-        exam.setTime(creatorTO.getTime());
-        if (location != null)
-            exam.setLocation(locationService.get(creatorTO.getLocationId()));
-        exam.setDegree(creatorTO.getDegree());
-        exam.setFieldOfStudy(creatorTO.getField());
+        var exam = examService.create(creatorTO);
+//        var location = creatorTO.getLocationId();
+//
+//        exam.setDate(creatorTO.getDate());
+//        exam.setTime(creatorTO.getTime());
+//        if (location != null)
+//            exam.setLocation(locationService.get(creatorTO.getLocationId()));
+//        exam.setDegree(creatorTO.getDegree());
+//        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.DRAFT);
