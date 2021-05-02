@@ -1,4 +1,4 @@
-import './App.css';
+import './styles/App.css';
 import CommissionsListPage from "./pages/manager/CommissionsList"
 import Header from "./components/Header";
 import {Route, Switch} from 'react-router-dom';
@@ -11,7 +11,7 @@ import TeacherSettings from "./pages/teacher/TeacherSettings";
 import EmailTemplates from "./pages/manager/EmailTemplates";
 import Login from "./pages/login/Login";
 import {ThemeProvider} from '@material-ui/core/styles'
-import femTheme from './theme'
+import femTheme from './styles/theme'
 import ModeratePermissionsPage from "./pages/manager/ModeratePermissionsPage";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Footer from "./components/Footer";
@@ -26,9 +26,8 @@ function App() {
                     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
                         {/*<Route exact path="/" component={CommissionsListPage}/>*/}
-                        {/*<Route exact path="/" component={Login}/>*/}
-                        <Route exact path="/index.html" component={Login}/>
-                        <Route exact path="/loginpage" component={Login}/>
+                        <Route exact path="/" component={Login}/>
+                        <Route exact path="/index.html" component={CommissionsListPage}/>
                         <Route exact path="/commissions" component={CommissionsListPage}/>
                         <Route exact path="/auto" component={AutoGeneratingPage}/>
                         <Route exact path="/manual" component={ManualCreatingPage}/>

@@ -3,11 +3,11 @@ import axios from "axios";
 const local_URL = "http://localhost:8080"
 const deploy_URL = "http://fem.felk.cvut.cz:8080/fem"
 
-// const base_URL = deploy_URL
-const base_URL = local_URL
+const base_URL = deploy_URL
+// const base_URL = local_URL
 
 const token = "Bearer "
-const enableJWT = true
+const enableJWT = false
 
 const config = (jwt) => {
     return {
