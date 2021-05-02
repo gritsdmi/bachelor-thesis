@@ -6,6 +6,7 @@ import cz.cvut.fel.fem.model.enums.EmailType;
 import cz.cvut.fel.fem.repository.EmailRepository;
 import cz.cvut.fel.fem.to.EmailTO;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.SimpleMailMessage;
@@ -28,6 +29,9 @@ public class EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     public Email get(Long emailId) {
         return emailRepository.getOne(emailId);
     }
@@ -41,25 +45,14 @@ public class EmailService {
     }
 
     public Email save(EmailTO emailTO) {
-        var email = new Email();
-
-        email.setAuthor(emailTO.getAuthor());
-        email.setMessageText(email.getMessageText());
-        email.setTo(emailTO.getToUsers());
-        email.setType(email.getType());
-
+        var email = modelMapper.map(emailTO, Email.class);
         return emailRepository.save(email);
     }
 
     public Email update(Long emailId, EmailTO emailTO) {
 
         var email = emailRepository.getOne(emailId);
-
-        email.setAuthor(emailTO.getAuthor());
-        email.setMessageText(email.getMessageText());
-        email.setTo(emailTO.getToUsers());
-        email.setType(email.getType());
-
+        modelMapper.map(emailTO, email);
         return emailRepository.save(email);
     }
 
@@ -80,11 +73,9 @@ public class EmailService {
         message.setSubject(subject);
         message.setText(text);
 
-        log.severe(message.toString());
         emailSender.send(message);
     }
 
-    //todo create email object
     public void sendEmail(EmailTO emailTO) {
 //        var from = emailTO.getAuthor().getEmailAddress();
         var text = emailTO.getMessageText();
@@ -97,6 +88,8 @@ public class EmailService {
                     .collect(Collectors.toList())
                     .toArray(String[]::new);
         }
+
+        save(emailTO);
 
         sendSimpleMessage(emailsArray, subject, text);
 

@@ -21,7 +21,6 @@ const useStyles = theme => ({
     firstCol: {
         paddingTop: theme.spacing(1.25),
         margin: theme.spacing(1)
-
     },
     item: {
         margin: theme.spacing(1)
@@ -298,9 +297,13 @@ class EmailDialog extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         <Button
+                            color={'secondary'}
+                            variant={'contained'}
                             onClick={this.props.onClose}
                         >Close</Button>
                         <Button
+                            color={'primary'}
+                            variant={'contained'}
                             onClick={this.onClickSendButton}
                         >Send</Button>
                     </DialogActions>

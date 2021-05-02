@@ -23,7 +23,7 @@ public class Email extends AbstractEntity {
 
     @OneToMany
     @JsonIgnore
-    private List<User> to;
+    private List<User> toUsers;
 
     @Enumerated(EnumType.STRING)
     private EmailType type;
