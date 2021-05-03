@@ -7,9 +7,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Log
 @RestController
@@ -31,18 +29,6 @@ public class LocationController implements Controller {
     @GetMapping("/{id}")
     public Location get(@PathVariable Long id) {
         return locationService.get(id);
-    }
-
-    @GetMapping("/map")
-    public Map<String, List<String>> getByMap() {
-        return locationService.getMap();
-    }
-
-    @GetMapping("/map2")
-    public List<Map<String, List<String>>> getByMap2() {
-        var lol = new ArrayList<Map<String, List<String>>>();
-        lol.add(locationService.getMap());
-        return lol;
     }
 
     @GetMapping("/free/{date}")

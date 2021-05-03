@@ -6,6 +6,7 @@ import cz.cvut.fel.fem.model.enums.CommissionState;
 import cz.cvut.fel.fem.repository.LocationRepository;
 import cz.cvut.fel.fem.to.LocationTO;
 import lombok.extern.java.Log;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,9 @@ public class LocationService {
 
     @Autowired
     private ExamService examService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     public List<Location> getAll() {
         return locationRepository.findAll();
@@ -68,19 +72,13 @@ public class LocationService {
     }
 
     public Location save(LocationTO locationTO) {
-        var newLoc = new Location();
-        newLoc.setBuilding(locationTO.getBuilding());
-        newLoc.setClassroom(locationTO.getClassroom());
-
+        var newLoc = modelMapper.map(locationTO, Location.class);
         return locationRepository.save(newLoc);
     }
 
-    public Location update(Long locationId, LocationTO location) {
+    public Location update(Long locationId, LocationTO locationTO) {
         var old = locationRepository.getOne(locationId);
-
-        old.setClassroom(location.getClassroom());
-        old.setBuilding(location.getBuilding());
-
+        modelMapper.map(locationTO, old);
         return locationRepository.save(old);
     }
 

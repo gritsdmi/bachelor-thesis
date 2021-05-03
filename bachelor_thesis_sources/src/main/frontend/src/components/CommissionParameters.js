@@ -44,7 +44,6 @@ const InitialState = {
 
 }
 
-
 //used in autogenerate page
 class CommissionGenerateParameters extends React.Component {
     constructor(props) {
@@ -105,11 +104,11 @@ class CommissionGenerateParameters extends React.Component {
         return arr
     }
 
-    handleChangeDate = (event) => {
-        this.setState({
-            selectedDate: event,
-        }, () => this.fetchLocations(this.state.selectedDate))
-    }
+    // handleChangeDate = (event) => {
+    //     this.setState({
+    //         selectedDate: event,
+    //     }, () => this.fetchLocations(this.state.selectedDate))
+    // }
 
     handleChangeDateTime = (event) => {
         this.setState({

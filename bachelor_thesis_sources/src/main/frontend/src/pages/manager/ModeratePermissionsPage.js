@@ -17,6 +17,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Paper from "@material-ui/core/Paper";
 import Container from "@material-ui/core/Container";
 import EditUserDialog from "../../components/manage/EditUserDialog";
+import LocationsDialog from "../../components/LocationsDialog";
 
 const useStyles = theme => ({
     paginationBox: {
@@ -41,6 +42,7 @@ const InitialState = {
     createUserDialogOpen: false,
     editUserDialogOpen: false,
     editedUser: null,
+    locationsDialogOpen: false,
 
     currentPage: 0,
     size: 10, //count items in current page
@@ -109,6 +111,18 @@ class ModeratePermissionsPage extends React.Component {
     onCLickCreateUser = () => {
         this.setState({
             createUserDialogOpen: true,
+        })
+    }
+
+    onCLickLocationsDialog = () => {
+        this.setState({
+            locationsDialogOpen: true,
+        })
+    }
+
+    onCloseLocationsDialog = () => {
+        this.setState({
+            locationsDialogOpen: false,
         })
     }
 
@@ -182,6 +196,13 @@ class ModeratePermissionsPage extends React.Component {
                 >
                     Create new user
                 </Button>
+                <Button
+                    onClick={this.onCLickLocationsDialog}
+                    color={'primary'}
+                    variant={'contained'}
+                >
+                    Locations
+                </Button>
                 <CreateUserDialog
                     open={this.state.createUserDialogOpen}
                     onClose={this.onCloseCreateUserDialog}
@@ -192,6 +213,10 @@ class ModeratePermissionsPage extends React.Component {
                     onClose={this.onCloseEditUserDialog}
                     onSave={this.onSaveEditedUser}
                     user={this.state.editedUser}
+                />
+                <LocationsDialog
+                    open={this.state.locationsDialogOpen}
+                    onClose={this.onCloseLocationsDialog}
                 />
                 <Box className={classes.paginationBox}>
                     <Pagination

@@ -13,7 +13,6 @@ import java.util.Objects;
 @Getter
 @ToString
 @Table(name = "Location")
-//@EqualsAndHashCode(callSuper = false)
 public class Location extends AbstractEntity {
 
     private String classroom;
