@@ -10,11 +10,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByActiveTrue();
+
+    Optional<User> findByLoginAndActiveTrue(String login);
 
     Page<User> findByActiveTrue(Pageable pageable);
 

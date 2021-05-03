@@ -7,7 +7,7 @@ const base_URL = deploy_URL
 // const base_URL = local_URL
 
 const token = "Bearer "
-const enableJWT = false
+const enableJWT = true
 
 const config = (jwt) => {
     return {
@@ -130,9 +130,12 @@ export function handleResponseError(err) {
                 console.log("Error code ", err.response.status)
                 if (err.response.status === 400) {
                     console.log("Http 400 Bad Request")
-
+                }
+                if (err.response.status === 401) {
+                    console.log("Http 401 ")
                 }
                 if (err.response.status === 403) {
+                    console.log("Http 403 ")
                     localStorage.clear()
                     window.location.href = '/fem/index.html'
                 }

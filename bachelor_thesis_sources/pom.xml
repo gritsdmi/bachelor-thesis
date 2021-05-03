@@ -140,6 +140,13 @@
             <version>3.2.0</version>
         </dependency>
 
+        <!-- 02.05 from https://www.baeldung.com/spring-boot-war-tomcat-deploy -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

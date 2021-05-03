@@ -27,7 +27,8 @@ function App() {
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
                         {/*<Route exact path="/" component={CommissionsListPage}/>*/}
                         <Route exact path="/" component={Login}/>
-                        <Route exact path="/index.html" component={CommissionsListPage}/>
+                        {/*<Route exact path="/index.html" component={CommissionsListPage}/>*/}
+                        <Route exact path="/index.html" component={Login}/>
                         <Route exact path="/commissions" component={CommissionsListPage}/>
                         <Route exact path="/auto" component={AutoGeneratingPage}/>
                         <Route exact path="/manual" component={ManualCreatingPage}/>

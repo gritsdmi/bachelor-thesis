@@ -6,6 +6,7 @@ import {get, post} from "../../utils/request"
 import NewPasswordDialog from "./NewPasswordDialog";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
+import {Redirect} from "react-router-dom"
 
 const useStyles = theme => ({
     paper: {
@@ -48,6 +49,7 @@ const InitialState = {
     data: null,
     errorLabel: false,
     errorText: "Auth failed",
+    redirectTo: '',
 }
 
 class Login extends React.Component {
@@ -96,8 +98,6 @@ class Login extends React.Component {
 
     goNext(newPass) {
         this.fillLocalStorage()
-        console.log(newPass)
-
         console.log(this.state.data)
 
         if (newPass) {
@@ -117,18 +117,22 @@ class Login extends React.Component {
         }
     }
 
-    redirect() {
-        console.log('redirect') //TODO redirect error here
+    redirect = () => {
         const data = this.state.data
+        let redirectPath
         if (data.role === "ROLE_TEACHER") {
-            window.location.href = '/fem/teacher';
+            redirectPath = '/teacher';
         }
         if (data.role === "ROLE_MANAGER") {
-            window.location.href = '/fem/commissions'
+            redirectPath = '/commissions'
         }
         if (data.role === "ROLE_TEST") {
-            window.location.href = '/fem/commissions'
+            redirectPath = '/permissions'
         }
+
+        this.setState({
+            redirectTo: redirectPath,
+        })
     }
 
     fillLocalStorage() {
@@ -180,7 +184,10 @@ class Login extends React.Component {
 
     render() {
         const {classes} = this.props
-
+        const {redirectTo} = this.state
+        if (redirectTo) {
+            return <Redirect to={redirectTo}/>;
+        }
         return (
             <Box className={classes.flex}>
                 <NewPasswordDialog
