@@ -27,9 +27,6 @@ const useStyles = theme => ({
     title: {
         textAlign: 'center',
     },
-    dialog: {
-        width: '40%',
-    },
     typography: {
         alignSelf: 'center',
     },
@@ -41,7 +38,7 @@ const useStyles = theme => ({
         paddingLeft: theme.spacing(2),
     },
     datePick: {
-        maxWidth: '120px',
+        maxWidth: '150px',
         paddingRight: theme.spacing(2),
         paddingLeft: theme.spacing(2),
     },
@@ -82,16 +79,6 @@ class GenerateCSVDialog extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    // componentDidUpdate(prevProps, prevState, snapshot) {
-    //     if (prevProps !== this.props) {
-    //         if (this.props.open) {
-    //             this.setState({
-    //                 selectedSemester: this.props.semesters[this.props.semesters.length - 1]
-    //             })
-    //         }
-    //     }
-    // }
-
     onChange = (e) => {
         this.setState({
             [e.target.name]: e.target.value,
@@ -118,7 +105,7 @@ class GenerateCSVDialog extends React.Component {
         }
 
         download(`/util/download`, payload)
-
+        this.props.onClose()
     }
 
     render() {
@@ -130,12 +117,9 @@ class GenerateCSVDialog extends React.Component {
                 onClose={this.props.onClose}
                 fullWidth
             >
-                <DialogTitle
-                    className={classes.title}
-                >CSV</DialogTitle>
+                <DialogTitle className={classes.title}>CSV</DialogTitle>
                 <DialogContent dividers>
                     <Grid
-                        className={classes.gridRoot}
                         container
                         direction={'column'}>
 
