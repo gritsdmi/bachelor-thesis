@@ -44,7 +44,7 @@ const InitialState = {
     totalItemsCount: null,
     totalPagesCount: null,
 
-    pageSizes: [2, 10, 25, 50, 100],
+    pageSizes: [10, 25, 50, 100],
 
     editTeacherDialogOpen: false,
     currentTeacher: null,
@@ -147,21 +147,11 @@ class ManualCreatingPage extends React.Component {
                 if (this.state.edit) {
                     this.setState({
                             locations: response.data,
-                        }
-                        , () => {
-                            // console.log(response.data)
-                            console.log(this.state)
                         })
                 } else {
                     this.setState({
                             locations: response.data,
                             selectedLocation: response.data.length > 0 ? response.data[0] : '',
-                        }
-                        , () => {
-                            console.log(this.state)
-
-                            // console.log(response.data)
-                            // console.log(this.state)
                         }
                     )
                 }
@@ -320,7 +310,6 @@ class ManualCreatingPage extends React.Component {
                     degree: this.state.selectedDegree,
                     fieldOfStudy: this.state.selectedField.field,
                     location: this.state.selectedLocation,
-                    semester: null,
                 }
             }
             console.log(payload)
@@ -362,8 +351,6 @@ class ManualCreatingPage extends React.Component {
                     }, () => this.fetchAll())
                 })
                 .catch(err => handleResponseError(err))
-
-
         }
     }
 

@@ -88,12 +88,13 @@ export default function CommissionCard({commission, onInfoClick, onEditClick}) {
                     variant={"contained"}
                     onClick={() => onInfoClick(commission)}
                 >Info</Button>}
-                {commission.state !== 'APPROVED' &&
+
                 <Button
                     color={'primary'}
                     variant={"contained"}
+                    disabled={commission.state === 'APPROVED'}
                     onClick={() => onEditClick(commission)}
-                >{buttonText()}</Button>}
+                >{buttonText()}</Button>
             </Box>
         </Paper>
     )

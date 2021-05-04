@@ -10,17 +10,7 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
-        // color:"red",
     },
-    buttonBox: {
-        justifyContent: 'center',
-    },
-    m1: {
-        margin: theme.spacing(1),
-    },
-    title: {
-        paddingLeft: '20px',
-    }
 
 }))
 
@@ -81,6 +71,7 @@ export default function CommissionListItem({commission, onClickInfoButton, onCli
                         <Button
                             color={'primary'}
                             variant={"contained"}
+                            disabled={commission.state === 'APPROVED'}
                             onClick={() => onClickEditButton(commission)}
                         >
                             Edit

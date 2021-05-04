@@ -13,8 +13,8 @@ const femTheme = createMuiTheme({
         },
         secondary: {
             light: "#ff4081",
-            main: "#f50057",
-            dark: "#c51162",
+            main: "#f20",
+            dark: "#b00000",
             contrastText: "#fff",
         },
     },

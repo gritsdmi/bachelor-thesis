@@ -31,6 +31,13 @@ const useStyles = theme => ({
         alignItems: "center",
     },
 
+    typography: {
+        padding: theme.spacing(2),
+    },
+    calPad: {
+        marginTop: theme.spacing(1),
+    },
+
 });
 
 const InitialState = {
@@ -298,7 +305,7 @@ class TeacherSettings extends React.Component {
                     <Box
                         className={classes.box}
                     >
-                        <Typography>Calendar</Typography>
+                        <Typography className={classes.typography} variant={"h4"}>Calendar</Typography>
 
                         <Calendar
                             // locale={"cs-CZ"}
@@ -306,6 +313,7 @@ class TeacherSettings extends React.Component {
                             locale={"en-UK"}
                             onChange={this.onClickHandle}
                             tileClassName={this.markDate()}
+                            className={classes.calPad}
                         />
                     </Box>
 

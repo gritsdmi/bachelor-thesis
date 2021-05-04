@@ -111,8 +111,9 @@ class TeacherCommissionInfoDialog extends React.Component {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Location</TableCell>
-                                    <TableCell className={classes.cell}>{commission.exam.location.building
-                                    + ":" + commission.exam.location.classroom}</TableCell>
+                                    <TableCell className={classes.cell}>{
+                                        commission.exam.location ? commission.exam.location.building
+                                            + ":" + commission.exam.location.classroom : 'Location is undefined'}</TableCell>
                                 </TableRow>
                                 <TableRow>
                                     <TableCell className={classes.firstCol}>Commission</TableCell>
@@ -130,20 +131,28 @@ class TeacherCommissionInfoDialog extends React.Component {
                         </Table>
                     </DialogContent>
                     <DialogActions>
-
-                        <Button>
-                            Will attend
-                        </Button>
                         <Button
-                            onClick={this.onClickCantAttendButton}
-                        >
-                            Can't attend
-                        </Button>
-                        <Button
+                            color={'secondary'}
+                            variant={'contained'}
                             onClick={this.props.onClose}
                         >
                             Close
                         </Button>
+                        <Button
+                            color={'primary'}
+                            variant={'contained'}
+                            disabled
+                        >
+                            Will attend
+                        </Button>
+                        <Button
+                            color={'primary'}
+                            variant={'contained'}
+                            onClick={this.onClickCantAttendButton}
+                        >
+                            Can't attend
+                        </Button>
+
                     </DialogActions>
                 </Dialog>
             </>

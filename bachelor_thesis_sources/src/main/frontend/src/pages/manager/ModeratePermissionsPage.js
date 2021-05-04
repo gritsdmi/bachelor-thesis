@@ -31,6 +31,10 @@ const useStyles = theme => ({
     flex: {
         display: 'flex',
     },
+    pageSelect: {
+        width: '70px',
+        marginLeft: '10px',
+    },
 });
 
 const InitialState = {

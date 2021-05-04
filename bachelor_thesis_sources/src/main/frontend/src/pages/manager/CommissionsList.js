@@ -38,9 +38,6 @@ const useStyles = theme => ({
         width: '70px',
         marginLeft: '10px',
     },
-    menuSelect: {
-        paddingLeft: '10px',
-    },
     typography: {
         alignSelf: 'center',
     },

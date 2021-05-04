@@ -3,7 +3,8 @@ import {Dialog, DialogActions, DialogContent, DialogTitle} from "@material-ui/co
 import {withStyles} from "@material-ui/core/styles";
 import SearchResultPanel from "../SearchResultPanel";
 import SearchBox from "../SearchBox";
-import {get, post} from "../../utils/request";
+import {get, handleResponseError, post} from "../../utils/request";
+import Button from "@material-ui/core/Button";
 
 const useStyles = theme => ({
     item: {
@@ -22,7 +23,10 @@ const useStyles = theme => ({
     inputCell: {
         maxWidth: '50px',
         border: 'none',
-    }
+    },
+    dialog: {
+        maxHeight: '80vh',
+    },
 });
 
 const InitialState = {
@@ -57,7 +61,7 @@ class TeacherRecommendDialog extends React.Component {
                     teachers: response.data,
                 }, () => console.log(response.data))
             })
-            .catch(error => console.log(error))
+            .catch(err => handleResponseError(err))
     }
 
     onClickRecommendTeacher = (teacherToRecommend) => {
@@ -69,26 +73,24 @@ class TeacherRecommendDialog extends React.Component {
                 console.log(res)
                 this.props.onClose()
             })
-            .catch(err => console.log(err))
-
-        console.log("onClickRecommendTeacher", teacherToRecommend)
-
+            .catch(err => handleResponseError(err))
     }
 
     render() {
+        const {classes} = this.props
         return (
             <Dialog
                 open={this.props.open}
                 onClose={this.props.onClose}
                 fullWidth
+                className={classes.dialog}
             >
 
                 <DialogTitle>
                     TeacherRecommendDialog
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent dividers>
                     <SearchBox/>
-
                     <SearchResultPanel
                         data={this.state.teachers}
                         onClick={this.onClickRecommendTeacher}
@@ -96,12 +98,15 @@ class TeacherRecommendDialog extends React.Component {
                     />
                 </DialogContent>
                 <DialogActions>
-
+                    <Button
+                        color={'primary'}
+                        variant={'contained'}
+                        onClick={this.props.onClose}
+                    >Cancel</Button>
                 </DialogActions>
             </Dialog>
         );
     }
-
 }
 
 export default withStyles(useStyles)(TeacherRecommendDialog)
