@@ -30,7 +30,6 @@ const useStyles = theme => ({
         flexDirection: "column",
         alignItems: "center",
     },
-
     typography: {
         padding: theme.spacing(2),
     },
@@ -255,7 +254,6 @@ class TeacherSettings extends React.Component {
 
         post(`/user/teacher/prop/${this.state.teacher.id}`, payload)
             .then(res => {
-                console.log(res.data)
                 this.setState({snackOpen: true})
             })
             .catch(err => handleResponseError(err))
@@ -313,6 +311,7 @@ class TeacherSettings extends React.Component {
                             locale={"en-UK"}
                             onChange={this.onClickHandle}
                             tileClassName={this.markDate()}
+                            tileDisabled={({date}) => date.getDay() === 0 || date.getDay() === 6}
                             className={classes.calPad}
                         />
                     </Box>

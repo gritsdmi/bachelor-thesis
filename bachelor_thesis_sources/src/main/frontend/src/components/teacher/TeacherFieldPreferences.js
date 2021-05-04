@@ -49,7 +49,7 @@ export default function TeacherFieldPreferences({
                             key={ixd}
                             className={classes.listItem}
                         >
-                            <Typography>{deg}</Typography>
+                            <Typography variant={'h6'}>{deg}</Typography>
                             <List dense>
                                 {fieldsClass.map((field, idx) => {
                                     return (
