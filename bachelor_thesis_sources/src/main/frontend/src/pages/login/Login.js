@@ -85,7 +85,6 @@ class Login extends React.Component {
 
     checkIfLoginFirst() {
         const data = this.state.data
-        console.log(data)
 
         if (data.firstLogin) {
             this.setState({
@@ -98,7 +97,6 @@ class Login extends React.Component {
 
     goNext(newPass) {
         this.fillLocalStorage()
-        console.log(this.state.data)
 
         if (newPass) {
             const payload = {
@@ -137,11 +135,13 @@ class Login extends React.Component {
 
     fillLocalStorage() {
         if (this.state.data) {
-            const data = this.state.data
-            localStorage.setItem('token', JSON.stringify(data.jwt));
-            localStorage.setItem('userId', JSON.stringify(data.userId));
-            localStorage.setItem('username', JSON.stringify(data.username));
-            localStorage.setItem('role', JSON.stringify(data.role));
+            const user = {
+                userId: this.state.data.userId,
+                username: this.state.data.username,
+                role: this.state.data.role,
+            }
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', JSON.stringify(this.state.data.jwt));
         }
     }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
 import TeacherEventsFilter from "../../components/teacher/TeacherEventsFilter";
-import {get, handleResponseError, post} from "../../utils/request";
+import {get, getUserFromLS, handleResponseError, post} from "../../utils/request";
 import {Paper, Typography} from "@material-ui/core";
 import CommissionListItem from "../../components/CommissionListItem";
 import TeacherCommissionInfoDialog from "../../components/teacher/TeacherCommissionInfoDialog";
@@ -74,8 +74,9 @@ class TeacherOverview extends React.Component {
         super(props);
         this.state = {
             ...InitialState,
-            teacherId: localStorage.getItem('userId'),
+            teacherId: getUserFromLS().userId,
         }
+        console.log(getUserFromLS())
     }
 
     componentDidMount() {

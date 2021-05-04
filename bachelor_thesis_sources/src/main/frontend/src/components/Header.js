@@ -20,6 +20,7 @@ const InitialState = {
     userId: null,
     username: null,
     role: null,
+    user: null,
 }
 
 class Header extends React.Component {
@@ -30,12 +31,8 @@ class Header extends React.Component {
             userId: JSON.parse(localStorage.getItem('userId')),
             username: JSON.parse(localStorage.getItem('username')),
             role: JSON.parse(localStorage.getItem('role')),
-
+            user: JSON.parse(localStorage.getItem('user')),
         }
-        // localStorage.setItem('token', JSON.stringify(data.jwt));
-        // localStorage.setItem('userId', JSON.stringify(data.userId));
-        // localStorage.setItem('username', JSON.stringify(data.username));
-        // localStorage.setItem('role', JSON.stringify(data.role));
     }
 
     onClickParseTeachers = () => {
@@ -72,6 +69,10 @@ class Header extends React.Component {
                     <Typography>
                         role:
                         {this.state.role}
+                    </Typography>
+                    <Typography>
+                        user:
+                        {/*{this.state.user}*/}
                     </Typography>
                 </Box>
                 <Box className={classes.buttons}>

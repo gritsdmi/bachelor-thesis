@@ -19,7 +19,7 @@ const config = (jwt) => {
 
 export function get(url) {
     const URL = base_URL + url;
-    const jwt = JSON.parse(localStorage.getItem('token'));
+    const jwt = getLSToken();
 
     if (!enableJWT) {
         const payload = base_URL + url;
@@ -43,7 +43,7 @@ export function get(url) {
 
 export function download(url, payload) {
     const URL = base_URL + url;
-    const jwt = JSON.parse(localStorage.getItem('token'));
+    const jwt = getLSToken();
     const config = {
         responseType: 'blob', // important
         headers: {
@@ -101,7 +101,7 @@ export function post(url, payload) {
 
 export function del(url) {
     const URL = base_URL + url;
-    const jwt = JSON.parse(localStorage.getItem('token'));
+    const jwt = getLSToken();
 
     if (jwt) {
         console.log("sending post request with token to ", URL, config(jwt))
@@ -145,4 +145,13 @@ export function handleResponseError(err) {
             }
         }
     }
+}
+
+export function getUserFromLS() {
+    return JSON.parse(localStorage.getItem('user'))
+}
+
+function getLSToken() {
+    return JSON.parse(localStorage.getItem('token'))
+
 }

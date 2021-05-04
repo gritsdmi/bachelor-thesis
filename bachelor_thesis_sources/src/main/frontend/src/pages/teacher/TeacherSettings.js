@@ -5,13 +5,14 @@ import Calendar from "react-calendar";
 import '../../styles/calendar.css';
 import moment from 'moment'
 import TeacherDateDialog from "../../components/teacher/TeacherDateDialog";
-import {get, handleResponseError, post} from "../../utils/request";
+import {get, getUserFromLS, handleResponseError, post} from "../../utils/request";
 import TeacherFieldPreferences from "../../components/teacher/TeacherFieldPreferences";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
+import {dateFormatMoment} from "../../utils/constants";
 
 const useStyles = theme => ({
     cardContainer: {
@@ -35,7 +36,6 @@ const useStyles = theme => ({
 const InitialState = {
     calendarDialogOpen: false,
     chosenDate: null,
-    teacherId: localStorage.getItem('userId'),
 
     unavailableDates: null,
     examDates: null,
@@ -48,14 +48,13 @@ const InitialState = {
     snackOpen: false,
 
 }
-const dateFormatMoment = "DD.MM.yyyy"
 
 class TeacherSettings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             ...InitialState,
-            teacherId: localStorage.getItem('userId'),
+            teacherId: getUserFromLS().userId,
         }
     }
 
