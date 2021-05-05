@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,13 +80,10 @@ public class UserService {
     }
 
     /**
-     * using model mapper (seems working)
+     * using model mapper
      */
     public User update(Long id, UserTO userTO) {
-//        var teacher = userRepository.getOne(id);
-//        log.info(teacher.toString());
         var user = modelMapper.map(userTO, User.class);
-        log.info(user.toString());
         return userRepository.save(user);
     }
 
@@ -138,11 +136,6 @@ public class UserService {
                 .map(commission -> commission.getExam().getDate())
                 .collect(Collectors.toList());
     }
-
-//    public void addDate(List<User> list, Date date) {
-//        for (User t : list)
-//            addDate(t, date);
-//    }
 
     /**
      * Used in teacher calendar
@@ -234,13 +227,23 @@ public class UserService {
         return new PageResponseTO(page).getData();
     }
 
+    /**
+     * Used only on create commission page. returns all users including deactivated.
+     * Sorted by contract descending
+     *
+     * @param pageRequestTO pageable request
+     * @return page with list of users
+     */
     public Map<String, Object> getAvailableTeachersByDatePaged(String date, PageRequestTO pageRequestTO) {
 
-        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(),
+                pageRequestTO.getSize(),
+                Sort.by("teacher.contract").descending().and(Sort.by("surname")));
         Page<User> page;
 
         var allIdsByDate = getAvailableTeachersByDate(date)
-                .stream().map(AbstractEntity::getId)
+                .stream()
+                .map(AbstractEntity::getId)
                 .collect(Collectors.toList());
 
         if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
@@ -290,7 +293,6 @@ public class UserService {
         } else {
             page = userRepository.getUsersByIdPaged(allUsers, pageRequest);
         }
-        log.info(page.toString());
         return new PageResponseTO(page).getData();
 
     }
