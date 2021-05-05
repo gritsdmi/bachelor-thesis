@@ -6,7 +6,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import {withStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import {get, handleResponseError, post} from "../../utils/request"
+import {get, getUserFromLS, handleResponseError, post} from "../../utils/request"
 import {Checkbox} from "@material-ui/core";
 
 const useStyles = theme => ({
@@ -29,8 +29,9 @@ const useStyles = theme => ({
 });
 
 const InitialState = {
-    user: null,
+    user: '',
     activeUser: true,
+    loggedUserId: getUserFromLS().userId,
 }
 
 class EditUserDialog extends React.Component {
@@ -72,7 +73,6 @@ class EditUserDialog extends React.Component {
     }
 
     onClickCheckBox = () => {
-        console.log('o box')
         this.setState({
             activeUser: !this.state.activeUser,
         })
@@ -98,6 +98,7 @@ class EditUserDialog extends React.Component {
                         <Grid item xs className={classes.typography}>Active user</Grid>
                         <Grid item xs={3} className={classes.checkbox}>
                             <Checkbox
+                                disabled={this.state.user.id === this.state.loggedUserId}
                                 onClick={this.onClickCheckBox}
                                 checked={this.state.activeUser}
                                 color={"primary"}

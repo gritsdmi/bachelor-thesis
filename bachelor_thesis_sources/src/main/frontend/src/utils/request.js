@@ -3,8 +3,8 @@ import axios from "axios";
 const local_URL = "http://localhost:8080"
 const deploy_URL = "http://fem.felk.cvut.cz:8080/fem"
 
-const base_URL = deploy_URL
-// const base_URL = local_URL
+// const base_URL = deploy_URL
+const base_URL = local_URL
 
 const token = "Bearer "
 const enableJWT = true
@@ -133,6 +133,8 @@ export function handleResponseError(err) {
                 }
                 if (err.response.status === 401) {
                     console.log("Http 401 ")
+                    localStorage.clear()
+                    window.location.href = '/fem/index.html'
                 }
                 if (err.response.status === 403) {
                     console.log("Http 403 ")

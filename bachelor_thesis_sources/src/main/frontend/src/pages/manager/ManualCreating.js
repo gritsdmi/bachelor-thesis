@@ -93,7 +93,7 @@ const useStyles = theme => ({
     },
     p1: {
         padding: theme.spacing(1),
-    }
+    },
 
 });
 
