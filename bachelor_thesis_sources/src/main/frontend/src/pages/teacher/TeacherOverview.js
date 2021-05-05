@@ -74,9 +74,8 @@ class TeacherOverview extends React.Component {
         super(props);
         this.state = {
             ...InitialState,
-            teacherId: getUserFromLS().userId,
+            teacherId: getUserFromLS() ? getUserFromLS().userId : '',
         }
-        console.log(getUserFromLS())
     }
 
     componentDidMount() {

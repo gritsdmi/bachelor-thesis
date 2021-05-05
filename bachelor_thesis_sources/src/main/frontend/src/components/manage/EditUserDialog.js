@@ -31,7 +31,7 @@ const useStyles = theme => ({
 const InitialState = {
     user: '',
     activeUser: true,
-    loggedUserId: getUserFromLS().userId,
+    loggedUserId: getUserFromLS() ? getUserFromLS().userId : '',
 }
 
 class EditUserDialog extends React.Component {
@@ -47,6 +47,7 @@ class EditUserDialog extends React.Component {
             this.setState({
                     user: this.props.user,
                     activeUser: this.props.user.active,
+                    loggedUserId: getUserFromLS() ? getUserFromLS().userId : '',
                 }
             )
         }

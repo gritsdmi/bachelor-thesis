@@ -15,20 +15,39 @@ import femTheme from './styles/theme'
 import ModeratePermissionsPage from "./pages/manager/ModeratePermissionsPage";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Footer from "./components/Footer";
+import React from "react";
 
 
 function App() {
+    const [loggedUserId, setLoggedUserId] = React.useState('')
+    const [loggedUserRole, setLoggedUserRole] = React.useState('')
+
+    function onLogin(user) {
+        setLoggedUserId(user.id)
+        setLoggedUserRole(user.role)
+    }
+
+    function onLogout() {
+        setLoggedUserId('')
+        setLoggedUserRole('')
+    }
+
     return (
         <ThemeProvider theme={femTheme}>
             <CssBaseline>
                 <Container className={'mainContainer'}>
-                    <Header/>
+                    <Header loggedUserRole={loggedUserRole} onLogout={onLogout}/>
                     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
                         {/*<Route exact path="/" component={CommissionsListPage}/>*/}
                         <Route exact path="/" component={Login}/>
                         {/*<Route exact path="/index.html" component={CommissionsListPage}/>*/}
-                        <Route exact path="/index.html" component={Login}/>
+                        <Route exact path="/index.html" render={(props) => (
+                            <Login {...props}
+                                   loggedUser={loggedUserId}
+                                   onLogin={onLogin}
+                            />
+                        )}/>
                         <Route exact path="/commissions" component={CommissionsListPage}/>
                         <Route exact path="/auto" component={AutoGeneratingPage}/>
                         <Route exact path="/manual" component={ManualCreatingPage}/>
@@ -43,8 +62,7 @@ function App() {
                 </Container>
             </CssBaseline>
         </ThemeProvider>
-
-    );
+    )
 }
 
 export default App;

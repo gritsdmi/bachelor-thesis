@@ -72,13 +72,13 @@ class Login extends React.Component {
                 token: res.data.jwt,
                 data: res.data,
             }, () => {
+                this.props.onLogin(this.state.data)
                 this.checkIfLoginFirst()
             }))
             .catch(err => {
                 this.setState({
                     errorLabel: true,
                 })
-                //TODO think about that
                 console.log(err)
             })
     }
@@ -106,7 +106,6 @@ class Login extends React.Component {
 
             post(`/user/pass/`, payload)
                 .then(res => {
-                    console.log(res)
                     this.redirect()
                 })
                 .catch(err => this.onClickCancel())
@@ -202,7 +201,6 @@ class Login extends React.Component {
                     <form
                         className={classes.form}
                     >
-
                         <TextField
                             name={'loginInput'}
                             error={this.state.errorLabel}
@@ -226,7 +224,6 @@ class Login extends React.Component {
                             {this.state.errorLabel ? this.state.errorText : ' '}
                         </Typography>
                         <Button
-                            // type={'submit'}
                             color={'primary'}
                             variant={'contained'}
                             onClick={this.onClickLoginButton}
@@ -234,13 +231,6 @@ class Login extends React.Component {
                         >
                             Login
                         </Button>
-
-                        {/*<Button*/}
-                        {/*    color={'secondary'}*/}
-                        {/*    variant={'contained'}*/}
-                        {/*    onClick={this.tokenTest}*/}
-                        {/*    className={classes.button}*/}
-                        {/*>token test</Button>*/}
                     </form>
                 </Paper>
             </Box>

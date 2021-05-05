@@ -60,7 +60,7 @@ class TeacherSettings extends React.Component {
         super(props);
         this.state = {
             ...InitialState,
-            teacherId: getUserFromLS().userId,
+            teacherId: getUserFromLS() ? getUserFromLS().userId : '',
         }
     }
 
@@ -75,7 +75,6 @@ class TeacherSettings extends React.Component {
                 teacher: res.data,
                 fieldsChecked: res.data.teacher.preferredFieldOfStudies
             }, () => {
-                console.log(res.data)
                 this.makeUnavailableSetDates(res.data.teacher.unavailableDates)
                 this.fetchFields()
             }))
@@ -325,9 +324,8 @@ class TeacherSettings extends React.Component {
                     />
                 </Paper>
             </Container>
-        );
+        )
     }
-
 }
 
 export default withStyles(useStyles)(TeacherSettings)
