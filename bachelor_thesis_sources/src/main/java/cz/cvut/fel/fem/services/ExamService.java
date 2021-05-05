@@ -91,6 +91,11 @@ public class ExamService {
         return examRepository.save(exam);
     }
 
+    public Exam arrangeSemesterByDate(Exam exam, String date) {
+        exam.setSemester(setSemesterByDate(date));
+        return examRepository.save(exam);
+    }
+
     private String setSemesterByDate(String date) {
 
         final short borderLs = 9;
@@ -116,32 +121,11 @@ public class ExamService {
     }
 
     public Exam save(ExamTO examTO) {
-        var exam = new Exam();
         var mapped = modelMapper.map(examTO, Exam.class);
-//        exam.setDate(examTO.getDate());
-//        exam.setLocation(examTO.getLocation());
-//        exam.setFieldOfStudy(examTO.getFieldOfStudy());
-//        exam.setDegree(examTO.getDegree());
-//todo test mapping
         return examRepository.save(mapped);
     }
 
     public Exam update(Exam exam) {
-        return examRepository.save(exam);
-    }
-
-    public Exam update(Long id, ExamTO examTO) {
-        var exam = examRepository.getOne(id);
-        var mapped = modelMapper.map(examTO, Exam.class);
-
-        exam.setDate(examTO.getDate());
-        exam.setLocation(examTO.getLocation());
-        exam.setFieldOfStudy(examTO.getFieldOfStudy());
-        exam.setDegree(examTO.getDegree());
-        //todo test mapping
-        log.info(exam.toString());
-        log.warning(mapped.toString());
-
         return examRepository.save(exam);
     }
 

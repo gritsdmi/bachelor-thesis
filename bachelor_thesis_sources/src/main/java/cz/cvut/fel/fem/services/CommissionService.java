@@ -115,13 +115,12 @@ public class CommissionService {
 
     /**
      * used to update existing commission in manual creating
-     * <p>
-     * <p>
-     * used model mapper (seems working)
      */
     public Commission update(Long commissionId, Commission commission) {
         var updatedComm = modelMapper.map(commission, Commission.class);
         var updatedExam = modelMapper.map(commission.getExam(), Exam.class);
+
+        updatedExam = examService.arrangeSemesterByDate(updatedExam, commission.getExam().getDate());
         updatedComm.setExam(examService.update(updatedExam));
         return commissionRepository.save(updatedComm);
     }
@@ -135,14 +134,6 @@ public class CommissionService {
     public Commission saveManual(CreatorTO creatorTO) {
         var commission = new Commission();
         var exam = examService.create(creatorTO);
-
-//        exam.setDate(creatorTO.getDate());
-//        exam.setTime(creatorTO.getTime());
-//        if (creatorTO.getLocationId() != null) {
-//            exam.setLocation(locationService.get(creatorTO.getLocationId()));
-//        }
-//        exam.setDegree(creatorTO.getDegree());
-//        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.EDITABLE);
@@ -160,16 +151,7 @@ public class CommissionService {
         }
 
         var commission = new Commission();
-
         var exam = examService.create(creatorTO);
-//        var location = creatorTO.getLocationId();
-//
-//        exam.setDate(creatorTO.getDate());
-//        exam.setTime(creatorTO.getTime());
-//        if (location != null)
-//            exam.setLocation(locationService.get(creatorTO.getLocationId()));
-//        exam.setDegree(creatorTO.getDegree());
-//        exam.setFieldOfStudy(creatorTO.getField());
 
         commission.setExam(exam);
         commission.setState(CommissionState.DRAFT);
@@ -188,26 +170,11 @@ public class CommissionService {
      *
      * @return updated Commission
      */
-//    public Commission updateToEditedState(Long commissionId, Commission commission) {
     public Commission updateToEditedState(Long commissionId) {
         var comm = commissionRepository.getOne(commissionId);
-        var date = comm.getExam().getDate();
 
         comm.setState(CommissionState.EDITABLE);
 
-        /** OLD VERSION
-         */
-
-//        removeCommissionByTeacher(commission.getTeachers());
-        //after that need to remove all commissions, where teacher was
-        //and rerender
-        //remove comm by (day and location)
-        // where state==DRAFT && comm.exam.date==day && comm.exam.location==location
-//        removeByDateLocation(commission.getExam().getLocation().getId(), commission.getExam().getDate().getDate());
-
-        /** NEW VERSION
-         * remove all draft commissions for today in this location
-         */
         var allDrafts = getDrafts();
         var draftsToRemove = allDrafts.stream()
                 .filter(draft -> !draft.getId().equals(commissionId))
@@ -232,7 +199,6 @@ public class CommissionService {
         var page = commissionRepository.findByStateNot(CommissionState.DRAFT, pageRequest);
 
         return new PageResponseTO(page).getData();
-
     }
 
     public Map<String, Object> getAll(PageRequestTO pageRequestTO) {
