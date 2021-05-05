@@ -186,11 +186,10 @@ class TeacherOverview extends React.Component {
     }
 
     onCloseCommissionInfoDialog = () => {
-
         this.setState({
             currentCommission: null,
             commissionInfoDialogOpen: false,
-        })
+        }, () => this.fetchCommissions(false))
     }
 
     onChangePagination = (event, value) => {
@@ -201,9 +200,8 @@ class TeacherOverview extends React.Component {
 
     onChangePageSize = (e) => {
         this.setState({
-                size: e.target.value,
-            }
-            , () => this.fetchCommissions(false))
+            size: e.target.value,
+        }, () => this.fetchCommissions(false))
     }
 
     onChangeRadio = (e) => {

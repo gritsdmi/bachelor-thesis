@@ -305,7 +305,9 @@ public class CommissionService {
             return getByPropsByTeacherBySemesterPaginated(teacherId, pageRequestTO);
         } else {
 
-            var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+            var pageRequest = PageRequest.of(pageRequestTO.getPage(),
+                    pageRequestTO.getSize(),
+                    Sort.by("exam.date"));
 
             var byTeacher = getByTeacher(teacherId).stream()
                     .filter(commission -> !commission.getState().equals(CommissionState.DRAFT))
@@ -331,7 +333,9 @@ public class CommissionService {
 
     public Map<String, Object> getByPropsByTeacherBySemesterPaginated(Long teacherId, PageRequestTO pageRequestTO) {
 
-        var pageRequest = PageRequest.of(pageRequestTO.getPage(), pageRequestTO.getSize());
+        var pageRequest = PageRequest.of(pageRequestTO.getPage(),
+                pageRequestTO.getSize(),
+                Sort.by("exam.date"));
 
         var byTeacher = getByTeacher(teacherId).stream()
                 .filter(commission -> !commission.getState().equals(CommissionState.DRAFT))

@@ -25,13 +25,15 @@ const useStyles = theme => ({
         border: 'none',
     },
     dialog: {
-        maxHeight: '80vh',
+        minHeight: '60vh !important',
+        maxHeight: '60vh !important',
     },
 });
 
 const InitialState = {
     teachers: [],
     commission: null,
+    searchPattern: '',
 }
 
 class TeacherRecommendDialog extends React.Component {
@@ -40,9 +42,6 @@ class TeacherRecommendDialog extends React.Component {
         this.state = {
             ...InitialState,
         }
-    }
-
-    componentDidMount() {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -58,11 +57,26 @@ class TeacherRecommendDialog extends React.Component {
         get(`/user/teacher/date/${this.props.date}`)
             .then(response => {
                 this.setState({
-                    teachers: response.data,
-                }, () => console.log(response.data))
+                        teachers: response.data,
+                    }
+                )
             })
             .catch(err => handleResponseError(err))
     }
+
+    teachersFilteredList() {
+        if (this.state.searchPattern === '') {
+            return this.state.teachers
+        }
+        return this.state.teachers.filter(teacher => {
+                return (
+                    (teacher.name ? teacher.name.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+                    || (teacher.surname ? teacher.surname.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false)
+                    || (teacher.login ? teacher.login.toLowerCase().startsWith(this.state.searchPattern.toLowerCase()) : false))
+            }
+        )
+    }
+
 
     onClickRecommendTeacher = (teacherToRecommend) => {
         //remove current teacher from commission and chosen Teacher to the commission
@@ -76,23 +90,34 @@ class TeacherRecommendDialog extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
+    handleInputChange = (e) => {
+        this.setState({
+            searchPattern: e.target.value ? e.target.value : '',
+        })
+    }
+
     render() {
         const {classes} = this.props
+        const teachersFilteredList = this.teachersFilteredList()
+
         return (
             <Dialog
                 open={this.props.open}
                 onClose={this.props.onClose}
                 fullWidth
-                className={classes.dialog}
             >
-
                 <DialogTitle>
-                    TeacherRecommendDialog
+                    Recommend another teacher
                 </DialogTitle>
-                <DialogContent dividers>
-                    <SearchBox/>
+                <DialogContent
+                    dividers
+                    className={classes.dialog}
+                >
+                    <SearchBox
+                        onChange={this.handleInputChange}
+                    />
                     <SearchResultPanel
-                        data={this.state.teachers}
+                        data={teachersFilteredList}
                         onClick={this.onClickRecommendTeacher}
                         rec={true}
                     />
@@ -105,7 +130,7 @@ class TeacherRecommendDialog extends React.Component {
                     >Cancel</Button>
                 </DialogActions>
             </Dialog>
-        );
+        )
     }
 }
 

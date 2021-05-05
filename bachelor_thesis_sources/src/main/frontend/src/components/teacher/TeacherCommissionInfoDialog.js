@@ -14,12 +14,6 @@ import Button from "@material-ui/core/Button";
 import TeacherRecommendDialog from "./TeacherRecommendDialog";
 
 const useStyles = theme => ({
-    item: {
-        paddingLeft: theme.spacing(2),
-        paddingTop: theme.spacing(1.5),
-        paddingBottom: theme.spacing(1.5),
-        paddingRight: theme.spacing(2),
-    },
     cell: {
         border: 'none',
     },
@@ -27,10 +21,6 @@ const useStyles = theme => ({
         width: '150px',
         border: 'none',
     },
-    inputCell: {
-        maxWidth: '50px',
-        border: 'none',
-    }
 });
 
 const InitialState = {
@@ -48,9 +38,6 @@ class TeacherCommissionInfoDialog extends React.Component {
         }
     }
 
-    componentDidMount() {
-    }
-
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps !== this.props) {
         }
@@ -64,15 +51,12 @@ class TeacherCommissionInfoDialog extends React.Component {
     }
 
     onClickCantAttendButton = () => {
-        console.log("onClickCantAttendButton")
         this.setState({
             recommendDialogOpen: true,
-
         })
     }
 
     onCloseRecommendDialog = () => {
-        console.log("onCloseRecommendDialog")
         this.setState({
             recommendDialogOpen: false,
         })
@@ -156,9 +140,8 @@ class TeacherCommissionInfoDialog extends React.Component {
                     </DialogActions>
                 </Dialog>
             </>
-        );
+        )
     }
-
 }
 
 export default withStyles(useStyles)(TeacherCommissionInfoDialog)
