@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByLoginAndActiveTrue(String login);
 
-    Page<User> findByActiveTrue(Pageable pageable);
+    Page<User> findByActiveTrueAndTeacherNotNull(Pageable pageable);
 
     @Query("select u from User u where (u.active = true and u.teacher.contract is not null and u.teacher.contract > 0)")
     List<User> getTeachersWhoCan();

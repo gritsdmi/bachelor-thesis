@@ -228,7 +228,7 @@ public class UserService {
         if (pageRequestTO.getPattern() != null && !pageRequestTO.getPattern().equals("")) {
             page = userRepository.findTeacherByNameOrSurnameOrLoginContaining(pageRequestTO.getPattern().toLowerCase(), pageRequest);
         } else {
-            page = userRepository.findByActiveTrue(pageRequest);
+            page = userRepository.findByActiveTrueAndTeacherNotNull(pageRequest);
         }
 
         return new PageResponseTO(page).getData();

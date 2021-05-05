@@ -5,12 +5,6 @@ VALUES (100, 'D3-256', 'T2'),
        (103, 'E-301', 'KN'),
        (104, 'E-2', 'KN');
 
--- INSERT INTO Field_Of_Study (id, field, deg)
--- VALUES (2, 'SIT', 'Bc');
-
--- INSERT INTO teacher (id, personal_number, name, surname, email_address, login, password, first_login)
--- VALUES (999, 1111111, 'Jiri', 'Sebek', 'sebek@sebek', 'sebek', 'sebek', true);
-
 INSERT INTO email_template (id, email_type, subject, text)
 VALUES (1, 'FINAL', 'testSubject FINAL', 'lorem ipsum FINAL'),
        (2, 'NOMINATED', 'testSubject NOMINATED', 'lorem ipsum NOMINATED'),
@@ -21,16 +15,29 @@ VALUES (1, 'FINAL', 'testSubject FINAL', 'lorem ipsum FINAL'),
 -- VALUES (100000, 'name_test_1', 'surname_test_1');
 
 INSERT INTO users (id, name, surname, email_address, login, password, first_login, role, active)
-VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', false, 'ROLE_TEST', true),
-       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email', 'email', false, 'ROLE_TEST', true);
+VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', false, 'ROLE_TEACHER', true),
+       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email', 'email', false, 'ROLE_TEST', true),
+       (998, 'manager', 'manager', 'manager@sebek.cz', 'manager', 'manager', false, 'ROLE_MANAGER', true);
+
 
 INSERT INTO teacher_property (id, contract)
 VALUES (100000, 1),
        (999, 1);
 
+INSERT INTO manager_property (id)
+VALUES (998);
+
 UPDATE users
 SET teacher = 100000
 WHERE id = 100000;
+
+UPDATE users
+SET teacher = 999
+WHERE id = 999;
+
+UPDATE users
+SET manager = 998
+WHERE id = 998;
 
 INSERT INTO exam (id, degree, location_id, semester)
 VALUES (10000000, 'Bc', 101, 'Summer 2020/2021');
@@ -43,24 +50,23 @@ INSERT INTO Field_Of_Study (id, field, deg)
 VALUES (1000, 'BP_EEM', 'Bc'),
        (1001, 'BP_EK', 'Bc'),
        (1002, 'BP_EEK', 'Bc'),
-(1003, 'BP_KYR', 'Bc'),
-(1004, 'BP_BIO', 'Bc'),
-(1005, 'BP_OI', 'Bc'),
-(1006, 'BP_OES', 'Bc'),
-(1007, 'BP_SIT', 'Bc'),
-(1101, 'MP_EEM', 'Ing'),
-(1102, 'MP_EK', 'Ing'),
-(1103, 'MP_KYR', 'Ing'),
-(1104, 'MP_BIO', 'Ing'),
-(1105, 'MP_OI', 'Ing'),
-(1106, 'MP_OES', 'Ing'),
-(1107, 'MP_IB', 'Ing'),
-(1108, 'MP_LAK', 'Ing'),
-(1200, 'D_KYR', 'PhD');
+       (1003, 'BP_KYR', 'Bc'),
+       (1004, 'BP_BIO', 'Bc'),
+       (1005, 'BP_OI', 'Bc'),
+       (1006, 'BP_OES', 'Bc'),
+       (1007, 'BP_SIT', 'Bc'),
+       (1101, 'MP_EEM', 'Ing'),
+       (1102, 'MP_EK', 'Ing'),
+       (1103, 'MP_KYR', 'Ing'),
+       (1104, 'MP_BIO', 'Ing'),
+       (1105, 'MP_OI', 'Ing'),
+       (1106, 'MP_OES', 'Ing'),
+       (1107, 'MP_IB', 'Ing'),
+       (1108, 'MP_LAK', 'Ing'),
+       (1200, 'D_KYR', 'PhD');
 
 -- /////////////////////////////////
 INSERT INTO position (id, position, description)
-VALUES
-(1, 'M', 'Místopředseda'),
-(2, 'P', 'Předseda'),
-(3, 'C', 'Člen');
+VALUES (1, 'M', 'Místopředseda'),
+       (2, 'P', 'Předseda'),
+       (3, 'C', 'Člen');
