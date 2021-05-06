@@ -35,6 +35,9 @@ const useStyles = theme => ({
         width: '70px',
         marginLeft: '10px',
     },
+    m1: {
+        margin: theme.spacing(1),
+    }
 });
 
 const InitialState = {
@@ -197,6 +200,7 @@ class ModeratePermissionsPage extends React.Component {
                     onClick={this.onCLickCreateUser}
                     color={'primary'}
                     variant={'contained'}
+                    className={classes.m1}
                 >
                     Create new user
                 </Button>
@@ -204,6 +208,7 @@ class ModeratePermissionsPage extends React.Component {
                     onClick={this.onCLickLocationsDialog}
                     color={'primary'}
                     variant={'contained'}
+                    className={classes.m1}
                 >
                     Locations
                 </Button>

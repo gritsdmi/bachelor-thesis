@@ -150,8 +150,6 @@ class CommissionsListPage extends React.Component {
 
     onClickCommissionEditButton = (commission) => {
         console.log("onCommissionEditButtonClick", commission)
-        // return <Redirect to="/manual/"/> // do not work
-        //TODO test on deploy
         this.props.history.push({
             pathname: "/manual",
             commission: commission,
@@ -212,7 +210,7 @@ class CommissionsListPage extends React.Component {
                 <CommissionInfoDialog
                     open={this.state.commissionInfoDialogOpen}
                     commission={this.state.currentCommission}
-                    history={this.props.history}//used to redirect
+                    history={this.props.history}
                     onClose={this.onCommissionInfoClose}
                     updComm={this.updateCommission}
                 />

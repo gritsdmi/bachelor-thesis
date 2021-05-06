@@ -1,6 +1,5 @@
 import React from "react";
 import {withStyles} from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
 import EmailListItem from "../../components/email/EmailListItem";
 import {get, handleResponseError} from "../../utils/request";
 import {ListItem, Paper, Snackbar} from "@material-ui/core";
@@ -13,19 +12,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import Box from "@material-ui/core/Box";
 
 const useStyles = theme => ({
-    cardContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-    },
-    item: {
-        margin: theme.spacing(1),
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-    },
-    title: {
-        paddingLeft: '20px',
-    },
+
 
 });
 
@@ -52,7 +39,6 @@ class EmailTemplates extends React.Component {
         get(`/template`)
             .then(res => this.setState({
                 templates: res.data,
-            }, () => {
             }))
             .catch(err => handleResponseError(err))
     }
@@ -106,17 +92,9 @@ class EmailTemplates extends React.Component {
                     templateId={this.state.chosenTemplateId}
                 />
                 <h1>Email Templates</h1>
-                {/*<SearchBox*/}
-                {/*    onChange*/}
-                {/*    label={"Email type"}*/}
-                {/*/>*/}
-                <Button
-                >
-                    Create template....
-                </Button>
                 <Paper>
                     <Box className={'titleBack'}>
-                        <Typography className={classes.title} variant={'h6'}>Templates</Typography>
+                        <Typography className={'title'} variant={'h6'}>Templates</Typography>
                     </Box>
                     <List>
                         {this.state.templates.map((template, idx) => {

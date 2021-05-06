@@ -85,9 +85,6 @@ class CommissionInfoDialog extends React.Component {
     }
 
     onCommissionEditButtonClick = () => {
-        // redirect to manual commission
-        // return <Redirect to="/manual/"/> // do not work
-        //TODO test on deploy
         this.state.history.push({
             pathname: "/manual",
             commission: this.state.commission,

@@ -18,9 +18,11 @@ const useStyles = makeStyles((theme) => ({
 export default function CommissionListItem({commission, onClickInfoButton, onClickEditButton, lastItem}) {
 
     function strTeachers() {
-        let string = ""
-        commission.teachers.forEach(teacher => string
-            += teacher.name ? teacher.name : '' + ' ' + teacher.surname)
+        let string = " "
+        commission.teachers.forEach(teacher =>
+            string += (teacher.titlesPre ? teacher.titlesPre + ' ' : '')
+                + (teacher.name ? teacher.name : '') + ' '
+                + (teacher.surname ? teacher.surname : ''))
         return string
     }
 

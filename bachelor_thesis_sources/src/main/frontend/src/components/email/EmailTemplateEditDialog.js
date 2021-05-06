@@ -92,7 +92,7 @@ class EmailTemplateEditDialog extends React.Component {
             <>
                 <Dialog
                     open={this.props.open}
-                    onClose={this.props.onClose}
+                    onClose={() => this.props.onClose(false)}
                     fullWidth
                 >
 
@@ -136,7 +136,7 @@ class EmailTemplateEditDialog extends React.Component {
                         <Button
                             color={'secondary'}
                             variant={'contained'}
-                            onClick={this.props.onClose}
+                            onClick={() => this.props.onClose(false)}
                         >Close</Button>
                         <Button
                             color={'primary'}
