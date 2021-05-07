@@ -21,9 +21,6 @@ const useStyles = theme => ({
         alignSelf: 'center',
         textAlign: 'center',
     },
-    buttonBox: {
-        display: 'flex',
-    },
     paginationBox: {
         margin: theme.spacing(1),
         display: 'flex',
@@ -108,6 +105,7 @@ class AutoGeneratingPage extends React.Component {
     onChangePageSize = (e) => {
         this.setState({
                 size: e.target.value,
+                currentPage: 0,
             }, () => this.fetchCommissions(false)
         )
     }

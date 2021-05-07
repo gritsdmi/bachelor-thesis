@@ -363,6 +363,7 @@ class ManualCreatingPage extends React.Component {
     onChangePageSize = (e) => {
         this.setState({
                 size: e.target.value,
+                currentPage: 0,
             }, () => this.fetchTeachers(false)
         )
     }

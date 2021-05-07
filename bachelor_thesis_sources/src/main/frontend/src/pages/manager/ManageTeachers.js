@@ -24,7 +24,11 @@ const useStyles = theme => ({
     flex: {
         display: 'flex',
     },
+    typography: {
+        alignSelf: 'center',
+    },
 });
+
 const InitialState = {
     teachers: [],
     currentTeacher: null,
@@ -101,6 +105,7 @@ class ManageTeachersPage extends React.Component {
     onChangePageSize = (e) => {
         this.setState({
                 size: e.target.value,
+                currentPage: 0,
             }, () => this.fetchTeachers(false)
         )
     }
@@ -188,4 +193,4 @@ class ManageTeachersPage extends React.Component {
     }
 }
 
-export default withStyles(useStyles)(ManageTeachersPage);
+export default withStyles(useStyles)(ManageTeachersPage)
