@@ -46,7 +46,7 @@ const InitialState = {
 class ManageTeachersPage extends React.Component {
 
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
             ...InitialState,
         }

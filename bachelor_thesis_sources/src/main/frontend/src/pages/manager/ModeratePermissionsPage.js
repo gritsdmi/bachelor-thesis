@@ -107,6 +107,14 @@ class ModeratePermissionsPage extends React.Component {
         }, () => this.fetchUsers(true))
     }
 
+    onChangePageSize = (e) => {
+        this.setState({
+                size: e.target.value,
+                currentPage: 0,
+            }, () => this.fetchUsers(false)
+        )
+    }
+
     onClickEditUser = (user) => {
         console.log("onClickEditUser", user)
         this.setState({
