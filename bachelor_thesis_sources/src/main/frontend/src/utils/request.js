@@ -104,16 +104,16 @@ export function del(url) {
     const jwt = getLSToken();
 
     if (jwt) {
-        console.log("sending post request with token to ", URL, config(jwt))
+        console.log("sending del request with token to ", URL, config(jwt))
         return axios.delete(URL, config(jwt));
     } else if (url === '/auth') {
-        console.log("sending post auth request to ", URL)
+        console.log("sending del auth request to ", URL)
         return axios.delete(URL);
 
     } else if (url.startsWith('/util')) {
-        console.log("sending post auth request to ", URL)
+        console.log("sending del auth request to ", URL)
     } else {
-        console.log("there are not jwt token for post request. Login first!")
+        console.log("there are not jwt token for del request. Login first!")
         window.location.href = '/fem/index.html'
     }
 }

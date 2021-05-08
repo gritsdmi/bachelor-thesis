@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,9 @@ public class UserService {
 
     @Autowired
     private PositionService positionService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, CsvParser csvParser) {
@@ -184,7 +189,8 @@ public class UserService {
 
     public User setNewPassword(NewPassTO newPassTO) {
         var user = userRepository.getOne(newPassTO.getId());
-        user.setPassword(newPassTO.getPassword());
+        user.setPassword(passwordEncoder.encode(newPassTO.getPassword()));
+
         user.setFirstLogin(false);
         return userRepository.save(user);
     }
@@ -192,7 +198,8 @@ public class UserService {
     public User resetPassword(Long id) {
         var user = userRepository.getOne(id);
         user.setFirstLogin(true);
-        user.setPassword(user.getLogin());
+        user.setPassword(passwordEncoder.encode(user.getLogin()));
+
         return userRepository.save(user);
     }
 
@@ -306,7 +313,8 @@ public class UserService {
 
         var user = modelMapper.map(newUserTo, User.class);
         user.setLogin(newUserTo.getEmailAddress().split("@")[0]);
-        user.setPassword(newUserTo.getEmailAddress().split("@")[0]);
+        user.setPassword(passwordEncoder.encode(newUserTo.getEmailAddress().split("@")[0]));
+
         user.setFirstLogin(true);
         user.setActive(true);
         //TODO figure out with requirement: data.xl -> 2.sheet -> columns F and G
@@ -362,7 +370,8 @@ public class UserService {
                     user.setSurname(v.get(0));
                     user.setEmailAddress(v.get(4));
                     user.setLogin(v.get(0));
-                    user.setPassword(v.get(0));
+                    user.setPassword(new BCryptPasswordEncoder().encode(v.get(0)));
+
                     user.setFirstLogin(true);
                     user.setActive(true);
                     user.setRole(Role.ROLE_TEACHER);

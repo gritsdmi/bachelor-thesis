@@ -114,7 +114,9 @@ public class CommissionController implements Controller {
 //    }
 //
     @DeleteMapping
-    public void deleteAll() {
+    public List<Commission> deleteAll() {
         commissionService.removeDrafts();
+        log.warning("remove all drafts complete");
+        return commissionService.getDrafts();
     }
 }

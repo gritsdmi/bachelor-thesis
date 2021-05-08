@@ -15,9 +15,12 @@ VALUES (1, 'FINAL', 'testSubject FINAL', 'lorem ipsum FINAL'),
 -- VALUES (100000, 'name_test_1', 'surname_test_1');
 
 INSERT INTO users (id, name, surname, email_address, login, password, first_login, role, active)
-VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', 'sebek', false, 'ROLE_TEACHER', true),
-       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email', 'email', false, 'ROLE_TEST', true),
-       (998, 'manager', 'manager', 'manager@sebek.cz', 'manager', 'manager', false, 'ROLE_MANAGER', true);
+VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', '$2a$10$1Fr6FMbll24BznwB8caG3uXMozsCQTPwHaP.tfYC8LunV6BvfjdwK',
+        false, 'ROLE_TEACHER', true),
+       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email',
+        '$2a$10$sVEgKnDYAss49ugFMdEPb.6yOEV8Z8FQnCSwTTpNsggcuudG5UoSq', false, 'ROLE_TEST', true),
+       (998, 'manager', 'manager', 'manager@sebek.cz', 'manager',
+        '$2a$10$zaGeKWRLIEvYhkHC2Uscue1sHVwE2CqudrSlPMGOiMYaWY47byUQq', false, 'ROLE_MANAGER', true);
 
 
 INSERT INTO teacher_property (id, contract)
