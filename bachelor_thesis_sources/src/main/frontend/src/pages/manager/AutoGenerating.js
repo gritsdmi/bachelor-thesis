@@ -81,8 +81,11 @@ class AutoGeneratingPage extends React.Component {
             .catch(err => handleResponseError(err))
     }
 
-    onGenerationComplete = (resp) => {
-        this.fetchCommissions(false)
+    onGenerationComplete = () => {
+        console.log('gen complete')
+        this.setState({
+            currentPage: 0,
+        }, () => this.fetchCommissions(false))
     }
 
     onClickCreate = (commission) => {

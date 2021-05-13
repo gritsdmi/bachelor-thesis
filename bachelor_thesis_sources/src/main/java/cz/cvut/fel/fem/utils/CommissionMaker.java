@@ -1,6 +1,8 @@
 package cz.cvut.fel.fem.utils;
 
 import cz.cvut.fel.fem.model.Commission;
+import cz.cvut.fel.fem.model.User;
+import cz.cvut.fel.fem.model.enums.PositionEnum;
 import cz.cvut.fel.fem.services.CommissionService;
 import cz.cvut.fel.fem.services.UserService;
 import cz.cvut.fel.fem.to.CommissionTO;
@@ -37,15 +39,44 @@ public class CommissionMaker {
 
         var teachersFreeToday = userService.getAvailableTeachersByDate(creatorTO.getDate());
         //todo add logic(titul, pozice)
+        log.warning(String.valueOf(teachersFreeToday.size()));
+        log.info("generation start");
+        var gen = Generator.combination(teachersFreeToday)
+                .simple(len);
+        log.info("generation end");
 
-        Generator.combination(teachersFreeToday)
-                .simple(len)
-                .stream()
+        gen.stream()
+                .filter(this::isThereP)
                 .forEach(teacherList -> {
                     var comTo = new CommissionTO();
                     comTo.setTeachers(teacherList);
                     commissionService.save(comTo, creatorTO);
                 });
+
+        log.info("saving end");
+
         return commissionService.getDrafts();
+    }
+
+    private boolean isThereP(List<User> users) {
+        var countP = 0L;
+        for (User u : users) {
+            countP += u.getTeacher().getPositionInCommissions().stream()
+                    .filter(position -> position.getPosition().equals(PositionEnum.P))
+                    .count();
+        }
+        return countP != 0;
+    }
+
+    private boolean teacherHavePermission(List<User> users) {
+
+        var res = true;
+        var countP = 0L;
+        for (User u : users) {
+            countP += u.getTeacher().getPositionInCommissions().stream()
+                    .filter(position -> position.getPosition().equals(PositionEnum.P))
+                    .count();
+        }
+        return res;
     }
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import {Grid, InputAdornment, MenuItem, Paper, TextField,} from "@material-ui/core";
+import {Backdrop, CircularProgress, Grid, MenuItem, Paper, TextField,} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import {withStyles} from "@material-ui/core/styles";
 import {del, get, handleResponseError, post} from "../utils/request"
@@ -9,38 +9,35 @@ import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import "moment/locale/en-gb"
 
-import TodayIcon from '@material-ui/icons/Today';
-
 const useStyles = theme => ({
-    cardContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-    },
     item: {
         margin: theme.spacing(1),
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-
+        // marginLeft: theme.spacing(2),
+        // marginRight: theme.spacing(2),
     },
     datePicker: {
         cursor: `pointer !important`,
     },
-
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
 });
 
 const InitialState = {
     degrees: [],
     fields: [],
     locations: [],
-    commissions: [],
+    commissionSizes: [1, 2, 3, 4],
 
     selectedDegree: '',
     selectedField: '',
     selectedLocation: '',
+    selectedCommissionSize: '',
     selectedDate: new Date().setHours(9, 0),
     selectedTime: new Date().setHours(9, 0),
     selectedDateTime: new Date().setHours(9, 0),
+    openBackdrop: false,
 
 }
 
@@ -49,7 +46,8 @@ class CommissionGenerateParameters extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ...InitialState
+            ...InitialState,
+            selectedCommissionSize: 2,
         }
     }
 
@@ -104,12 +102,6 @@ class CommissionGenerateParameters extends React.Component {
         return arr
     }
 
-    // handleChangeDate = (event) => {
-    //     this.setState({
-    //         selectedDate: event,
-    //     }, () => this.fetchLocations(this.state.selectedDate))
-    // }
-
     handleChangeDateTime = (event) => {
         this.setState({
             selectedDate: event,
@@ -118,44 +110,81 @@ class CommissionGenerateParameters extends React.Component {
         }, () => this.fetchLocations(this.state.selectedDate))
     }
 
-    handleChangeDegree = (event) => {
+    // handleChangeDegree = (event) => {
+    //     this.setState({
+    //         selectedDegree: event.target.value,
+    //     }, () => {
+    //         this.fetchFields()
+    //     })
+    // }
+    //
+    // handleChangeLocation = (event) => {
+    //     this.setState({
+    //         selectedLocation: event.target.value,
+    //     })
+    // }
+    //
+    // handleChangeField = (e) => {
+    //     this.setState({
+    //         selectedField: e.target.value,
+    //     })
+    // }
+
+    handleChangeSelect = (e) => {
         this.setState({
-            selectedDegree: event.target.value,
+            [e.target.name]: e.target.value,
         }, () => {
-            this.fetchFields()
-        })
-    }
-
-    handleChangeLocation = (event) => {
-        this.setState({
-            selectedLocation: event.target.value,
-        })
-    }
-
-    handleChangeField = (e) => {
-        this.setState({
-            selectedField: e.target.value,
+            if (e.target.name === 'selectedDegree') {
+                this.fetchFields()
+            }
         })
     }
 
     onClickGenerateButton = () => {
-        //todo make button disable, until generation complete
-
-        //creationTO object
+        //creatorTO object
         const payload = {
             date: moment(this.state.selectedDate).format(dateFormatMoment),
             time: moment(this.state.selectedTime).format(timeFormatMoment),
             degree: this.state.selectedDegree,
-            locationId: this.state.selectedLocation ? this.state.selectedLocation : null,
+            field: this.state.selectedField.field,
+            locationId: this.state.selectedLocation ? this.state.selectedLocation.id : null,
             teachers: [],
         }
         console.log("onClickGenerateButton", payload)
+        this.openBackdrop()
 
-        post("/util/gen/2", payload)
-            .then(response => this.props.onComplete(response))
+        post(`/util/gen/${this.state.selectedCommissionSize}`, payload)
+            .then(() => {
+                this.props.onComplete()
+                this.handleCloseBackdrop()
+            })
             .catch(err => handleResponseError(err))
     }
 
+    onClickDeleteDrafts = () => {
+        console.log('onClickDeleteDrafts')
+        this.openBackdrop()
+
+        del(`/commission`)
+            .then(res => {
+                console.log(res)
+                this.props.onComplete()
+                this.handleCloseBackdrop()
+            })
+            .catch(err => handleResponseError(err))
+    }
+
+    openBackdrop = () => {
+        this.setState({
+            openBackdrop: true,
+        })
+    }
+
+    handleCloseBackdrop = () => {
+        this.setState({
+            openBackdrop: false,
+        })
+    }
 
     render() {
         if (!this.state.locations || !this.state.degrees) {
@@ -166,14 +195,20 @@ class CommissionGenerateParameters extends React.Component {
 
         return (
             <Paper>
+                <Backdrop
+                    className={classes.backdrop}
+                    open={this.state.openBackdrop}
+                >
+                    <CircularProgress color="inherit"/>
+                </Backdrop>
                 <Grid container>
                     <Grid item xs={1} className={classes.item}>
                         <TextField
-                            id="degree-select"
+                            name={'selectedDegree'}
                             select
                             fullWidth
                             value={this.state.selectedDegree}
-                            onChange={this.handleChangeDegree}
+                            onChange={this.handleChangeSelect}
                             helperText="Degree"
                             className={classes.item}
                         >
@@ -192,11 +227,11 @@ class CommissionGenerateParameters extends React.Component {
                     </Grid>
                     <Grid item xs={1} className={classes.item}>
                         <TextField
-                            id="field-select"
+                            name={'selectedField'}
                             select
                             fullWidth
                             value={this.state.selectedField}
-                            onChange={this.handleChangeField}
+                            onChange={this.handleChangeSelect}
                             helperText="Field of study"
                             className={classes.item}
                         >
@@ -216,16 +251,7 @@ class CommissionGenerateParameters extends React.Component {
                                 value={this.state.selectedDateTime}
                                 disablePast
                                 ampm={false}
-                                minutesStep={15}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment
-                                            position="end"
-                                        >
-                                            <TodayIcon/>
-                                        </InputAdornment>
-                                    )
-                                }}
+                                minutesStep={5}
                                 format={dateTimeFormatMoment}
                                 onChange={this.handleChangeDateTime}
                                 helperText="Date and time"
@@ -236,11 +262,11 @@ class CommissionGenerateParameters extends React.Component {
                     </Grid>
                     <Grid item xs={2} className={classes.item}>
                         <TextField
-                            id="location-select"
+                            name={'selectedLocation'}
                             select
                             fullWidth
                             value={this.state.selectedLocation}
-                            onChange={this.handleChangeLocation}
+                            onChange={this.handleChangeSelect}
                             helperText="Location"
                             error={!!!this.state.locations.length}
                             className={classes.item}
@@ -258,22 +284,40 @@ class CommissionGenerateParameters extends React.Component {
                             }
                         </TextField>
                     </Grid>
+                    <Grid item xs={2} className={classes.item}>
+                        <TextField
+                            name={'selectedCommissionSize'}
+                            select
+                            value={this.state.selectedCommissionSize}
+                            onChange={this.handleChangeSelect}
+                            helperText="Commission size"
+                            className={classes.item}
+                        >
+                            {
+                                this.state.commissionSizes.map((int, idx) => {
+                                    return (
+                                        <MenuItem
+                                            key={idx}
+                                            value={int}
+                                        >{int}
+                                        </MenuItem>
+                                    )
+                                })
+                            }
+                        </TextField>
+                    </Grid>
                     <Grid item className={classes.item}>
                         <Button
                             color={'primary'}
                             variant={'contained'}
                             onClick={this.onClickGenerateButton}
                         >
-                            Generate 2
+                            Generate
                         </Button>
 
                         <Button
                             color={'secondary'}
-                            onClick={() => {
-                                del(`/commission`)
-                                    .then(res => console.log(res))
-                                    .catch(err => handleResponseError(err))
-                            }}
+                            onClick={this.onClickDeleteDrafts}
                         >
                             delete drafts
                         </Button>

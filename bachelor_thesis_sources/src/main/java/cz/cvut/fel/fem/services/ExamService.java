@@ -136,4 +136,8 @@ public class ExamService {
     public void delete(Exam exam) {
         examRepository.delete(exam);
     }
+
+    public void deleteByCommissionIsNull() {
+        examRepository.deleteByCommissionIsNull();
+    }
 }

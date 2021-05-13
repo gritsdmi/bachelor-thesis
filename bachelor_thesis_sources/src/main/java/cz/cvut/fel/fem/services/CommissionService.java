@@ -392,22 +392,33 @@ public class CommissionService {
 //    }
 
     private void remove(List<Commission> toRemove) {
-        var iter = toRemove.iterator();
-        while (iter.hasNext()) {
-            remove(iter.next());
-        }
+//        for (Commission commission : toRemove) {
+//            remove(commission);
+//        }
+
+        commissionRepository.deleteInBatch(toRemove); //does not remove exam entity, why?
+        // produce stackoverflow
+
+
+        commissionRepository.deleteAllDrafts(CommissionState.DRAFT);
     }
 
     public void remove(Commission commission) {
         commissionRepository.deleteById(commission.getId());
     }
 
-    public void remove(Long id) {
-        commissionRepository.deleteById(id);
-    }
+//    public void remove(Long id) {
+//        commissionRepository.deleteById(id);
+//    }
 
     public void removeDrafts() {
-        var drafts = getDrafts();
-        remove(drafts);
+        log.warning("remove start");
+//        remove(drafts);
+        commissionRepository.deleteAllDrafts(CommissionState.DRAFT);
+        log.warning("remove comm complete");
+
+        examService.deleteByCommissionIsNull();
+        log.warning("remove exam complete");
+
     }
 }

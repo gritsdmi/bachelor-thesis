@@ -15,7 +15,6 @@ import java.util.Objects;
 @Setter
 @ToString
 @Table(name = "users")
-//@Inheritance(strategy = InheritanceType.JOINED)
 public class User extends AbstractEntity {
 
     private Integer personalNumber;
@@ -41,7 +40,6 @@ public class User extends AbstractEntity {
     @OneToOne(cascade = CascadeType.ALL) // produce InvalidDataAccessApiUsageException
 //    @OneToOne // w/o cascading produce TransientPropertyValueException
     @JoinColumn(name = "teacher", referencedColumnName = "id")
-//    @Column(name = "teacher") // not allowed here
     private TeacherProperty teacher;
 
     @OneToOne

@@ -58,6 +58,8 @@ public class LocationService {
     public List<Location> getFreeLocationByDate(String date) {
 
         var examsToday = examService.getByDate(date);
+        log.warning("exams today " + date + " " + examsToday.toString());
+
         var allLocations = locationRepository.findAll();
 
         if (!examsToday.isEmpty()) {

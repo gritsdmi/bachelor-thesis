@@ -29,11 +29,9 @@ public class TeacherProperty extends AbstractEntity {
     @ToString.Exclude
     private List<Commission> commissionList;
 
-    //    @ManyToMany(cascade = CascadeType.REMOVE) // old version
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Date> unavailableDates;
 
-    //new item
     @ManyToMany
     private List<FieldOfStudy> preferredFieldOfStudies;
 

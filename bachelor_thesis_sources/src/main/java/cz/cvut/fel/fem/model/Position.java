@@ -22,14 +22,4 @@ public class Position extends AbstractEntity {
 
     private String description;
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Position pos = (Position) o;
-//        return Objects.equals(personalNumber, user.personalNumber)
-//
-//                && Objects.equals(titlesPre, user.titlesPre);
-//    }
-
 }

@@ -22,7 +22,7 @@ public class Commission extends AbstractEntity {
 
     //owner side
     @OneToOne
-            (cascade = CascadeType.REMOVE)
+            (cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "exam_id", referencedColumnName = "id")
     private Exam exam;
 
