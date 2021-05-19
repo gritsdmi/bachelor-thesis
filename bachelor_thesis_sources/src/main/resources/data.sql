@@ -1,75 +1,85 @@
 INSERT INTO location (id, classroom, building)
-VALUES (100, 'D3-256', 'T2'),
-       (101, 'D3-309', 'T2'),
-       (102, 'B5-333', 'JP'),
-       (103, 'E-301', 'KN'),
-       (104, 'E-2', 'KN');
+VALUES (1, 'D3-256', 'T2'),
+       (2, 'D3-309', 'T2'),
+       (3, 'B5-333', 'JP'),
+       (4, 'E-301', 'KN'),
+       (5, 'E-2', 'KN');
+SELECT setval('location_id_seq', 5, true);
 
 INSERT INTO email_template (id, email_type, subject, text)
 VALUES (1, 'FINAL', 'testSubject FINAL', 'lorem ipsum FINAL'),
        (2, 'NOMINATED', 'testSubject NOMINATED', 'lorem ipsum NOMINATED'),
        (3, 'RECOMMENDED', 'testSubject RECOMMENDED', 'lorem ipsum RECOMMENDED');
+SELECT setval('email_template_id_seq', 5, true);
 
--- //////////////////////// new mapping ////////////////////////
--- INSERT INTO users (id, name, surname)
--- VALUES (100000, 'name_test_1', 'surname_test_1');
 
 INSERT INTO users (id, name, surname, email_address, login, password, first_login, role, active)
-VALUES (999, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', '$2a$10$1Fr6FMbll24BznwB8caG3uXMozsCQTPwHaP.tfYC8LunV6BvfjdwK',
+VALUES (1, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', '$2a$10$1Fr6FMbll24BznwB8caG3uXMozsCQTPwHaP.tfYC8LunV6BvfjdwK',
         false, 'ROLE_TEACHER', true),
-       (100000, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email',
+       (2, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email',
         '$2a$10$sVEgKnDYAss49ugFMdEPb.6yOEV8Z8FQnCSwTTpNsggcuudG5UoSq', false, 'ROLE_TEST', true),
-       (998, 'manager', 'manager', 'manager@sebek.cz', 'manager',
+       (3, 'manager', 'manager', 'manager@sebek.cz', 'manager',
         '$2a$10$zaGeKWRLIEvYhkHC2Uscue1sHVwE2CqudrSlPMGOiMYaWY47byUQq', false, 'ROLE_MANAGER', true);
+SELECT setval('users_id_seq', 3, true);
 
 
 INSERT INTO teacher_property (id, contract)
-VALUES (100000, 1),
-       (999, 1);
+VALUES (2, 1),
+       (1, 1);
+SELECT setval('teacher_property_id_seq', 2, true);
 
 INSERT INTO manager_property (id)
-VALUES (998);
+VALUES (3);
+SELECT setval('manager_property_id_seq', 1, true);
+
 
 UPDATE users
-SET teacher = 100000
-WHERE id = 100000;
+SET teacher = 2
+WHERE id = 2;
 
 UPDATE users
-SET teacher = 999
-WHERE id = 999;
+SET teacher = 1
+WHERE id = 1;
 
 UPDATE users
-SET manager = 998
-WHERE id = 998;
+SET manager = 3
+WHERE id = 3;
 
 INSERT INTO exam (id, degree, location_id, semester)
-VALUES (10000000, 'Bc', 101, 'Summer 2020/2021');
+VALUES (1, 'Bc', 2, 'Summer 2020/2021');
+SELECT setval('exam_id_seq', 1, true);
 
 INSERT INTO commission (id, exam_id, state)
-VALUES (10000000, 10000000, 'DRAFT');
+VALUES (1, 1, 'DRAFT');
+SELECT setval('commission_id_seq', 1, true);
+
+
 -- ///////////////////////////////////////////////////////////////
 
 INSERT INTO Field_Of_Study (id, field, deg)
-VALUES (1000, 'BP_EEM', 'Bc'),
-       (1001, 'BP_EK', 'Bc'),
-       (1002, 'BP_EEK', 'Bc'),
-       (1003, 'BP_KYR', 'Bc'),
-       (1004, 'BP_BIO', 'Bc'),
-       (1005, 'BP_OI', 'Bc'),
-       (1006, 'BP_OES', 'Bc'),
-       (1007, 'BP_SIT', 'Bc'),
-       (1101, 'MP_EEM', 'Ing'),
-       (1102, 'MP_EK', 'Ing'),
-       (1103, 'MP_KYR', 'Ing'),
-       (1104, 'MP_BIO', 'Ing'),
-       (1105, 'MP_OI', 'Ing'),
-       (1106, 'MP_OES', 'Ing'),
-       (1107, 'MP_IB', 'Ing'),
-       (1108, 'MP_LAK', 'Ing'),
-       (1200, 'D_KYR', 'PhD');
+VALUES (1, 'BP_EEM', 'Bc'),
+       (2, 'BP_EK', 'Bc'),
+       (3, 'BP_EEK', 'Bc'),
+       (4, 'BP_KYR', 'Bc'),
+       (5, 'BP_BIO', 'Bc'),
+       (6, 'BP_OI', 'Bc'),
+       (7, 'BP_OES', 'Bc'),
+       (8, 'BP_SIT', 'Bc'),
+       (9, 'MP_EEM', 'Ing'),
+       (10, 'MP_EK', 'Ing'),
+       (11, 'MP_KYR', 'Ing'),
+       (12, 'MP_BIO', 'Ing'),
+       (13, 'MP_OI', 'Ing'),
+       (14, 'MP_OES', 'Ing'),
+       (15, 'MP_IB', 'Ing'),
+       (16, 'MP_LAK', 'Ing'),
+       (17, 'D_KYR', 'PhD');
+SELECT setval('field_of_study_id_seq', 17, true);
+
 
 -- /////////////////////////////////
 INSERT INTO position (id, position, description)
 VALUES (1, 'M', 'Místopředseda'),
        (2, 'P', 'Předseda'),
        (3, 'C', 'Člen');
+SELECT setval('position_id_seq', 3, true);

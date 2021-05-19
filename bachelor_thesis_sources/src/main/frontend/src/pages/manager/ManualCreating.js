@@ -138,20 +138,21 @@ class ManualCreatingPage extends React.Component {
     fetchAll(trigger) {
         this.fetchTeachers()
         this.fetchDegrees()
-        this.fetchLocations(moment(this.state.selectedDate).format(dateFormatMoment));
+        this.fetchLocations()
     }
 
-    fetchLocations(dateF) {
+    fetchLocations() {
+        const dateF = moment(this.state.selectedDate).format(dateFormatMoment)
         get(`/location/free/${dateF}`)
             .then(response => {
                 if (this.state.edit) {
                     this.setState({
-                            locations: response.data,
-                        })
+                        locations: response.data,
+                    })
                 } else {
                     this.setState({
-                            locations: response.data,
-                            selectedLocation: response.data.length > 0 ? response.data[0] : '',
+                        locations: response.data,
+                        selectedLocation: response.data.length > 0 ? response.data[0] : '',
                         }
                     )
                 }
@@ -414,6 +415,10 @@ class ManualCreatingPage extends React.Component {
         return ""
     }
 
+    onClickSaveLoc = () => {
+        this.fetchLocations()
+    }
+
     render() {
 
         if (!this.state.locations || !this.state.degrees) {
@@ -479,6 +484,7 @@ class ManualCreatingPage extends React.Component {
                         onChangeLoc={this.handleChangeLocation}
                         defaults={defaults}
                         edit={this.state.edit}
+                        onSaveNewLoc={this.onClickSaveLoc}
                     />
 
                     <Grid container>

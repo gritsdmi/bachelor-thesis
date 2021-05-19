@@ -1,9 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import {InputAdornment, makeStyles, MenuItem, Paper, TextField} from "@material-ui/core";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import TodayIcon from "@material-ui/icons/Today";
+import Button from "@material-ui/core/Button";
+import LocationEditDialog from "./LocationEditDialog";
 
 const dateTimeFormatMoment = "DD.MM.yyyy HH:mm"
 
@@ -38,14 +40,29 @@ export default function CommissionProps({
                                             locations,
                                             defaults,
                                             edit,
+                                            onSaveNewLoc,
                                         }) {
     const classes = useStyles();
+    const [newLocationDialogOpen, setNewLocationDialogOpen] = useState(false);
+
+    function onClickNewLocation() {
+        setNewLocationDialogOpen(true)
+    }
+
+    function onCloseNewLocation() {
+        setNewLocationDialogOpen(false)
+        onSaveNewLoc()
+    }
 
     return (
         <Paper
             className={classes.commissionPropsPaper}
         >
-
+            <LocationEditDialog
+                open={newLocationDialogOpen}
+                onClose={onCloseNewLocation}
+                location={''}
+            />
             <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils} locale={"en-gb"}>
                 <DateTimePicker
                     value={date}
@@ -95,6 +112,7 @@ export default function CommissionProps({
                 >{defaults.loc.building + ":" + defaults.loc.classroom}
                 </MenuItem>}
             </TextField>
+
             <TextField
                 id="degree-select"
                 select
@@ -133,6 +151,13 @@ export default function CommissionProps({
                     </MenuItem>
                 ))}
             </TextField>
+            <Button
+                color={"primary"}
+                variant={"contained"}
+                onClick={() => onClickNewLocation()}
+            >
+                new location
+            </Button>
         </Paper>
     )
 }
