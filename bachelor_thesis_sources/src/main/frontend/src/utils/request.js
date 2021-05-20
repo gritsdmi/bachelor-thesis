@@ -29,7 +29,7 @@ export function get(url) {
 
         if (jwt) {
             console.log("sending get request with token to ", URL, config(jwt))
-            return axios.get(URL, config(jwt)); // no 'Access-Control-Allow-Origin header //next error: no http ok status
+            return axios.get(URL, config(jwt));
         } else if (url.startsWith('/util')) {
             console.log("sending get auth request to ", URL)
             return axios.get(URL);
@@ -82,21 +82,20 @@ export function post(url, payload) {
         console.log("sending post request to ", URL)
         return axios.post(URL, payload);
     } else {
-        if (jwt) {
-            console.log("sending post request with token to ", URL, config(jwt))
-            return axios.post(URL, payload, config(jwt));
-        } else if (url === '/auth') {
+        if (url === '/auth') {
             console.log("sending post auth request to ", URL)
             return axios.post(URL, payload);
+        } else if (jwt) {
+            console.log("sending post request with token to ", URL, config(jwt))
+            return axios.post(URL, payload, config(jwt));
         } else if (url.startsWith('/util')) {
-            console.log("sending post auth request to ", URL)
+            console.log("sending post util request to ", URL)
             return axios.post(URL, payload);
         } else {
             console.log("there are not jwt token for post request. Login first!")
             window.location.href = '/fem/index.html'
         }
     }
-
 }
 
 export function del(url) {
