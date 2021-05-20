@@ -4,6 +4,7 @@ import cz.cvut.fel.fem.model.Date;
 import cz.cvut.fel.fem.model.*;
 import cz.cvut.fel.fem.model.auth.NewPassTO;
 import cz.cvut.fel.fem.model.enums.CommissionState;
+import cz.cvut.fel.fem.model.enums.Degree;
 import cz.cvut.fel.fem.model.enums.Role;
 import cz.cvut.fel.fem.repository.UserRepository;
 import cz.cvut.fel.fem.to.DateTO;
@@ -381,6 +382,7 @@ public class UserService {
                     var tProps = new TeacherProperty();
                     tProps.setContract(Double.parseDouble(v.get(2)));
                     tProps.setPositionInCommissions(parsePosition(v.get(4)));
+                    tProps.setCommissionTypes(Degree.Bc.toString());
 
                     user.setTeacher(tProps);
                     userRepository.save(user);

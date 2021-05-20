@@ -49,13 +49,15 @@ const InitialState = {
     errorEmail: false,
 
     roleSelected: 'ROLE_MANAGER',
-    // roleSelected: 'ROLE_TEACHER',
     contractInput: '0',
     errorContract: false,
     departmentInput: '',
     errorDepartment: false,
     selectedDegrees: [],
     selectedPositions: [],
+    extern: false,
+    approvedByScientificCouncilFrom: '',
+    vrError: false,
 
 }
 
@@ -115,7 +117,6 @@ class CreateUserDialog extends React.Component {
     }
 
     onClickSaveButton = () => {
-        console.log("onClickSaveButton")
 
         let newUser = {
             titlesPre: this.state.titulInput,
@@ -131,6 +132,8 @@ class CreateUserDialog extends React.Component {
             }
         }
         if (this.state.roleSelected === 'ROLE_TEACHER') {
+            const comTypesStr = this.state.selectedDegrees.join()
+            console.log(comTypesStr)
             newUser = {
                 ...newUser,
                 teacher: { //teacherPropertyTO
@@ -138,7 +141,9 @@ class CreateUserDialog extends React.Component {
                     department: this.state.departmentInput,
                     positionInCommissions: this.state.selectedPositions,
                     degrees: this.state.selectedDegrees,
-                    approvedByScientificCouncilFrom: null,
+                    approvedByScientificCouncilFrom: this.state.approvedByScientificCouncilFrom,
+                    commissionTypes: comTypesStr,
+                    extern: this.state.extern,
                 },
             }
         }
@@ -152,7 +157,6 @@ class CreateUserDialog extends React.Component {
                 }
             })
             .catch(err => handleResponseError(err))
-
     }
 
     inputsAreValid() {
@@ -235,6 +239,12 @@ class CreateUserDialog extends React.Component {
                 })
             }
         )
+    }
+
+    onChangeExtern = () => {
+        this.setState({
+            extern: !this.state.extern,
+        })
     }
 
     render() {
@@ -369,9 +379,7 @@ class CreateUserDialog extends React.Component {
                                 />
                             </Grid>
                         </Grid>
-                        <Grid container
-                              className={classes.gridLine}
-                        >
+                        <Grid container className={classes.gridLine}>
                             <Grid item xs={3} className={classes.typography}>
                                 <Typography>Position</Typography></Grid>
                             <Grid item xs>
@@ -401,9 +409,7 @@ class CreateUserDialog extends React.Component {
                                 </List>
                             </Grid>
                         </Grid>
-                        <Grid container
-                              className={classes.gridLine}
-                        >
+                        <Grid container className={classes.gridLine}>
                             <Grid item xs={3} className={classes.typography}> <Typography>Commission
                                 type</Typography></Grid>
                             <Grid item xs>
@@ -431,6 +437,30 @@ class CreateUserDialog extends React.Component {
                                         })
                                     }
                                 </List>
+                            </Grid>
+                        </Grid>
+                        <Grid container className={classes.gridLine}>
+                            <Grid item xs={3} className={classes.typography}> <Typography>Extern</Typography></Grid>
+                            <Grid item xs>
+                                <Checkbox
+                                    onClick={this.onChangeExtern}
+                                    checked={this.state.extern}
+                                    color={"primary"}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid container className={classes.gridLine}>
+                            <Grid item xs={3} className={classes.typography}> <Typography>VR dne</Typography></Grid>
+                            <Grid item xs>
+                                <TextField
+                                    fullWidth
+                                    name={'approvedByScientificCouncilFrom'}
+                                    variant={"outlined"}
+                                    size={"small"}
+                                    label={"Scientific Council From"}
+                                    value={this.state.approvedByScientificCouncilFrom}
+                                    onChange={this.onChangeTextField}
+                                />
                             </Grid>
                         </Grid>
                     </>

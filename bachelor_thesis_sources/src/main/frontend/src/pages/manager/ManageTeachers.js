@@ -63,7 +63,6 @@ class ManageTeachersPage extends React.Component {
             size: this.state.size,
             pattern: this.state.searchPattern,
         }
-        console.log(pageTO)
         post(`/user/teacher/page`, pageTO)
             .then(res => {
                 this.setState({
@@ -110,6 +109,11 @@ class ManageTeachersPage extends React.Component {
         )
     }
 
+    onTeacherSave = () => {
+        this.fetchTeachers()
+        this.onCloseEditTeacherDialog()
+    }
+
     render() {
         if (!this.state.teachers) {
             return <></>
@@ -126,6 +130,7 @@ class ManageTeachersPage extends React.Component {
                         open={this.state.editTeacherDialogOpen}
                         onClose={this.onCloseEditTeacherDialog}
                         teacher={this.state.currentTeacher}
+                        onTeacherSave={this.onTeacherSave}
                     />
 
                     <SearchBox

@@ -35,12 +35,15 @@ public class TeacherProperty extends AbstractEntity {
     @ManyToMany
     private List<FieldOfStudy> preferredFieldOfStudies;
 
-    //new item
     @ManyToMany
     private List<Position> positionInCommissions;
 
-    //new item
     private String approvedByScientificCouncilFrom;
+
+    //represents commissionTypes [Bc, Ing, PhD]
+    private String commissionTypes;
+
+    private Boolean extern;
 
 //    new item
 //    private List<String> availableExamDegrees;
