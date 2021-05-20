@@ -45,9 +45,6 @@ public class TeacherProperty extends AbstractEntity {
 
     private Boolean extern;
 
-//    new item
-//    private List<String> availableExamDegrees;
-
 //    //new item
 //    @ElementCollection
 //    @CollectionTable(name = "teacher_commission_reaction",

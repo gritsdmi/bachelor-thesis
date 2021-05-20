@@ -378,7 +378,6 @@ public class UserService {
                     user.setActive(true);
                     user.setRole(Role.ROLE_TEACHER);
 
-//                    log.severe(v.get(2));
                     var tProps = new TeacherProperty();
                     tProps.setContract(Double.parseDouble(v.get(2)));
                     tProps.setPositionInCommissions(parsePosition(v.get(4)));
