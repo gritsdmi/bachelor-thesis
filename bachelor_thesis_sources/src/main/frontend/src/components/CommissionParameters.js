@@ -8,6 +8,7 @@ import {dateFormatMoment, dateTimeFormatMoment, timeFormatMoment} from "../utils
 import moment from "moment";
 import MomentUtils from "@date-io/moment";
 import "moment/locale/en-gb"
+import Box from "@material-ui/core/Box";
 
 const useStyles = theme => ({
     item: {
@@ -22,13 +23,18 @@ const useStyles = theme => ({
         zIndex: theme.zIndex.drawer + 1,
         color: '#fff',
     },
+    buttonBox: {
+        padding: theme.spacing(2),
+        display: 'flex',
+        alignItems: 'center',
+    },
 });
 
 const InitialState = {
     degrees: [],
     fields: [],
     locations: [],
-    commissionSizes: [1, 2, 3, 4],
+    commissionSizes: [1, 2, 3],
 
     selectedDegree: '',
     selectedField: '',
@@ -307,20 +313,23 @@ class CommissionGenerateParameters extends React.Component {
                         </TextField>
                     </Grid>
                     <Grid item className={classes.item}>
-                        <Button
-                            color={'primary'}
-                            variant={'contained'}
-                            onClick={this.onClickGenerateButton}
-                        >
-                            Generate
-                        </Button>
+                        <Box className={classes.buttonBox}>
+                            <Button
+                                color={'primary'}
+                                variant={'contained'}
+                                onClick={this.onClickGenerateButton}
+                            >
+                                Generate
+                            </Button>
 
-                        <Button
-                            color={'secondary'}
-                            onClick={this.onClickDeleteDrafts}
-                        >
-                            delete drafts
-                        </Button>
+                            <Button
+                                color={'secondary'}
+                                onClick={this.onClickDeleteDrafts}
+                            >
+                                delete drafts
+                            </Button>
+                        </Box>
+
                     </Grid>
                 </Grid>
             </Paper>

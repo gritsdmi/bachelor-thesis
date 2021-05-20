@@ -4,7 +4,6 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 
 import {del, handleResponseError, post} from "../../utils/request"
-import Button from "@material-ui/core/Button";
 import CommissionCard from "../../components/commission/CommissionCard";
 import {withStyles} from "@material-ui/core/styles";
 import Pagination from '@material-ui/lab/Pagination';
@@ -226,9 +225,7 @@ class CommissionsListPage extends React.Component {
                         Commissions List Page
                     </h1>
                 </Box>
-                <Box>
-                    <Button onClick={this.onClearButtonClick}>Clear commissions</Button>
-                </Box>
+
                 <CommissionSearchBox
                     onChange={this.onChangeFilter}
                     onClickGenButton={this.onClickGenerateCSV}

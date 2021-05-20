@@ -6,6 +6,7 @@ import MomentUtils from "@date-io/moment";
 import TodayIcon from "@material-ui/icons/Today";
 import Button from "@material-ui/core/Button";
 import LocationEditDialog from "./LocationEditDialog";
+import Box from "@material-ui/core/Box";
 
 const dateTimeFormatMoment = "DD.MM.yyyy HH:mm"
 
@@ -24,6 +25,13 @@ const useStyles = makeStyles((theme) => ({
     commissionPropsPaper: {
         marginTop: theme.spacing(2),
         marginBottom: theme.spacing(2),
+        display: "flex",
+        flexDirection: 'row',
+    },
+    buttonBox: {
+        padding: theme.spacing(2),
+        display: 'flex',
+        alignItems: 'center',
     },
 
 }));
@@ -151,13 +159,15 @@ export default function CommissionProps({
                     </MenuItem>
                 ))}
             </TextField>
-            <Button
-                color={"primary"}
-                variant={"contained"}
-                onClick={() => onClickNewLocation()}
-            >
-                new location
-            </Button>
+            <Box className={classes.buttonBox}>
+                <Button
+                    color={"primary"}
+                    variant={"contained"}
+                    onClick={() => onClickNewLocation()}
+                >
+                    new location
+                </Button>
+            </Box>
         </Paper>
     )
 }

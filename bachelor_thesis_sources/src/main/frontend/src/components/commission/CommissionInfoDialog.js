@@ -106,7 +106,11 @@ class CommissionInfoDialog extends React.Component {
                         className={classes.cell}
                         align={'right'}
                     >
-                        <Button onClick={this.onSendEmailButtonClick(teacher)}>Send email</Button>
+                        <Button
+                            color={'primary'}
+                            variant={'contained'}
+                            onClick={this.onSendEmailButtonClick(teacher)}
+                        >Send email</Button>
                     </TableCell>
                 </TableRow>
             )

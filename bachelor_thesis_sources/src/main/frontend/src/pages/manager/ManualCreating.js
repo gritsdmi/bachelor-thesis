@@ -419,6 +419,11 @@ class ManualCreatingPage extends React.Component {
         this.fetchLocations()
     }
 
+    onTeacherSave = () => {
+        this.fetchTeachers()
+        this.onCloseEditTeacherDialog()
+    }
+
     render() {
 
         if (!this.state.locations || !this.state.degrees) {
@@ -450,6 +455,7 @@ class ManualCreatingPage extends React.Component {
                         open={this.state.editTeacherDialogOpen}
                         onClose={this.onCloseEditTeacherDialog}
                         teacher={this.state.currentTeacher}
+                        onTeacherSave={this.onTeacherSave}
                     />
                     <Snackbar
                         anchorOrigin={{
