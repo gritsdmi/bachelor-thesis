@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log
 @Service
@@ -38,8 +40,11 @@ public class CommissionMaker {
         log.warning(creatorTO.toString());
 
         var teachersFreeToday = userService.getAvailableTeachersByDate(creatorTO.getDate());
-        //todo add logic(titul, pozice)
-        log.warning(String.valueOf(teachersFreeToday.size()));
+        teachersFreeToday = teachersFreeToday.stream()
+                .filter(user -> correctExamTypeFilter(user, creatorTO))
+                .collect(Collectors.toList());
+
+        log.warning("teachersFreeToday size" + String.valueOf(teachersFreeToday.size()));
         log.info("generation start");
         var gen = Generator.combination(teachersFreeToday)
                 .simple(len);
@@ -66,6 +71,21 @@ public class CommissionMaker {
                     .count();
         }
         return countP != 0;
+    }
+
+    private boolean correctExamTypeFilter(User user, CreatorTO creatorTO) {
+        if (user.getTeacher().getCommissionTypes() == null
+                || user.getTeacher().getCommissionTypes().equals("")) {
+            return false;
+        }
+        var teacherCommissionTypes = user.getTeacher().getCommissionTypes();
+        var degrees = Set.of(teacherCommissionTypes.split(","));
+
+        if (degrees.contains(creatorTO.getDegree().toString())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean teacherHavePermission(List<User> users) {

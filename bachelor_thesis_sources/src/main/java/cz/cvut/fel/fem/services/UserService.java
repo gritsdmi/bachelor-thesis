@@ -370,7 +370,7 @@ public class UserService {
 
                     var user = new User();
                     user.setSurname(v.get(0));
-                    user.setEmailAddress(v.get(4));
+//                    user.setEmailAddress(v.get(4));
                     user.setLogin(v.get(0));
                     user.setPassword(new BCryptPasswordEncoder().encode(v.get(0)));
 
