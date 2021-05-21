@@ -117,7 +117,7 @@ class GenerateCSVDialog extends React.Component {
                 onClose={this.props.onClose}
                 fullWidth
             >
-                <DialogTitle className={classes.title}>CSV</DialogTitle>
+                <DialogTitle className={classes.title}>Generate XLS</DialogTitle>
                 <DialogContent dividers>
                     <Grid
                         container

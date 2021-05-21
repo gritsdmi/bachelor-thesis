@@ -53,7 +53,7 @@ class Header extends React.Component {
                 user: getUserFromLS() ? getUserFromLS() : '',
             })
             console.log(this.state, this.props)
-            this.fetchUser()
+            // this.fetchUser()
         }
     }
 

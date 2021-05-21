@@ -25,7 +25,16 @@ const useStyles = theme => ({
     firstCol: {
         width: '250px',
         border: 'none',
-    }
+    },
+    title: {
+        textAlign: 'center',
+    },
+    typography: {
+        alignSelf: 'center',
+    },
+    gridLine: {
+        padding: theme.spacing(2),
+    },
 
 });
 
@@ -130,27 +139,37 @@ class CommissionInfoDialog extends React.Component {
                     <DialogContent
                         dividers
                     >
-                        <Grid
-                            container
-                            direction={'column'}
-                        >
-                            <Typography>
-                                Exam date {this.state.commission.exam.date}
-                            </Typography>
-                            <Typography>
-                                State {this.state.commission.state}
-                            </Typography>
-                            <Typography>
-                                Location
-                                {" " + this.props.commission.exam.location.building + ": " +
-                                this.props.commission.exam.location.classroom}
-                            </Typography>
-                            <Table>
-                                <TableBody>
-                                    {teacherTable}
-                                </TableBody>
-                            </Table>
+                        {/*<Grid container direction={'column'}>*/}
+                        <Grid container className={classes.gridLine}>
+                            <Grid item xs={3} className={classes.typography}> <Typography>Exam date</Typography> </Grid>
+                            <Grid item>
+                                <Typography>{this.state.commission.exam.date}</Typography>
+                            </Grid>
                         </Grid>
+
+                        <Grid container className={classes.gridLine}>
+                            <Grid item xs={3} className={classes.typography}> <Typography>State</Typography> </Grid>
+                            <Grid item>
+                                <Typography>{this.state.commission.state}</Typography>
+                            </Grid>
+                        </Grid>
+
+                        <Grid container className={classes.gridLine}>
+                            <Grid item xs={3} className={classes.typography}> <Typography>Location</Typography> </Grid>
+                            <Grid item>
+                                <Typography>
+                                    {" " + this.props.commission.exam.location.building + ": " +
+                                    this.props.commission.exam.location.classroom}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+
+                        <Table>
+                            <TableBody>
+                                {teacherTable}
+                            </TableBody>
+                        </Table>
+                        {/*</Grid>*/}
                     </DialogContent>
                     <DialogActions>
                         <Button

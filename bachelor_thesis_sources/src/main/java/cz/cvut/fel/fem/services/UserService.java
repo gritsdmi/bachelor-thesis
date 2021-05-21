@@ -116,7 +116,7 @@ public class UserService {
     public List<User> getAvailableTeachersByDate(String dateStr) {
         var teachersWhoCan = getTeachersWhoCan();
         var examsToday = examService.getByDate(dateStr);
-        log.warning("exams today " + dateStr + " " + examsToday.toString());
+//        log.warning("exams today " + dateStr + " " + examsToday.toString());
         var teacherExamToday = examsToday
                 .stream()
                 .map(exam -> exam.getCommission().getTeachers())

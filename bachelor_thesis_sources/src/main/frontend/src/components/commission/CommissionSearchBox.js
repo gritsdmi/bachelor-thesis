@@ -329,7 +329,7 @@ class CommissionSearchBox extends React.Component {
                                 variant={"contained"}
                                 className={classes.button}
                             >
-                                Generate CSV
+                                Generate XLS
                             </Button>
                             <Button
                                 color={'primary'}

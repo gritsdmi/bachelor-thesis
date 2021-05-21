@@ -46,7 +46,7 @@ public class AuthController implements Controller {
 
     @PostMapping("/auth")
     public ResponseEntity<?> authCreateToken(@RequestBody Request request) throws Exception {
-        log.info("auth request");
+//        log.info("auth request");
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -62,7 +62,7 @@ public class AuthController implements Controller {
         final var userFromDb = userService.getUserByName(request.getUsername()).get(0);
 
         assert userFromDb != null;
-        log.info(userDetails.toString());
+//        log.info(userDetails.toString());
         var response = ResponseEntity.ok(new Response(jwt,
                 userFromDb.getId(),
                 userDetails.getUsername(),
