@@ -31,7 +31,7 @@ public class CSVCreator {
     private final String fileNameLocal = "src/main/resources/new.xlsx";
     private final String fileNameDeploy = "../webapps/fem/WEB-INF/classes/new.xlsx";
 
-//        private String fileName = fileNameLocal;
+//    private String fileName = fileNameLocal;
     private String fileName = fileNameDeploy;
 
     public File generateCSV(GenerateCSVRequestTO request) throws ParseException {
@@ -152,6 +152,10 @@ public class CSVCreator {
         style.setWrapText(true);
 
         Cell cell;
+        cell = row.createCell(celCounter++);
+        cell.setCellValue(rowCounter);
+        cell.setCellStyle(style);
+
 
         for (int i = 0; i < 5; i++) {
             cell = row.createCell(celCounter++);

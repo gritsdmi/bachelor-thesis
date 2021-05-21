@@ -77,6 +77,10 @@ public class UserService {
         return userRepository.getAllTeachers();
     }
 
+    public User getUser(Long id) {
+        return userRepository.getOne(id);
+    }
+
     public User getTeacher(Long id) {
         return userRepository.getUserByIdAndTeacherNotNull(id);
     }
@@ -370,7 +374,7 @@ public class UserService {
 
                     var user = new User();
                     user.setSurname(v.get(0));
-//                    user.setEmailAddress(v.get(4));
+                    user.setEmailAddress(" ");
                     user.setLogin(v.get(0));
                     user.setPassword(new BCryptPasswordEncoder().encode(v.get(0)));
 
@@ -382,6 +386,7 @@ public class UserService {
                     tProps.setContract(Double.parseDouble(v.get(2)));
                     tProps.setPositionInCommissions(parsePosition(v.get(4)));
                     tProps.setCommissionTypes(Degree.Bc.toString());
+                    tProps.setExtern(false);
 
                     user.setTeacher(tProps);
                     userRepository.save(user);
