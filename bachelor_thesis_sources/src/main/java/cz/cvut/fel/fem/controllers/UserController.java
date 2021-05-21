@@ -35,8 +35,13 @@ public class UserController implements Controller {
         return userService.getAllTeachers();
     }
 
-    @GetMapping("/teacher/{id}")
+    @GetMapping("/{id}")
     public User get(@PathVariable Long id) {
+        return userService.getUser(id);
+    }
+
+    @GetMapping("/teacher/{id}")
+    public User getTeacher(@PathVariable Long id) {
         return userService.getTeacher(id);
     }
 

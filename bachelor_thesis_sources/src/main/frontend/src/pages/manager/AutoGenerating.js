@@ -95,7 +95,7 @@ class AutoGeneratingPage extends React.Component {
         post(`/commission/${commission.id}/toEditState`)
             .then(res => this.setState({
                 commissions: res.data
-            }))
+            }, () => this.onGenerationComplete()))
             .catch(err => handleResponseError(err))
     }
 

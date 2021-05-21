@@ -162,9 +162,8 @@ public class CommissionService {
     /**
      * Used when manager clicks on "CREATE" button in autogenerate commissions.
      * <p>
-     * updating commission to the EDITED state
-     * delete every commission, with same teachers today
-     * todo delete every commission with same location in same day (т.е удалить все остальные, кроме текущей)
+     * updating commission to the EDITED state.
+     * Delete every commission, with same teachers today
      *
      * @return updated Commission
      */
@@ -172,17 +171,20 @@ public class CommissionService {
         var comm = commissionRepository.getOne(commissionId);
 
         comm.setState(CommissionState.EDITABLE);
+        commissionRepository.save(comm);
 
-        var allDrafts = getDrafts();
-        var draftsToRemove = allDrafts.stream()
-                .filter(draft -> !draft.getId().equals(commissionId))
-                .filter(draft -> draft.getExam().getLocation().equals(comm.getExam().getLocation()))
-                .filter(draft -> draft.getExam().getDate().equals(comm.getExam().getDate()))
-                .collect(Collectors.toList());
+//        var allDrafts = getDrafts();
+//        var draftsToRemove = allDrafts.stream()
+//                .filter(draft -> !draft.getId().equals(commissionId))
+//                .filter(draft -> draft.getExam().getLocation().equals(comm.getExam().getLocation()))
+//                .filter(draft -> draft.getExam().getDate().equals(comm.getExam().getDate()))
+//                .collect(Collectors.toList());
+//
+//        remove(draftsToRemove);
 
-        remove(draftsToRemove);
+        removeDrafts();
 
-        return commissionRepository.save(comm);
+        return commissionRepository.getOne(comm.getId());
     }
 
     /**
