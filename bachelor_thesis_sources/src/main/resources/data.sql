@@ -14,36 +14,32 @@ SELECT setval('email_template_id_seq', 5, true);
 
 
 INSERT INTO users (id, name, surname, email_address, login, password, first_login, role, active)
-VALUES (1, 'jiri', 'sebek', 'sebek@sebek.cz', 'sebek', '$2a$10$1Fr6FMbll24BznwB8caG3uXMozsCQTPwHaP.tfYC8LunV6BvfjdwK',
-        false, 'ROLE_TEACHER', true),
-       (2, 'test_email', 'test_email', 'dimagr13@seznam.cz', 'email',
-        '$2a$10$sVEgKnDYAss49ugFMdEPb.6yOEV8Z8FQnCSwTTpNsggcuudG5UoSq', false, 'ROLE_TEST', true),
-       (3, 'manager', 'manager', 'manager@sebek.cz', 'manager',
-        '$2a$10$zaGeKWRLIEvYhkHC2Uscue1sHVwE2CqudrSlPMGOiMYaWY47byUQq', false, 'ROLE_MANAGER', true);
-SELECT setval('users_id_seq', 3, true);
+VALUES (1, 'admin', 'admin', 'admin@cvut.fel.cz', 'admin',
+        '$2y$10$XEa9HvTAd7ITL3mE21aSXuVGKb7QBIbQwGWItGqQqM3ehTtwBF/NG', false, 'ROLE_MANAGER', true);
+SELECT setval('users_id_seq', 1, true);
 
 
-INSERT INTO teacher_property (id, contract)
-VALUES (2, 1),
-       (1, 1);
-SELECT setval('teacher_property_id_seq', 2, true);
+-- INSERT INTO teacher_property (id, contract)
+-- VALUES (2, 1),
+--        (1, 1);
+-- SELECT setval('teacher_property_id_seq', 2, true);
 
 INSERT INTO manager_property (id)
-VALUES (3);
+VALUES (1);
 SELECT setval('manager_property_id_seq', 1, true);
 
 
-UPDATE users
-SET teacher = 2
-WHERE id = 2;
+-- UPDATE users
+-- SET teacher = 2
+-- WHERE id = 2;
+
+-- UPDATE users
+-- SET teacher = 1
+-- WHERE id = 1;
 
 UPDATE users
-SET teacher = 1
+SET manager = 1
 WHERE id = 1;
-
-UPDATE users
-SET manager = 3
-WHERE id = 3;
 
 INSERT INTO exam (id, degree, location_id, semester)
 VALUES (1, 'Bc', 2, 'Summer 2020/2021');
