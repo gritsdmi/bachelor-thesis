@@ -36,7 +36,7 @@ a {
 .footerBox {
     background-color: #333333;
     color: white;
-    height: 50px;
+    height: 70px;
     padding: 20px;
     margin-top: auto;
     border-top-left-radius: 5px;
@@ -54,8 +54,8 @@ a {
 }
 
 .header {
-    padding: 30px;
-    min-height: 200px;
+    padding: 30px 30px 10px;
+    min-height: 10px;
 }
 
 #uniqueButton {

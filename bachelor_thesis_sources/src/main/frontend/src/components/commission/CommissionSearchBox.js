@@ -17,6 +17,9 @@ const useStyles = theme => ({
         margin: theme.spacing(1),
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
+        width: "150px",
+    },
+    semester: {
         width: "170px",
     },
     flex: {
@@ -35,6 +38,8 @@ const useStyles = theme => ({
     rightBox: {
         display: 'flex',
         alignItems: 'center !important',
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
     },
     leftBox: {
         display: 'flex',
@@ -261,7 +266,7 @@ class CommissionSearchBox extends React.Component {
                                 value={this.state.selectedSemester}
                                 onChange={this.onChangeSelect}
                                 helperText="Semester"
-                                className={classes.item}
+                                className={`${classes.item} ${classes.semester}`}
                             >
                                 {this.state.semesters.map((semester, idx) => (
                                     <MenuItem

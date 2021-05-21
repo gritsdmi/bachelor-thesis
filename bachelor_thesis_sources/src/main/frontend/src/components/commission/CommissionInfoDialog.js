@@ -80,7 +80,10 @@ class CommissionInfoDialog extends React.Component {
         }
         post(`/commission/${commission.id}`, payload)
             .then(response => this.setState({commission: response.data}
-                , () => this.props.updComm(response.data)))
+                , () => {
+                    this.props.updComm(response.data)
+                    this.props.onClose()
+                }))
             .catch(error => handleResponseError(error))
     }
 

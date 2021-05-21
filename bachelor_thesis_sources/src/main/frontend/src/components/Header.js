@@ -6,6 +6,7 @@ import {NavLink} from "react-router-dom";
 import {get, getUserFromLS} from "../utils/request"
 import {Typography} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
 
 
 const useStyles = theme => ({
@@ -16,6 +17,15 @@ const useStyles = theme => ({
     flex: {
         display: 'flex',
     },
+    log: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    flexVert: {
+        display: "flex",
+        flexDirection: 'column',
+
+    }
 
 })
 
@@ -24,6 +34,7 @@ const InitialState = {
     username: null,
     role: null,
     user: '',
+    fullUser: '',
 }
 
 class Header extends React.Component {
@@ -31,6 +42,7 @@ class Header extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            ...InitialState,
             user: getUserFromLS() ? getUserFromLS() : '',
         }
     }
@@ -40,6 +52,18 @@ class Header extends React.Component {
             this.setState({
                 user: getUserFromLS() ? getUserFromLS() : '',
             })
+            console.log(this.state, this.props)
+            this.fetchUser()
+        }
+    }
+
+    fetchUser() {
+        if (this.props.loggedUserId) {
+            get(`/user/${this.props.loggedUserId}`)
+                .then(res => this.setState({
+                    fullUser: res.data,
+                }))
+
         }
     }
 
@@ -61,60 +85,72 @@ class Header extends React.Component {
         return (
 
             <Paper className={'header'}>
-                <Box>
-                    <Typography variant={'h3'}>
-                        Final exam commissions manager
-                    </Typography>
-                </Box>
-                <>
-                    <Box>
-                        <Typography>
-                            user:
-                            {this.state.user.username}
-                            {this.state.user.role}
-                        </Typography>
-                    </Box>
-                    <Box className={classes.buttons}>
-                        {(this.state.user.role === 'ROLE_MANAGER'
-                            || this.state.user.role === 'ROLE_TEST'
-                            || this.props.loggedUserRole === 'ROLE_TEST'
-                            || this.props.loggedUserRole === 'ROLE_MANAGER')
-                        &&
-                        <Box className={classes.flex}>
-                            <NavLink to="/commissions"> Commissions List </NavLink>
-                            <NavLink to="/auto">Auto Generating</NavLink>
-                            <NavLink to="/manual">Manual Generating</NavLink>
-                            <NavLink to="/manage">Manage teachers</NavLink>
-                            <NavLink to="/emails">emails</NavLink>
-                            <NavLink to="/permissions">admin</NavLink>
+                <Grid container>
+                    <Grid item xs>
+
+                        <Box>
+                            <Typography variant={'h3'}>
+                                Final exam commissions manager
+                            </Typography>
                         </Box>
-                        }
-                        {(this.state.user.role === 'ROLE_TEACHER'
-                            || this.state.user.role === 'ROLE_TEST'
-                            || this.props.loggedUserRole === 'ROLE_TEST'
-                            || this.props.loggedUserRole === 'ROLE_TEACHER')
-                        &&
-                        <Box className={classes.flex}>
-                            <NavLink to="/teacher">Teacher</NavLink>
-                            <NavLink to="/teacherPref">Teacher settings</NavLink>
+                        <>
+
+                            <Box className={classes.buttons}>
+                                {(this.state.user.role === 'ROLE_MANAGER'
+                                    || this.state.user.role === 'ROLE_TEST'
+                                    || this.props.loggedUserRole === 'ROLE_TEST'
+                                    || this.props.loggedUserRole === 'ROLE_MANAGER')
+                                &&
+                                <Box className={classes.flex}>
+                                    <NavLink to="/commissions"> Commissions List </NavLink>
+                                    <NavLink to="/auto">Auto Generating</NavLink>
+                                    <NavLink to="/manual">Manual Generating</NavLink>
+                                    <NavLink to="/manage">Manage teachers</NavLink>
+                                    <NavLink to="/emails">emails</NavLink>
+                                    <NavLink to="/permissions">admin</NavLink>
+                                </Box>
+                                }
+                                {(this.state.user.role === 'ROLE_TEACHER'
+                                    || this.state.user.role === 'ROLE_TEST'
+                                    || this.props.loggedUserRole === 'ROLE_TEST'
+                                    || this.props.loggedUserRole === 'ROLE_TEACHER')
+                                &&
+                                <Box className={classes.flex}>
+                                    <NavLink to="/teacher">Teacher</NavLink>
+                                    <NavLink to="/teacherPref">Teacher settings</NavLink>
+                                </Box>
+                                }
+                                {/*<Button*/}
+                                {/*    color={'secondary'}*/}
+                                {/*    variant={'contained'}*/}
+                                {/*    onClick={this.onClickParseTeachers}*/}
+                                {/*>*/}
+                                {/*    Parse teachers*/}
+                                {/*</Button>*/}
+
+                            </Box>
+                        </>
+                    </Grid>
+                    <Grid item xs={2} className={classes.log}>
+                        {/*{this.props.loggedUserRole &&*/}
+                        <Box className={classes.flexVert}>
+                            <Button
+                                color={'secondary'}
+                                variant={'contained'}
+                                onClick={this.logout}
+                            >
+                                Logout
+                            </Button>
+                            <Typography>
+                                {this.state.fullUser.name}
+                                {" "}
+                                {this.state.fullUser.surname}
+                                {" "}
+                            </Typography>
                         </Box>
-                        }
-                        <Button
-                            color={'secondary'}
-                            variant={'contained'}
-                            onClick={this.onClickParseTeachers}
-                        >
-                            Parse teachers
-                        </Button>
-                        <Button
-                            color={'secondary'}
-                            variant={'contained'}
-                            onClick={this.logout}
-                        >
-                            Logout
-                        </Button>
-                    </Box>
-                </>
+                        {/*}*/}
+                    </Grid>
+                </Grid>
             </Paper>
         )
     }

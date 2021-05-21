@@ -23,7 +23,8 @@ function App() {
     const [loggedUserRole, setLoggedUserRole] = React.useState('')
 
     function onLogin(user) {
-        setLoggedUserId(user.id)
+        console.log(user)
+        setLoggedUserId(user.userId)
         setLoggedUserRole(user.role)
     }
 
@@ -36,7 +37,11 @@ function App() {
         <ThemeProvider theme={femTheme}>
             <CssBaseline>
                 <Container className={'mainContainer'}>
-                    <Header loggedUserRole={loggedUserRole} onLogout={onLogout}/>
+                    <Header
+                        loggedUserRole={loggedUserRole}
+                        loggedUserId={loggedUserId}
+                        onLogout={onLogout}
+                    />
                     <Switch> {/* The Switch decides which component to show based on the current URL.*/}
                         {/*<Route exact path="/" render={() => <Redirect to={"/commissions"}/>}/>*/}
                         {/*<Route exact path="/" component={CommissionsListPage}/>*/}
